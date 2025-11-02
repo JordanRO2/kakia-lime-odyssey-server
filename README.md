@@ -2,7 +2,7 @@
 ### Built for the Korean CBT3 Client of the game (rev 211)
 _There are some references to the AriaGames client in the code, but that will not work at the moment with this emulator_
 
-This is built in C# .NET 9, when you run the server the first time it will generate a default config.json file listening on localhost as default.
+This is built in C# .NET 10, when you run the server the first time it will generate a default config.json file listening on localhost as default.
 If you are running the server on the same PC as you are playing on, then you shouldn't need to make any changes to the config file.
 The `"Crypto": true` part in the config need to be set in order to work with the Korean CBT3 client, this option is here only because we disabled it when experimenting with the AriaGames client.
 
