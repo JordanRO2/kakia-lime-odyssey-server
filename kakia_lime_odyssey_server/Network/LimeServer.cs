@@ -26,9 +26,12 @@ public class LimeServer : SocketServer
 	public static Dictionary<uint, List<NPC>> Npcs = new();
 	public static Dictionary<uint, List<Monster>> Mobs = new();
 	public static DateTime StartTime = DateTime.Now;
+
 	public Config Config { get; set; }
 
 	public BackgroundTask BackgroundTask { get; set; }
+
+	private static uint _currentObjInstID = 200000;
 
 	public LimeServer(Config cfg) : base(cfg.ServerIP, cfg.Port)
 	{
@@ -49,7 +52,7 @@ public class LimeServer : SocketServer
 		foreach (var mob in  mapMobs)
 		{
 			var monster = MonsterDB.FirstOrDefault(mDb => mDb.ModelTypeID == mob.ModelTypeId);
-			Monster newMob = new Monster(monster, (uint)mob.Id, mob.Pos, new FPOS() { x = 0.9f, y = 0, z = 0}, (uint)mob.ZoneId, false, mob.LootTableId);
+			Monster newMob = new Monster(monster, GenerateUniqueObjectId(), mob.Pos, new FPOS() { x = 0.9f, y = 0, z = 0}, (uint)mob.ZoneId, false, mob.LootTableId);
 			AddNPC(newMob);
 		}
 
@@ -217,6 +220,8 @@ public class LimeServer : SocketServer
 			switch (npc.GetNPCType())
 			{
 				case NPC_TYPE.MOB:
+					if ((npc as Monster).Despawned)
+						continue;
 					pw.Write((npc as Monster).GetEnterSight());
 					break;
 
@@ -285,5 +290,10 @@ public class LimeServer : SocketServer
 			if (pc == sender || pc.GetZone() != sender.GetZone()) continue;
 			pc.Send(packet, token).Wait();
 		}
+	}
+
+	public static uint GenerateUniqueObjectId()
+	{ 	
+		return Interlocked.Increment(ref _currentObjInstID);
 	}
 }

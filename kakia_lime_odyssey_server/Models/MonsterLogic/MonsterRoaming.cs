@@ -13,19 +13,26 @@ public partial class Monster : INPC
 			return;
 		}
 
-		Random rnd = new Random();
-		if (_actionStartTick < 20 + rnd.Next(0, 100))
-		{
-			_actionStartTick++;
+		// Wait until the next roam decision time (serverTick is milliseconds since server start)
+		if (serverTick < _nextRoamDecisionTick)
 			return;
-		}
 
+		// Random wait until next roam decision (500ms - 2500ms)
+		int waitMs = 500 + _rng.Next(0, 2000);
+		_nextRoamDecisionTick = serverTick + (uint)waitMs;
+
+		// Pick a new destination within radius around the original spawn
 		FPOS newDestination;
-		do { newDestination = _originalPosition.GetRandomPositionWithinRadius(250); } while (_destination.Compare(Position));
-		SetNewDestination(newDestination, serverTick);
+		int tries = 0;
+		do
+		{
+			newDestination = _originalPosition.GetRandomPositionWithinRadius(25);
+			if (++tries > 8) // avoid infinite loops
+				break;
+		}
+		// Ensure the new destination isn't the exact current position
+		while (newDestination.Compare(Position));
 
-		// Turn monster towards destination
-		var sc_stop = GetStopPacket(newDestination, serverTick);
-		SendToNearbyPlayers(sc_stop, playerClients);
+		SetNewDestination(newDestination, serverTick);
 	}
 }

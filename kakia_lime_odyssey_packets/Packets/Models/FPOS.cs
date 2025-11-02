@@ -1,10 +1,16 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.Models;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct FPOS
 {
+	private static double HalfPI = Math.PI / 2;
+	private static double _2PI = Math.PI * 2;
+	private static float s_epsilon = 0.0099999998f;
+
+
 	public float x;
 	public float y;
 	public float z;
@@ -13,18 +19,14 @@ public struct FPOS
 	{
 		double dx = destination.x - x;
 		double dy = destination.y - y;
-		double dz = 0; //destination.z - z;
-
-		// Calculate the magnitude of the direction vector
-		double magnitude = Math.Sqrt(dx * dx + dy * dy);
-
-		// Normalize the direction vector
-		return new FPOS
+		var dirVec = new FPOS
 		{
-			x = (float)(dx / magnitude),
-			y = (float)(dy / magnitude),
+			x = (float)dx,
+			y = (float)dy,
 			z = 0
 		};
+
+		return dirVec.Unitize();
 	}
 
 	public bool IsNaN()
@@ -47,7 +49,7 @@ public struct FPOS
 		return distance / velocity; 
 	}
 
-	public FPOS CalculateCurrentPosition(FPOS destination, double velocity, double elapsedTime, double epsilon = 0.0001)
+	public FPOS CalculateCurrentPosition(FPOS destination, double velocity, double elapsedTime)
 	{
 		FPOS direction = CalculateDirection(destination);
 		double distanceTraveled = velocity * elapsedTime;
@@ -57,9 +59,9 @@ public struct FPOS
 		double currentZ = z + direction.z * distanceTraveled;
 
 		// Check if the new position is within epsilon distance of the destination
-		if (Math.Abs(currentX - destination.x) < epsilon &&
-			Math.Abs(currentY - destination.y) < epsilon &&
-			Math.Abs(currentZ - destination.z) < epsilon)
+		if (Math.Abs(currentX - destination.x) < s_epsilon &&
+			Math.Abs(currentY - destination.y) < s_epsilon &&
+			Math.Abs(currentZ - destination.z) < s_epsilon)
 		{
 			return destination;
 		}
@@ -100,11 +102,11 @@ public struct FPOS
 		};
 	}
 
-	public bool Compare(FPOS other, float epsilon = 0.0001f)
+	public bool Compare(FPOS other)
 	{		
-		return Math.Abs(x - other.x) < epsilon && 
-			   Math.Abs(y - other.y) < epsilon && 
-			   Math.Abs(z - other.z) < epsilon;
+		return Math.Abs(x - other.x) < s_epsilon && 
+			   Math.Abs(y - other.y) < s_epsilon && 
+			   Math.Abs(z - other.z) < s_epsilon;
 	}
 
 	public FPOS CalculatePositionAtPercentage(FPOS destination, double percentage)
@@ -116,5 +118,65 @@ public struct FPOS
 			x = (float)(x + direction.x * distanceToTravel), 
 			y = (float)(y + direction.y * distanceToTravel), 
 			z = (float)(z + direction.z * distanceToTravel) }; 
+	}
+
+	public float GetLength(FPOS pos)
+	{
+		return (float)Math.Sqrt(z * z + y * y + x * x);
+	}
+
+	public FPOS Unitize() 
+	{ 
+		double fLength = GetLength(this);
+		float x = 0;
+		float y = 0;
+		float z = 0;
+
+		if (fLength > 0.0000009999999974752427) 
+		{
+			double fRecip = 1.0 / fLength;
+			x = (float)(this.x * fRecip);
+			y = (float)(this.y * fRecip);
+			z = (float)(this.z * fRecip);
+		} 
+
+		return new FPOS()
+		{
+			x = x,
+			y = y,
+			z = z
+		}; 
+	}
+
+
+	public static void Cross(FPOS vector1, FPOS vector2, out FPOS result) 
+	{ 
+		result = new FPOS 
+		{ 
+			x = vector1.y * vector2.z - vector1.z * vector2.y, 
+			y = vector1.z * vector2.x - vector1.x * vector2.z, 
+			z = vector1.x * vector2.y - vector1.y * vector2.x 
+		}; 
+	}
+
+
+	public static FPOS operator *(FPOS point, float scalar) 
+	{ 
+		return new FPOS() 
+		{ 
+			x = point.x * scalar,
+			y = point.y * scalar, 
+			z = point.z * scalar 
+		}; 
+	}
+
+	public static FPOS operator +(FPOS point1, FPOS point2) 
+	{ 
+		return new FPOS()
+		{
+			x = point1.x + point2.x,
+			y = point1.y + point2.y,
+			z = point1.z + point2.z
+		}; 
 	}
 }

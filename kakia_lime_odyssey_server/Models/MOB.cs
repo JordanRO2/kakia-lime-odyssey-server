@@ -34,6 +34,17 @@ public class MOB : INPC
 			stopType = StopType
 		};
 	}
+
+	public SC_LEAVE_SIGHT_MONSTER GetLeaveSight()
+	{
+		return new()
+		{
+			leave_zone = new()
+			{
+				objInstID = Id
+			}
+		};
+	}
 }
 
 public enum MOB_STATE

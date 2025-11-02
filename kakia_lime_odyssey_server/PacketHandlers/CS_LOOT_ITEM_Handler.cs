@@ -86,7 +86,7 @@ class CS_LOOT_ITEM_Handler : PacketHandler
 			}
 		}
 
-		entity.Loot(item);
+		entity?.Loot(item);
 
 		SC_LOOTED_ITEM sc_looted = new()
 		{

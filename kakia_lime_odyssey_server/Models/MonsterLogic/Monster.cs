@@ -15,6 +15,8 @@ public partial class Monster : INPC, IEntity
 {
 	private readonly XmlMonster _mobInfo;
 
+	public PosCalc mobPosition;
+
 	public FPOS Position { get; set; }
 	public FPOS Direction { get; set; }
 	public uint Zone { get; set; }
@@ -37,9 +39,14 @@ public partial class Monster : INPC, IEntity
 	private FPOS _destination;
 	private FPOS _originalPosition;
 
+	private static readonly Random _rng = Random.Shared;
+	private uint _nextRoamDecisionTick = 0;
+
 	private uint _actionStartTick;
 	private uint _lastTick;
 	public bool IsMoving;
+
+	public bool Despawned = false;
 
 	private MOVE_TYPE _moveType = MOVE_TYPE.MOVE_TYPE_WALK;
 
@@ -52,11 +59,14 @@ public partial class Monster : INPC, IEntity
 	public Monster(XmlMonster mobInfo, uint id, FPOS pos, FPOS dir, uint zone, bool aggro, int lootTable)
 	{
 		_mobInfo = mobInfo;
+
+		mobPosition = new PosCalc();
+
 		Position = pos;
 		Direction = dir;
 		Zone = zone;
 		Id = id;
-		_originalPosition = pos;
+		_originalPosition = pos with { };
 
 		Lv = (uint)_mobInfo.Level;
 		MMP = (uint)_mobInfo.MMP;
@@ -86,6 +96,11 @@ public partial class Monster : INPC, IEntity
 	public SC_ENTER_SIGHT_MONSTER GetEnterSight()
 	{
 		return GetMob().GetEnterSight();
+	}
+
+	public SC_LEAVE_SIGHT_MONSTER GetLeaveSight()
+	{
+		return GetMob().GetLeaveSight();
 	}
 
 	public MOB GetMob()
@@ -142,9 +157,23 @@ public partial class Monster : INPC, IEntity
 			if (CurrentTarget != null)
 				CurrentTarget = null;
 
-			if (serverTick - _actionStartTick > 60_000)
+			if (!Despawned && serverTick - _actionStartTick > 30_000)
 			{
-				// Despawn
+				_actionStartTick = serverTick;
+				Despawned = true;
+				using PacketWriter pw = new(false);
+				pw.Write(GetLeaveSight());
+				SendToNearbyPlayers(pw.ToPacket(), playerClients);
+			}
+			else if (Despawned && serverTick - _actionStartTick > 3 * 30_000)
+			{
+				Spawn();
+				_actionStartTick = serverTick;
+				Despawned = false;
+
+				using PacketWriter pw = new(false);
+				pw.Write(GetEnterSight());
+				SendToNearbyPlayers(pw.ToSizedPacket(), playerClients);
 			}
 
 			return;
@@ -190,46 +219,49 @@ public partial class Monster : INPC, IEntity
 		}
 	}
 
-	private void MoveTowardsDestination(uint serverTick, ReadOnlySpan<PlayerClient> playerClients, double distance = 0)
+	private void MoveTowardsDestination(uint serverTick, ReadOnlySpan<PlayerClient> playerClients, double distance = 0.1)
 	{
-		var currentPosition = GetMobCurrentPosition(serverTick);
-		if (currentPosition.IsNaN())
-			currentPosition = Position;
+		// Use the same position interpolation used elsewhere
+		var currentPos = GetMobCurrentPosition(serverTick);
+		if (currentPos.IsNaN())
+			currentPos = Position;
 
-		double distanceToTarget = currentPosition.CalculateDistance(_destination);
-		var dir = currentPosition.CalculateDirection(_destination);
+		double distanceToTarget = currentPos.CalculateDistance(_destination);
 
-		if (!dir.IsNaN())
+		// Arrival threshold: at least the provided 'distance' but scaled with velocity so
+		// faster monsters get a larger acceptance window and avoid overshoot/oscillation.
+		double velocity = GetCurrentVelocity();
+		double arrivalThreshold = Math.Max(distance, velocity * 0.11); // multiplier tuned experimentally
+
+		// If we've reached (or are sufficiently close), snap to exact destination and stop.
+		if (currentPos.Compare(_destination) || distanceToTarget <= arrivalThreshold)
 		{
-			Direction = dir;
-			SC_DIRECTION sc_dir = new()
-			{
-				objInstID = Id,
-				dir = Direction,
-				tick = LimeServer.GetCurrentTick()
-			};
-			using PacketWriter pw = new(false);
-			pw.Write(sc_dir);
-			SendToNearbyPlayers(pw.ToPacket(), playerClients);
-		}
+			// Snap to the destination exactly to avoid floating-point jitter
+			if (!_destination.IsNaN())
+				Position = _destination;
+			else
+				Position = currentPos;
 
-		
-
-		if (currentPosition.Compare(_destination) || distanceToTarget <= distance)
-		{
-			Position = currentPosition;
 			_destination = default;
-
 
 			IsMoving = false;
 			_actionStartTick = 0;
 
+			// Optionally reset mobPosition state to a non-moving state to keep systems consistent
+			// (PosCalc.Start is called when movement begins; leaving mobPosition as-is is acceptable,
+			// but if you observe drift you can reinitialize it here.)
 			var sc_stop = GetStopPacket(Position, serverTick);
 			SendToNearbyPlayers(sc_stop, playerClients);
 			return;
 		}
 
-		var pck = GetMovePacket(currentPosition, serverTick);
+		// While moving, keep facing direction updated toward the destination for smooth visuals.
+		var dir = currentPos.CalculateDirection(_destination);
+		if (!dir.IsNaN())
+			Direction = dir;
+
+		// Build and broadcast movement packet using the same current position.
+		var pck = GetMovePacket(currentPos, serverTick);
 		SendToNearbyPlayers(pck, playerClients);
 	}
 
@@ -268,16 +300,22 @@ public partial class Monster : INPC, IEntity
 
 	private void SetNewDestination(FPOS destination, uint serverTick)
 	{
+		// Calculate direction towards the provided destination
+		var dirToDest = Position.CalculateDirection(destination);
+		var angel = (float)PosCalc.GetAngleRadian(dirToDest.x, dirToDest.y);
+
+		mobPosition.Start(serverTick, Position, GetCurrentVelocity(), GetCurrentAccel(), angel, 1.0f);
 		_destination = destination;
 
-		var dir = Position.CalculateDirection(_destination);
-		if (!dir.IsNaN())
-			Direction = dir;
+		// Update facing direction to point at the new destination if valid
+		if (!dirToDest.IsNaN())
+			Direction = dirToDest;
 
+		// store the action start time (ms)
 		if (!IsMoving)
 			_actionStartTick = serverTick;
 
-		IsMoving = true;		
+		IsMoving = true;
 	}
 
 	private byte[] GetMovePacket(FPOS currentPosition, uint serverTick)
@@ -327,6 +365,19 @@ public partial class Monster : INPC, IEntity
 			MOVE_TYPE.MOVE_TYPE_RUN => velocities.run,
 			MOVE_TYPE.MOVE_TYPE_WALK => velocities.walk,
 			_ => velocities.walk
+		};
+	}
+
+	private float GetCurrentAccel()
+	{
+		return 1.0f;
+
+		var velocities = GetVelocities();
+		return _moveType switch
+		{
+			MOVE_TYPE.MOVE_TYPE_RUN => velocities.runAccel,
+			MOVE_TYPE.MOVE_TYPE_WALK => velocities.walkAccel,
+			_ => velocities.walkAccel
 		};
 	}
 
@@ -447,5 +498,19 @@ public partial class Monster : INPC, IEntity
 	{
 		if (Loot.Contains(item))
 			Loot.Remove(item);
+	}
+
+	private void Spawn()
+	{
+		Id = LimeServer.GenerateUniqueObjectId();
+		_currentState = MOB_STATE.ROAMING;
+		IsMoving = false;
+		mobPosition = new PosCalc();
+		Position = _originalPosition with { };
+		_destination = new FPOS() { x = 0, y = 0, z = 0 };
+		Loot = null!;
+		MP = (uint)_mobInfo.MP;
+		HP = (uint)_mobInfo.HP;
+		CurrentTarget = null;
 	}
 }
