@@ -4,15 +4,15 @@ namespace kakia_lime_odyssey_server.Models.SkillXML;
 
 public class SkillSubject
 { 
-	[XmlElement(ElementName = "SubjectList")] 
-	public List<SkillSubjectList> SubjectLists { get; set; } 
+	[XmlElement(ElementName = "SubjectList")]
+	public List<SkillSubjectList> SubjectLists { get; set; } = default!; 
 }
 
 
 public class SkillSubjectList 
 { 
-	[XmlAttribute(AttributeName = "subjectLevel")] public int SubjectLevel { get; set; } 
-	[XmlAttribute(AttributeName = "detail")] public string Detail { get; set; } 
+	[XmlAttribute(AttributeName = "subjectLevel")] public int SubjectLevel { get; set; }
+	[XmlAttribute(AttributeName = "detail")] public string Detail { get; set; } = default!; 
 	[XmlAttribute(AttributeName = "range")] public double Range { get; set; } 
 	[XmlAttribute(AttributeName = "castingTime")] public double CastingTime { get; set; } 
 	[XmlAttribute(AttributeName = "coolTime")] public double CoolTime { get; set; } 
@@ -23,8 +23,8 @@ public class SkillSubjectList
 	[XmlAttribute(AttributeName = "useLP")] public int UseLP { get; set; } 
 	[XmlAttribute(AttributeName = "useLPStyle")] public int UseLPStyle { get; set; } 
 	[XmlAttribute(AttributeName = "useMP")] public int UseMP { get; set; } 
-	[XmlAttribute(AttributeName = "useMPStyle")] public int UseMPStyle { get; set; } 
-	[XmlElement(ElementName = "subject")] public List<SkillSubjectDetail> Subjects { get; set; } 
+	[XmlAttribute(AttributeName = "useMPStyle")] public int UseMPStyle { get; set; }
+	[XmlElement(ElementName = "subject")] public List<SkillSubjectDetail> Subjects { get; set; } = default!; 
 }
 
 public class SkillSubjectDetail

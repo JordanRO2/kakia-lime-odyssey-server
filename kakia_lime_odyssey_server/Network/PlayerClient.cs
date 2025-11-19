@@ -23,8 +23,8 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	private SocketClient _socketClient { get; set; }
 	private int _clientRevision { get; set; }
-	private string _accountId { get; set; }
-	private ModClientPC _currentCharacter { get; set; }
+	private string _accountId { get; set; } = default!;
+	private ModClientPC _currentCharacter { get; set; } = default!;
 	private uint _objInstID = 0;
 	private long _target = 0;
 	private bool _inCombat = false;
@@ -32,7 +32,7 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	private WorldPosition _worldPosition = new();
 	private VELOCITIES _velocities;
-	private ModCommonStatus _status;
+	private ModCommonStatus _status = default!;
 
 	private PlayerInventory _inventory { get; set; } = new();
 	private PlayerEquips _equipment { get; set; } = new();

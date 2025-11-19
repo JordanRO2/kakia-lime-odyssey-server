@@ -7,7 +7,7 @@ namespace kakia_lime_odyssey_server.Models.PcStatusXML;
 public class PcStatus
 {
 	[XmlElement("Exp")]
-	public List<Exp> Exps { get; set; }
+	public List<Exp> Exps { get; set; } = default!;
 
 	public static Dictionary<int, Exp> GetEntries()
 	{

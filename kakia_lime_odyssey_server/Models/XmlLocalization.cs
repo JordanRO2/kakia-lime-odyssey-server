@@ -2,24 +2,24 @@
 
 namespace kakia_lime_odyssey_server.Models;
 
-[XmlRoot(ElementName = "Message")] 
+[XmlRoot(ElementName = "Message")]
 public class XmlMessage
 {
 	[XmlAttribute(AttributeName = "ID")]
 	public int ID { get; set; }
 	[XmlAttribute(AttributeName = "Text")]
-	public string Text { get; set; } 
+	public string Text { get; set; } = default!;
 	[XmlAttribute(AttributeName = "Note_File")]
-	public string NoteFile { get; set; } 
+	public string NoteFile { get; set; } = default!;
 	[XmlAttribute(AttributeName = "Note_Field")]
-	public string NoteField { get; set; } 
+	public string NoteField { get; set; } = default!;
 }
 
 [XmlRoot(ElementName = "Localization")]
 public class XmlLocalization
 {
-	[XmlElement(ElementName = "Message")] 
-	public List<XmlMessage> Messages { get; set; }
+	[XmlElement(ElementName = "Message")]
+	public List<XmlMessage> Messages { get; set; } = default!;
 
 	public static List<XmlMessage> GetEntries()
 	{

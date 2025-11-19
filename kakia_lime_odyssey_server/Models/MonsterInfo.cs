@@ -8,7 +8,7 @@ namespace kakia_lime_odyssey_server.Models;
 public class MonsterInfo
 {
 	[XmlElement(ElementName = "Monster")]
-	public List<XmlMonster> Monsters {	get; set; }
+	public List<XmlMonster> Monsters {	get; set; } = default!;
 
 	public static List<XmlMonster> GetEntries()
 	{
@@ -40,7 +40,7 @@ public class MapMob
 	public int Id { get; set; }
 	public int ZoneId { get; set; }
 	public int ModelTypeId { get; set; }
-	public string Name { get; set; }
+	public string Name { get; set; } = default!;
 	public FPOS Pos { get; set; }
 	public int LootTableId { get; set; }
 }

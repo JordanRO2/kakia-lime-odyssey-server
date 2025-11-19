@@ -7,7 +7,7 @@ namespace kakia_lime_odyssey_server.Models;
 public class SkillInfo
 {
 	[XmlElement(ElementName = "Skill")]
-	public List<XmlSkill> Skills { get; set; }
+	public List<XmlSkill> Skills { get; set; } = default!;
 
 	public static List<XmlSkill> GetSkills()
 	{

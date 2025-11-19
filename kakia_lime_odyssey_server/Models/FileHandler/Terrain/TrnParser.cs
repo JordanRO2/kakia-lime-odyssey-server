@@ -98,7 +98,6 @@ public class TrnParser
 		{
 			int localY;
 			bool skipFullRow = false;
-			bool readData = true;
 			bool seekAtStart = false;
 
 			switch (_quadrantType)
