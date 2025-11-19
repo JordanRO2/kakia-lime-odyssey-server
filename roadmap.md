@@ -2,6 +2,11 @@
 
 ## Recent Updates (2025-11-19)
 
+### Build Status (DONE)
+Successfully built with .NET 10.0 SDK. Build completed with 107 warnings (mostly nullable reference warnings) but no errors.
+
+Fixed: Made `velocity` field public in CS_FELL_PC.cs for proper accessibility.
+
 ### Fall Damage System (DONE)
 **File**: `PacketHandlers/CS_FELL_PC_Handler.cs`
 
