@@ -10,5 +10,5 @@ namespace kakia_lime_odyssey_packets.Packets.CS;
 [StructLayout(LayoutKind.Sequential, Pack = 2)]
 public struct CS_FELL_PC
 {
-	float velocity;
+	public float velocity;
 }
