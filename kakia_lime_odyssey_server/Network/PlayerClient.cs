@@ -519,9 +519,17 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	public void SendEquipment()
 	{
-		using PacketWriter pw = new(_clientRevision == 345);
-		pw.Write(_equipment.Combat.GetCombatEquipList());
-		Send(pw.ToSizedPacket(), default).Wait();
+		using (PacketWriter pw = new(_clientRevision == 345))
+		{
+			pw.Write(_equipment.Combat.GetCombatEquipList());
+			Send(pw.ToSizedPacket(), default).Wait();
+		}
+
+		using (PacketWriter pw = new(_clientRevision == 345))
+		{
+			pw.Write(_equipment.Life.GetLifeEquipList());
+			Send(pw.ToSizedPacket(), default).Wait();
+		}
 	}
 
 	public long GetId()

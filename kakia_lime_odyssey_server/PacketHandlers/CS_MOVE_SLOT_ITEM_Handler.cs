@@ -48,13 +48,6 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 			move_list = new()
 		};
 
-
-		// TODO:
-		// Not the proper way to update stacks
-		// haven't figured out yet why moving
-		// increased amounts don't work though.
-		SC_UPDATE_SLOT_ITEM? sc_update_slot = null;
-
 		// Moving item to empty slot
 		if (item_slot2 is null && item_slot1 is not null)
 		{
@@ -63,7 +56,7 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 
 			sc_move.move_list.Add(new()
 			{
-				fromCount = cs_move.count,
+				fromCount = 0,
 				toCount = cs_move.count,
 				fromSlot = cs_move.from,
 				toSlot = cs_move.to
@@ -74,9 +67,6 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 		{
 			if (ShouldStack(item_slot1, item_slot2))
 			{
-				ulong prevCount = item_slot2.GetAmount();
-
-
 				CreateStacks(item_slot1, item_slot2);
 				if (item_slot1.GetAmount() == 0)
 					inventory.RemoveItem(cs_move.from.slot);
@@ -87,22 +77,11 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 
 				sc_move.move_list.Add(new()
 				{
-					fromCount = cs_move.count - item_slot1.GetAmount(),
+					fromCount = item_slot1.GetAmount(),
 					toCount = item_slot2.GetAmount(),
 					fromSlot = cs_move.from,
 					toSlot = cs_move.to
 				});
-
-
-				// TODO:
-				// Not the proper way to update stacks
-				// haven't figured out yet why moving
-				// increased amounts don't work though.
-				sc_update_slot = new()
-				{
-					count = (long)item_slot2.GetAmount(),
-					slot = cs_move.to
-				};
 			}
 			else
 			{
@@ -137,17 +116,5 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 
 		Logger.Log(pw.ToSizedPacket().ToFormatedHexString());
 		client.Send(pw.ToSizedPacket(), default).Wait();
-
-
-		// TODO:
-		// Not the proper way to update stacks
-		// haven't figured out yet why moving
-		// increased amounts don't work though.
-		if (!sc_update_slot.HasValue)
-			return;
-
-		using PacketWriter pw2 = new(client.GetClientRevision() == 345);
-		pw2.Write(sc_update_slot);
-		client.Send(pw2.ToPacket(), default).Wait();
 	}
 }

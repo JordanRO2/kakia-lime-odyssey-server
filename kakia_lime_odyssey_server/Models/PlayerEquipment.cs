@@ -59,6 +59,18 @@ public class PlayerEquipment : IPlayerEquipment
 		};
 	}
 
+	public SC_LIFE_JOB_EQUIP_ITEM_LIST GetLifeEquipList()
+	{
+		return new()
+		{
+			equipList = equipment
+						.Values
+						.Where(e => e is not null)
+						.Select(m => m!.AsEquipItem())
+						.ToArray()
+		};
+	}
+
 	private int GetSlotID(EQUIP_SLOT slot)
 	{
 		return equipment[slot] is null ? 0 : equipment[slot]!.Id;
