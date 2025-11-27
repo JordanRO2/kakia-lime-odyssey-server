@@ -25,13 +25,34 @@ namespace kakia_lime_odyssey_packets.Packets.Models;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct APPEARANCE_NPC
 {
+	/// <summary>NPC display name (31 bytes, null-terminated)</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 31)]
 	public byte[] name;
+
+	/// <summary>Padding byte for alignment (offset 0x1F)</summary>
+	public byte padding;
+
+	/// <summary>Current animation/action ID (offset 0x20)</summary>
 	public uint action;
+
+	/// <summary>Animation start time (offset 0x24)</summary>
 	public uint actionStartTick;
+
+	/// <summary>Model scale multiplier (offset 0x28)</summary>
 	public float scale;
+
+	/// <summary>Transparency value 0.0-1.0 (offset 0x2C)</summary>
 	public float transparent;
+
+	/// <summary>Model type identifier (offset 0x30)</summary>
 	public uint modelTypeID;
+
+	/// <summary>RGB color tint (offset 0x34, 3 bytes)</summary>
 	public COLOR color;
+
+	/// <summary>Padding byte for alignment (offset 0x37)</summary>
+	public byte padding2;
+
+	/// <summary>NPC type/template ID (offset 0x38)</summary>
 	public uint typeID;
 }
