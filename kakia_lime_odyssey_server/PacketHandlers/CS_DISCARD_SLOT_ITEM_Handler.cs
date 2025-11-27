@@ -28,7 +28,7 @@ class CS_DISCARD_SLOT_ITEM_Handler : PacketHandler
 				slot = cs_slot_item.slot
 			};
 
-			using PacketWriter pw = new(client.GetClientRevision() == 345);
+			using PacketWriter pw = new();
 			pw.Write(sc_delete);
 			client.Send(pw.ToPacket(), default).Wait();
 			return;

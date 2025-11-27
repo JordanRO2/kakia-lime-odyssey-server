@@ -23,7 +23,7 @@ class CS_DIRECTION_PC_Handler : PacketHandler
 			tick = LimeServer.GetCurrentTick()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_dir);
 
 		client.SendGlobalPacket(pw.ToPacket(), default);

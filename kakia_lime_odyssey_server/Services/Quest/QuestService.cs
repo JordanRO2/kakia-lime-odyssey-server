@@ -217,7 +217,7 @@ public class QuestService
 		}
 
 		string questName = questDef?.TypeName ?? "Unknown";
-		Logger.Log($"[QUEST] {charName} completed quest {questTypeID} ({questName})", LogLevel.Info);
+		Logger.Log($"[QUEST] {charName} completed quest {questTypeID} ({questName})", LogLevel.Information);
 		return true;
 	}
 

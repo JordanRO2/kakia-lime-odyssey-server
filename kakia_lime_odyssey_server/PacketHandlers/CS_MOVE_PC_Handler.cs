@@ -38,7 +38,7 @@ class CS_MOVE_PC_Handler : PacketHandler
 		client.UpdateDirection(move_pc.dir);
 		client.SetInMotion(true);
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_move);
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();
 	}

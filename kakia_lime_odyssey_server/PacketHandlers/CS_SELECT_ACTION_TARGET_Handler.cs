@@ -21,7 +21,7 @@ class CS_SELECT_ACTION_TARGET_Handler : PacketHandler
 
 		client.SetCurrentTarget(cs_target.targetInstID);
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_target);
 		client.Send(pw.ToPacket(), default).Wait();
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();

@@ -49,7 +49,7 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 				castTime = castTime
 			};
 
-			using (PacketWriter pw = new(client.GetClientRevision() == 345))
+			using (PacketWriter pw = new())
 			{
 				pw.Write(castSkill);
 				client.Send(pw.ToPacket(), default).Wait();
@@ -69,7 +69,7 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 			coolTime = (uint)(skillLv1 != null ? skillLv1.CoolTime : skill.CoolTime)
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(actionSkill);
 			client.Send(pw.ToSizedPacket(), default).Wait();
@@ -94,13 +94,13 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 				stopType = 0
 			};
 
-			using PacketWriter pw_stop = new(false);
+			using PacketWriter pw_stop = new();
 			pw_stop.Write(sc_stop);
 			client.Send(pw_stop.ToPacket(), default).Wait();
 			client.SendGlobalPacket(pw_stop.ToPacket(), default).Wait();
 
 
-			using (PacketWriter pw = new(false))
+			using (PacketWriter pw = new())
 			{
 				SC_DEAD dead = new()
 				{
@@ -119,7 +119,7 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 			var levelUp = pcEntity.AddExp((ulong)result.ExpReward);
 			var currentStatus = pcEntity.GetEntityStatus();
 
-			using (PacketWriter pw = new(false))
+			using (PacketWriter pw = new())
 			{
 				SC_GOT_COMBAT_JOB_EXP addExp = new()
 				{
@@ -135,7 +135,7 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 
 
 
-			using (PacketWriter pw = new(false))
+			using (PacketWriter pw = new())
 			{
 				SC_PC_COMBAT_JOB_LEVEL_UP lvUp = new()
 				{
@@ -147,7 +147,7 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 					newAgi = 5,
 					newDex = 5,
 					newSpi = 5,
-					newVit = 5				
+					newVit = 5
 				};
 				pw.Write(lvUp);
 				client.Send(pw.ToPacket(), default).Wait();

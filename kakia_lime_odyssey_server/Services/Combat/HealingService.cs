@@ -177,10 +177,10 @@ public class HealingService : IHealingService
 			fromInstID = source.GetId(),
 			toInstID = target.GetId(),
 			typeID = (uint)skillId,
-			useHP = (short)(skillLevelData?.UseHP ?? 0),
-			useMP = (short)(skillLevelData?.UseMP ?? 0),
-			useSP = (short)(skillLevelData?.UseSP ?? 0),
-			useLP = (short)(skillLevelData?.UseLP ?? 0),
+			useHP = (ushort)(skillLevelData?.UseHP ?? 0),
+			useMP = (ushort)(skillLevelData?.UseMP ?? 0),
+			useSP = (ushort)(skillLevelData?.UseSP ?? 0),
+			useLP = (ushort)(skillLevelData?.UseLP ?? 0),
 			coolTime = (uint)(skillLevelData?.CoolTime ?? skill?.CoolTime ?? 0)
 		};
 

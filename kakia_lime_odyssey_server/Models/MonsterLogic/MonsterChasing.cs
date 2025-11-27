@@ -98,7 +98,7 @@ public partial class Monster : INPC
 			moveType = (byte)_moveType
 		};
 
-		using PacketWriter pw = new(false);
+		using PacketWriter pw = new();
 		pw.Write(moveToTarget);
 		SendToNearbyPlayers(pw.ToPacket(), playerClients);
 	}

@@ -39,7 +39,7 @@ class CS_SLIDE_PC_Handler : PacketHandler
 			velocityRatio = vel.ratio
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_slide);
 
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();

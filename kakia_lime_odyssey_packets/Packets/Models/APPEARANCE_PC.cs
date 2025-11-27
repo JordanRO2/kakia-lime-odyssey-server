@@ -123,7 +123,7 @@ public class ModAppearance
 	public byte earType;
 	public byte playingJobClass;
 	public short underwearType;
-	public int[] equiped { get; set; }
+	public ModEquipped equiped { get; set; }
 	public byte familyNameType;
 	public uint action;
 	public uint actionStartTick;
@@ -150,7 +150,30 @@ public class ModAppearance
 		this.earType = other.earType;
 		this.playingJobClass = other.playingJobClass;
 		this.underwearType = other.underwearType;
-		this.equiped = other.equiped;
+		// Convert int[20] array to ModEquipped
+		this.equiped = new ModEquipped(new EQUIPPED
+		{
+			NONE = other.equiped[0],
+			MAIN_EQUIP = other.equiped[1],
+			SUB_EQUIP = other.equiped[2],
+			RANGE_MAIN_EQUIP = other.equiped[3],
+			SPENDING = other.equiped[4],
+			HEAD = other.equiped[5],
+			FOREHEAD = other.equiped[6],
+			EYE = other.equiped[7],
+			MOUTH = other.equiped[8],
+			NECK = other.equiped[9],
+			SHOULDER = other.equiped[10],
+			UPPER_BODY = other.equiped[11],
+			HAND = other.equiped[12],
+			WAIST = other.equiped[13],
+			LOWER_BODY = other.equiped[14],
+			FOOT = other.equiped[15],
+			RELIC = other.equiped[16],
+			RING_1 = other.equiped[17],
+			RING_2 = other.equiped[18],
+			ACCESSORY_1 = other.equiped[19]
+		});
 		this.familyNameType = other.familyNameType;
 		this.action = other.action;
 		this.actionStartTick = other.actionStartTick;
@@ -183,7 +206,7 @@ public class ModAppearance
 			earType = earType,
 			playingJobClass = playingJobClass,
 			underwearType = underwearType,
-			equiped = equiped,
+			equiped = equiped?.AsArray() ?? new int[20],
 			familyNameType = familyNameType,
 			action = action,
 			actionStartTick = actionStartTick,

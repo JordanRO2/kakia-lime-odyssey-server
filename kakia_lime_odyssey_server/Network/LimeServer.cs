@@ -231,7 +231,7 @@ public class LimeServer : SocketServer
 
 			SC_LEAVE_SIGHT_PC leave_pc = new()
 			{
-				objInstID = pc.GetObjInstID()
+				leave_zone = new SC_LEAVE_ZONEOBJ { objInstID = pc.GetObjInstID() }
 			};
 
 			using PacketWriter pw = new();

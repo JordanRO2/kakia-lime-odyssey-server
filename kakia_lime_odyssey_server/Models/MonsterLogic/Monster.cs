@@ -166,7 +166,7 @@ public partial class Monster : INPC, IEntity
 			{
 				_actionStartTick = serverTick;
 				Despawned = true;
-				using PacketWriter pw = new(false);
+				using PacketWriter pw = new();
 				pw.Write(GetLeaveSight());
 				SendToNearbyPlayers(pw.ToPacket(), playerClients);
 			}
@@ -176,7 +176,7 @@ public partial class Monster : INPC, IEntity
 				_actionStartTick = serverTick;
 				Despawned = false;
 
-				using PacketWriter pw = new(false);
+				using PacketWriter pw = new();
 				pw.Write(GetEnterSight());
 				SendToNearbyPlayers(pw.ToSizedPacket(), playerClients);
 			}
@@ -340,7 +340,7 @@ public partial class Monster : INPC, IEntity
 			velocityRatio = 1
 		};
 
-		using PacketWriter pw = new(false);
+		using PacketWriter pw = new();
 		pw.Write(sc_move);
 		return pw.ToPacket();
 	}
@@ -356,7 +356,7 @@ public partial class Monster : INPC, IEntity
 			stopType = 0
 		};
 
-		using PacketWriter pw = new(false);
+		using PacketWriter pw = new();
 		pw.Write(sc_stop);
 
 		return pw.ToPacket();

@@ -13,7 +13,7 @@ class CS_CANCEL_SELECTED_ACTION_TARGET_Handler : PacketHandler
 	{
 		client.SetCurrentTarget(0);
 		SC_CANCEL_SELECTED_ACTION_TARGET cancel = new() {  objInstID = client.GetObjInstID() };
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(cancel);
 			client.SendGlobalPacket(pw.ToPacket(), default);
@@ -28,7 +28,7 @@ class CS_CANCEL_SELECTED_ACTION_TARGET_Handler : PacketHandler
 			instID = client.GetObjInstID()
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(sc_stop_combat);
 			client.Send(pw.ToPacket(), default).Wait();

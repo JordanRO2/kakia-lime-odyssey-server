@@ -36,7 +36,7 @@ class CS_LIFE_JOB_UNEQUIP_ITEM_handler : PacketHandler
 			equips = equipActions.ToArray()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_cmb_equip);
 		client.Send(pw.ToSizedPacket(), default).Wait();
 		client.SetEquipToCurrentJob();
@@ -48,7 +48,7 @@ class CS_LIFE_JOB_UNEQUIP_ITEM_handler : PacketHandler
 			appearance = client.GetCurrentCharacter().appearance.AsStruct()
 		};
 
-		using PacketWriter pw2 = new(client.GetClientRevision() == 345);
+		using PacketWriter pw2 = new();
 		pw2.Write(sc_update_appearance);
 
 		// client doesn't need it, only others do

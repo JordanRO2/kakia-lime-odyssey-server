@@ -89,24 +89,24 @@ class CS_START_GAME_Handler : PacketHandler
 			completedMain = 0,
 			completedSub = 0,
 			completedNormal = 0,
-			details = new()
+			details = new List<QuestDetail>()
 			{
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101190,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				},
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101300,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				},
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101360,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				}
 			}
@@ -120,27 +120,27 @@ class CS_START_GAME_Handler : PacketHandler
 
 		SC_SKILL_LIST skillList = new()
 		{
-			skills = new()
+			skills = new SKILL[]
 			{
-				new()
+				new SKILL()
 				{
 					typeID = 1,
 					level = 1,
 					remainCoolTime = 0
 				},
-				new()
+				new SKILL()
 				{
 					typeID = 2,
 					level = 1,
 					remainCoolTime = 0
 				},
-				new()
+				new SKILL()
 				{
 					typeID = 3,
 					level = 1,
 					remainCoolTime = 0
 				},
-				new()
+				new SKILL()
 				{
 					typeID = 4,
 					level = 1,

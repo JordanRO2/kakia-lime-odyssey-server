@@ -16,7 +16,7 @@ class CS_FINISH_LOOTING_Handler : PacketHandler
 			objInstID = client.GetObjInstID()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_finish_looting);
 
 		client.Send(pw.ToPacket(), default).Wait();		

@@ -147,7 +147,7 @@ public static class QuestInfo
 			quests = LoadAllQuestFiles(questsFolder);
 		}
 
-		Logger.Log($"[QUEST] Loaded {quests.Count} quest definitions", LogLevel.Info);
+		Logger.Log($"[QUEST] Loaded {quests.Count} quest definitions", LogLevel.Information);
 		return quests;
 	}
 

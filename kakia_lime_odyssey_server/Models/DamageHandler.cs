@@ -33,7 +33,7 @@ public static class DamageHandler
 			damage = (uint)((sourceStatus.MeleeAttack.Atk - targetStatus.MeleeAttack.Def) * varianceBonus);
 		}
 
-		using (PacketWriter pw = new(false))
+		using (PacketWriter pw = new())
 		{
 			SC_WEAPON_HIT_RESULT hit = new()
 			{

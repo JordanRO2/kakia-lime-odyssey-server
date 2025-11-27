@@ -109,7 +109,7 @@ class CS_USE_SKILL_SELF_Handler : PacketHandler
 				Logger.Log(
 					$"[CRITICAL HEAL] {playerClient?.GetCurrentCharacter().appearance.name} " +
 					$"healed self for {healResult.HealAmount} HP (critical!)",
-					LogLevel.Info
+					LogLevel.Information
 				);
 			}
 		}

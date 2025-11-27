@@ -118,7 +118,7 @@ class CS_CREATE_PC_Handler : PacketHandler
 			client_pc = newCharacter
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_created_pc);
 
 		client.Send(pw.ToSizedPacket(), default);

@@ -324,13 +324,13 @@ public static class CombatValidator
 			status.MeleeAttack.Def = 0;
 
 		// Clamp crit rate
-		status.MeleeAttack.CritRate = Math.Clamp(status.MeleeAttack.CritRate, 0, MaxCritRate);
+		status.MeleeAttack.CritRate = Math.Clamp((int)status.MeleeAttack.CritRate, 0, MaxCritRate);
 
 		// Clamp hit rate
-		status.MeleeAttack.Hit = Math.Max(status.MeleeAttack.Hit, 1);
+		status.MeleeAttack.Hit = (ushort)Math.Max((int)status.MeleeAttack.Hit, 1);
 
 		// Clamp flee rate
-		status.MeleeAttack.FleeRate = Math.Max(status.MeleeAttack.FleeRate, 0);
+		status.MeleeAttack.FleeRate = (ushort)Math.Max((int)status.MeleeAttack.FleeRate, 0);
 
 		return status;
 	}

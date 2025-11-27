@@ -239,7 +239,7 @@ public class ExchangeService
 
 		EndSession(session);
 
-		Logger.Log($"[EXCHANGE] Session {session.SessionId} completed successfully", LogLevel.Info);
+		Logger.Log($"[EXCHANGE] Session {session.SessionId} completed successfully", LogLevel.Information);
 	}
 
 	private void EndSession(ExchangeSession session)

@@ -276,12 +276,12 @@ public class PartyMember
 				playingJob = (byte)(character?.savedStatus.playingJob ?? 0),
 				combatJobLv = character?.savedStatus.combatJob.lv ?? 1,
 				lifeJobLv = character?.savedStatus.lifeJob.lv ?? 1,
-				hp = (int)(status?.BasicStatus.Hp ?? 0),
-				mhp = (int)(status?.BasicStatus.MaxHp ?? 0),
-				mp = (int)(status?.BasicStatus.Mp ?? 0),
-				mmp = (int)(status?.BasicStatus.MaxMp ?? 0),
-				lp = (int)(status?.Lp ?? 0),
-				mlp = (int)(status?.MaxLp ?? 0),
+				hp = status?.BasicStatus.Hp ?? 0,
+				mhp = status?.BasicStatus.MaxHp ?? 0,
+				mp = status?.BasicStatus.Mp ?? 0,
+				mmp = status?.BasicStatus.MaxMp ?? 0,
+				lp = status?.BasicStatus.Lp ?? 0,
+				mlp = status?.BasicStatus.MaxLp ?? 0,
 				pos = new POS { x = PosX, y = PosY, z = PosZ },
 				zoneID = ZoneId
 			}

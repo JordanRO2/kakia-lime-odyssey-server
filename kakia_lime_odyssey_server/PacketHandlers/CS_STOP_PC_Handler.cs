@@ -28,7 +28,7 @@ class CS_STOP_PC_Handler : PacketHandler
 			stopType = cs_stop.stopType
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_stop);
 
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();

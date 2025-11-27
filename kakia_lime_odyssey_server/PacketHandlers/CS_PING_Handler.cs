@@ -15,7 +15,7 @@ class CS_PING_Handler : PacketHandler
 	{
 		var ping = PacketConverter.Extract<CS_PING>(p.Payload);
 		SC_PONG pong = new() { tick = LimeServer.GetCurrentTick() };
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(pong);
 		client.Send(pw.ToPacket(), default).Wait();
 	}

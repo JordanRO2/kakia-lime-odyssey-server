@@ -21,7 +21,7 @@ class CS_SELECT_TARGET_READY_WEAPON_HITING_Handler : PacketHandler
 			instID = client.GetObjInstID()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_start_combat);
 		client.Send(pw.ToPacket(), default).Wait();
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();

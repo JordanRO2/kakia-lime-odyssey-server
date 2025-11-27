@@ -51,7 +51,7 @@ class CS_LOGIN_Handler : PacketHandler
 
 
 
-		using PacketWriter pw = new(login.revision == 345);
+		using PacketWriter pw = new();
 		pw.Write(char_list);
 		var pck = pw.ToSizedPacket();
 		//Logger.LogPck(pck);
@@ -67,7 +67,7 @@ class CS_LOGIN_Handler : PacketHandler
 		pw.Write((byte)2); // Combat job level
 		pw.Write((byte)0); // Unk
 
-		using PacketWriter pw2 = new(true);
+		using PacketWriter pw2 = new();
 
 		// Name
 		pw2.Write(System.Text.Encoding.ASCII.GetBytes("Sziadan"));

@@ -29,8 +29,8 @@ class CS_EQUIPPED_ITEM_REPAIR_REQUEST_Handler : PacketHandler
 
 		// Send SC_EQUIPPED_ITEM_REPAIR_RESULT
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_EQUIPPED_ITEM_REPAIR_RESULT);
-		pw.Writer.Write(success);
+		pw.Write((ushort)PacketType.SC_EQUIPPED_ITEM_REPAIR_RESULT);
+		pw.Write(success);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 }

@@ -33,7 +33,7 @@ class CS_JUMP_PC_Handler : PacketHandler
 			isSwim = cs_jump.isSwim
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_jump);
 
 		client.SendGlobalPacket(pw.ToPacket(), default);

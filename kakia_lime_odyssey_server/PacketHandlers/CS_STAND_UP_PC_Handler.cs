@@ -20,7 +20,7 @@ class CS_STAND_UP_PC_Handler : PacketHandler
 			tick = LimeServer.GetCurrentTick()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_stand);
 
 		client.SendGlobalPacket(pw.ToPacket(), default);

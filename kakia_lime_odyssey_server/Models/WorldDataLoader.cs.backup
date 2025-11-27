@@ -119,11 +119,11 @@ public class NpcSpawnXml
             Dir = new FPOS { x = Dir.X, y = Dir.Y, z = Dir.Z },
             Status = new COMMON_STATUS
             {
-                lv = (byte)Status.Level,
-                hp = (uint)Status.Hp,
-                mhp = (uint)Status.MaxHp,
-                mp = (uint)Status.Mp,
-                mmp = (uint)Status.MaxMp
+                lv = Status.Level,
+                hp = Status.Hp,
+                mhp = Status.MaxHp,
+                mp = Status.Mp,
+                mmp = Status.MaxMp
             },
             Appearance = new APPEARANCE_VILLAGER
             {

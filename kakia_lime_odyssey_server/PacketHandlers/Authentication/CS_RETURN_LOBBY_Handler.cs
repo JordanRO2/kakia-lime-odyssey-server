@@ -31,7 +31,7 @@ class CS_RETURN_LOBBY_Handler : PacketHandler
 		// Notify other players that this character is leaving
 		pc.SendGlobalPacket(new PacketWriter().Write(new SC_LEAVE_SIGHT_PC
 		{
-			objInstID = pc.GetObjInstID()
+			leave_zone = new SC_LEAVE_ZONEOBJ { objInstID = pc.GetObjInstID() }
 		}).ToPacket(), default).Wait();
 
 		// Clean up services state

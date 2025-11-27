@@ -52,6 +52,21 @@ public struct EQUIPPED
 	public int RING_1;
 	public int RING_2;
 	public int ACCESSORY_1;
+
+	/// <summary>
+	/// Converts the equipment slots to an int[20] array for packet serialization.
+	/// Order matches IDA APPEARANCE_PC.equiped field.
+	/// </summary>
+	public int[] AsArray()
+	{
+		return new int[20]
+		{
+			NONE, MAIN_EQUIP, SUB_EQUIP, RANGE_MAIN_EQUIP, SPENDING,
+			HEAD, FOREHEAD, EYE, MOUTH, NECK,
+			SHOULDER, UPPER_BODY, HAND, WAIST, LOWER_BODY,
+			FOOT, RELIC, RING_1, RING_2, ACCESSORY_1
+		};
+	}
 }
 
 
@@ -127,6 +142,21 @@ public class ModEquipped
 			RING_1 = this.RING_1,
 			RING_2 = this.RING_2,
 			ACCESSORY_1 = this.ACCESSORY_1
+		};
+	}
+
+	/// <summary>
+	/// Converts the equipment slots to an int[20] array for packet serialization.
+	/// Order matches IDA APPEARANCE_PC.equiped field.
+	/// </summary>
+	public int[] AsArray()
+	{
+		return new int[20]
+		{
+			NONE, MAIN_EQUIP, SUB_EQUIP, RANGE_MAIN_EQUIP, SPENDING,
+			HEAD, FOREHEAD, EYE, MOUTH, NECK,
+			SHOULDER, UPPER_BODY, HAND, WAIST, LOWER_BODY,
+			FOOT, RELIC, RING_1, RING_2, ACCESSORY_1
 		};
 	}
 }

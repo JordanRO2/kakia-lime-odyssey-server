@@ -887,6 +887,7 @@ public class PlayerClient : IPlayerClient, IEntity
 	/// <param name="broadcast">Whether to broadcast the change to nearby players</param>
 	public void UpdateHP(int newHP, bool broadcast = true)
 	{
+		int oldHP = (int)_status.hp;
 		_status.hp = newHP < 0 ? 0 : (uint)newHP;
 		if (_status.hp > _status.mhp)
 			_status.hp = _status.mhp;
@@ -894,7 +895,9 @@ public class PlayerClient : IPlayerClient, IEntity
 		SC_CHANGED_HP hpPacket = new()
 		{
 			objInstID = GetObjInstID(),
-			hp = _status.hp
+			current = (int)_status.hp,
+			update = (int)_status.hp - oldHP,
+			fromID = 0
 		};
 
 		using PacketWriter pw = new();
@@ -913,6 +916,7 @@ public class PlayerClient : IPlayerClient, IEntity
 	/// <param name="broadcast">Whether to broadcast the change to nearby players</param>
 	public void UpdateMP(int newMP, bool broadcast = true)
 	{
+		int oldMP = (int)_status.mp;
 		_status.mp = newMP < 0 ? 0 : (uint)newMP;
 		if (_status.mp > _status.mmp)
 			_status.mp = _status.mmp;
@@ -920,7 +924,8 @@ public class PlayerClient : IPlayerClient, IEntity
 		SC_CHANGED_MP mpPacket = new()
 		{
 			objInstID = GetObjInstID(),
-			mp = _status.mp
+			current = (int)_status.mp,
+			update = (int)_status.mp - oldMP
 		};
 
 		using PacketWriter pw = new();

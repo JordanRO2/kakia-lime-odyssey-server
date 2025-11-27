@@ -132,7 +132,7 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 		}
 		else return; // Moving no item at all.. Shouldn't be a thing, right?
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_move);
 
 		Logger.Log(pw.ToSizedPacket().ToFormatedHexString());
@@ -146,7 +146,7 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 		if (!sc_update_slot.HasValue)
 			return;
 
-		using PacketWriter pw2 = new(client.GetClientRevision() == 345);
+		using PacketWriter pw2 = new();
 		pw2.Write(sc_update_slot);
 		client.Send(pw2.ToPacket(), default).Wait();
 	}

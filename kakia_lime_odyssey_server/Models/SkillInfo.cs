@@ -141,7 +141,7 @@ public static class SkillInfo
 				skills.AddRange(skillRoot.Skills);
 			}
 
-			Logger.Log($"[SKILL] Loaded {skills.Count} skill definitions", LogLevel.Info);
+			Logger.Log($"[SKILL] Loaded {skills.Count} skill definitions", LogLevel.Information);
 		}
 		catch (Exception ex)
 		{

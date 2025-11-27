@@ -186,7 +186,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			{
 				appearance = new()
 				{
-					name = "Test Villager",
+					name = System.Text.Encoding.ASCII.GetBytes("Test Villager"),
 					action = 0,
 					actionStartTick = 4,
 					scale = 1,

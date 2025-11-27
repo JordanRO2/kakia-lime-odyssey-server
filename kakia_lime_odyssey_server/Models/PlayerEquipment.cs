@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_contracts.Enums;
 using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;

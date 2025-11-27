@@ -54,7 +54,7 @@ class CS_LOOT_ITEM_Handler : PacketHandler
 				}
 			};
 
-			using (PacketWriter pw = new(client.GetClientRevision() == 345))
+			using (PacketWriter pw = new())
 			{
 				pw.Write(sc_update_slot);
 				client.Send(pw.ToPacket(), default).Wait();
@@ -79,7 +79,7 @@ class CS_LOOT_ITEM_Handler : PacketHandler
 				inherits = item.GetInherits()
 			};
 
-			using (PacketWriter pw = new(client.GetClientRevision() == 345))
+			using (PacketWriter pw = new())
 			{
 				pw.Write(sc_item);
 				client.Send(pw.ToPacket(), default).Wait();
@@ -94,7 +94,7 @@ class CS_LOOT_ITEM_Handler : PacketHandler
 			count = lootItem.popCount
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(sc_looted);
 			client.Send(pw.ToPacket(), default).Wait();

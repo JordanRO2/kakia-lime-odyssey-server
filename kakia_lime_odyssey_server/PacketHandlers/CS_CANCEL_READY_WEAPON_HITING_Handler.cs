@@ -16,7 +16,7 @@ class CS_CANCEL_READY_WEAPON_HITING_Handler : PacketHandler
 			instID = client.GetObjInstID()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(stop_combat);
 
 		client.Send(pw.ToPacket(), default).Wait();

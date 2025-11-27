@@ -49,7 +49,7 @@ class CS_COMBAT_JOB_EQUIP_ITEM_Handler : PacketHandler
 			equips = equipActions.ToArray()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_cmb_equip);
 		client.Send(pw.ToSizedPacket(), default).Wait();
 		client.SetEquipToCurrentJob();
@@ -62,7 +62,7 @@ class CS_COMBAT_JOB_EQUIP_ITEM_Handler : PacketHandler
 			appearance = client.GetCurrentCharacter().appearance.AsStruct()
 		};
 
-		using PacketWriter pw2 = new(client.GetClientRevision() == 345);
+		using PacketWriter pw2 = new();
 		pw2.Write(sc_update_appearance);
 
 		// client doesn't need it, only others do

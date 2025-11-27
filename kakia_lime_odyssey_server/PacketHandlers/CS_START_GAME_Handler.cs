@@ -47,7 +47,7 @@ class CS_START_GAME_Handler : PacketHandler
 			tick = LimeServer.GetCurrentTick()
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(tick);
 			client.Send(pw.ToPacket(), default).Wait();
@@ -59,7 +59,7 @@ class CS_START_GAME_Handler : PacketHandler
 			pc = client.GetRegionPC()
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(ready);
 			client.Send(pw.ToPacket(), default).Wait();
@@ -71,7 +71,7 @@ class CS_START_GAME_Handler : PacketHandler
 			objInstID = client.GetObjInstID()
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(sc_enter_zone);
 			client.Send(pw.ToPacket(), default).Wait();
@@ -111,7 +111,7 @@ class CS_START_GAME_Handler : PacketHandler
 			}
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(questList);
 			client.Send(pw.ToSizedPacket(), default).Wait();
@@ -148,7 +148,7 @@ class CS_START_GAME_Handler : PacketHandler
 			}
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(skillList);
 			client.Send(pw.ToSizedPacket(), default).Wait();

@@ -178,11 +178,11 @@ public class SkillService
 		using PacketWriter pw = new();
 
 		// Write packet type
-		pw.Writer.Write((ushort)PacketType.SC_SKILL_LV_UP);
+		pw.Write((ushort)PacketType.SC_SKILL_LV_UP);
 
 		// Write skill data
-		pw.Writer.Write(skillTypeId);
-		pw.Writer.Write(newLevel);
+		pw.Write(skillTypeId);
+		pw.Write(newLevel);
 
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}

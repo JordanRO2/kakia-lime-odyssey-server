@@ -44,7 +44,7 @@ public class GuildService : IGuildService
 				_nextGuildId = guild.Id + 1;
 		}
 
-		Logger.Log($"[GUILD] Loaded {guilds.Count} guilds from database", LogLevel.Info);
+		Logger.Log($"[GUILD] Loaded {guilds.Count} guilds from database", LogLevel.Information);
 		_initialized = true;
 	}
 
@@ -222,7 +222,7 @@ public class GuildService : IGuildService
 		// Send SC_GUILD_INFO to leader with initial guild info
 		SendGuildInfo(leader, guild, member);
 
-		Logger.Log($"[GUILD] {character.appearance.name} created guild '{guildName}' (ID: {guildId})", LogLevel.Info);
+		Logger.Log($"[GUILD] {character.appearance.name} created guild '{guildName}' (ID: {guildId})", LogLevel.Information);
 
 		return GuildResult.Ok(guild);
 	}
@@ -253,7 +253,7 @@ public class GuildService : IGuildService
 		DeleteGuildFromDb(guild.Id);
 
 		var character = leader.GetCurrentCharacter();
-		Logger.Log($"[GUILD] {character?.appearance.name} disbanded guild '{guild.Name}'", LogLevel.Info);
+		Logger.Log($"[GUILD] {character?.appearance.name} disbanded guild '{guild.Name}'", LogLevel.Information);
 
 		return true;
 	}
@@ -378,7 +378,7 @@ public class GuildService : IGuildService
 		// Send SC_GUILD_INFO to new member with all guild info
 		SendGuildInfo(player, guild, member);
 
-		Logger.Log($"[GUILD] {character.appearance.name} joined guild '{guild.Name}'", LogLevel.Info);
+		Logger.Log($"[GUILD] {character.appearance.name} joined guild '{guild.Name}'", LogLevel.Information);
 
 		return GuildResult.Ok(guild);
 	}
@@ -479,7 +479,7 @@ public class GuildService : IGuildService
 		// Send SC_GUILD_INFO to new member with all guild info
 		SendGuildInfo(player, guild, member);
 
-		Logger.Log($"[GUILD] {character.appearance.name} joined guild '{guild.Name}' via open recruitment", LogLevel.Info);
+		Logger.Log($"[GUILD] {character.appearance.name} joined guild '{guild.Name}' via open recruitment", LogLevel.Information);
 
 		return GuildResult.Ok(guild);
 	}
@@ -544,7 +544,7 @@ public class GuildService : IGuildService
 		}
 
 		var character = player.GetCurrentCharacter();
-		Logger.Log($"[GUILD] {character?.appearance.name} left guild '{guild.Name}'", LogLevel.Info);
+		Logger.Log($"[GUILD] {character?.appearance.name} left guild '{guild.Name}'", LogLevel.Information);
 
 		return true;
 	}
@@ -598,7 +598,7 @@ public class GuildService : IGuildService
 		}
 
 		var leaderChar = leader.GetCurrentCharacter();
-		Logger.Log($"[GUILD] {leaderChar?.appearance.name} kicked {targetMember.Name} from guild", LogLevel.Info);
+		Logger.Log($"[GUILD] {leaderChar?.appearance.name} kicked {targetMember.Name} from guild", LogLevel.Information);
 
 		return true;
 	}
@@ -634,7 +634,7 @@ public class GuildService : IGuildService
 			SendGuildChangedLeader(m.Player!, newLeaderIdx);
 		}
 
-		Logger.Log($"[GUILD] {newLeader.Name} is now leader of '{guild.Name}'", LogLevel.Info);
+		Logger.Log($"[GUILD] {newLeader.Name} is now leader of '{guild.Name}'", LogLevel.Information);
 
 		return true;
 	}

@@ -60,7 +60,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			instID = client.GetObjInstID()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(action);
 
 		client.Send(pw.ToPacket(), default).Wait();
@@ -77,7 +77,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			action = id
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(action);
 
 		client.Send(pw.ToPacket(), default).Wait();
@@ -112,7 +112,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			inherits = item.GetInherits()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_item);
 		client.Send(pw.ToPacket(), default).Wait();
 	}
@@ -140,7 +140,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			dir = client.GetDirection()
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(warp);
 		client.Send(pw.ToPacket(), default).Wait();
 		client.SendGlobalPacket(pw.ToPacket(), default).Wait();		
@@ -173,7 +173,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			{
 				appearance = new()
 				{
-					name = "Test Villager",
+					name = System.Text.Encoding.ASCII.GetBytes("Test Villager"),
 					action = 0,
 					actionStartTick = 4,
 					scale = 1,
@@ -300,7 +300,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			velocities = vel
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(updateVel);
 			client.Send(pw.ToPacket(), default).Wait();
@@ -329,7 +329,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			message = cs_say.message
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_say);
 
 		client.SendGlobalPacket(pw.ToSizedPacket(), default).Wait();

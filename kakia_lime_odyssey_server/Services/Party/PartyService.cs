@@ -75,7 +75,7 @@ public class PartyService : IPartyService
 		// Send SC_PARTY_JOINED to leader with initial party info
 		SendPartyJoined(leader, party, member);
 
-		Logger.Log($"[PARTY] {character.appearance.name} created party '{partyName}' (ID: {partyId})", LogLevel.Info);
+		Logger.Log($"[PARTY] {character.appearance.name} created party '{partyName}' (ID: {partyId})", LogLevel.Information);
 
 		return PartyResult.Ok(party);
 	}
@@ -103,7 +103,7 @@ public class PartyService : IPartyService
 		_parties.TryRemove(party.Id, out _);
 
 		var character = leader.GetCurrentCharacter();
-		Logger.Log($"[PARTY] {character?.appearance.name} disbanded party '{party.Name}'", LogLevel.Info);
+		Logger.Log($"[PARTY] {character?.appearance.name} disbanded party '{party.Name}'", LogLevel.Information);
 
 		return true;
 	}
@@ -227,7 +227,7 @@ public class PartyService : IPartyService
 		// Send SC_PARTY_JOINED to new member with all party info
 		SendPartyJoined(player, party, member);
 
-		Logger.Log($"[PARTY] {character.appearance.name} joined party '{party.Name}'", LogLevel.Info);
+		Logger.Log($"[PARTY] {character.appearance.name} joined party '{party.Name}'", LogLevel.Information);
 
 		return PartyResult.Ok(party);
 	}
@@ -340,7 +340,7 @@ public class PartyService : IPartyService
 		}
 
 		var character = player.GetCurrentCharacter();
-		Logger.Log($"[PARTY] {character?.appearance.name} left party '{party.Name}'", LogLevel.Info);
+		Logger.Log($"[PARTY] {character?.appearance.name} left party '{party.Name}'", LogLevel.Information);
 
 		return true;
 	}
@@ -383,7 +383,7 @@ public class PartyService : IPartyService
 		}
 
 		var leaderChar = leader.GetCurrentCharacter();
-		Logger.Log($"[PARTY] {leaderChar?.appearance.name} kicked {targetMember.Name} from party", LogLevel.Info);
+		Logger.Log($"[PARTY] {leaderChar?.appearance.name} kicked {targetMember.Name} from party", LogLevel.Information);
 
 		return true;
 	}
@@ -413,7 +413,7 @@ public class PartyService : IPartyService
 			SendPartyChangedLeader(m.Player!, newLeaderIdx);
 		}
 
-		Logger.Log($"[PARTY] {newLeader.Name} is now leader of '{party.Name}'", LogLevel.Info);
+		Logger.Log($"[PARTY] {newLeader.Name} is now leader of '{party.Name}'", LogLevel.Information);
 
 		return true;
 	}
@@ -691,7 +691,7 @@ public class PartyService : IPartyService
 		// Write header
 		var header = new SC_PARTY_JOINED
 		{
-			name = party.Name,
+			name = System.Text.Encoding.ASCII.GetBytes(party.Name),
 			myIdx = self.Index,
 			leaderIndex = party.LeaderIndex,
 			option = (byte)party.Option
@@ -713,8 +713,8 @@ public class PartyService : IPartyService
 		using PacketWriter pw = new();
 		pw.Write(new SC_PARTY_INVITED
 		{
-			pcName = inviterName,
-			partyName = partyName
+			pcName = System.Text.Encoding.ASCII.GetBytes(inviterName),
+			partyName = System.Text.Encoding.ASCII.GetBytes(partyName)
 		});
 		player.Send(pw.ToPacket(), default).Wait();
 	}
@@ -822,8 +822,7 @@ public class PartyService : IPartyService
 		{
 			idx = member.Index,
 			instID = member.InstId,
-			name = member.Name,
-			state = member.ToPacketStruct().state
+			name = System.Text.Encoding.ASCII.GetBytes(member.Name)
 		});
 		player.Send(pw.ToPacket(), default).Wait();
 	}

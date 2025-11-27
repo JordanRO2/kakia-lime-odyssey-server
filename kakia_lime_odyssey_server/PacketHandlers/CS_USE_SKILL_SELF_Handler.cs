@@ -37,7 +37,7 @@ class CS_USE_SKILL_SELF_Handler : PacketHandler
 				castTime = castTime
 			};
 
-			using (PacketWriter pw = new(client.GetClientRevision() == 345))
+			using (PacketWriter pw = new())
 			{
 				pw.Write(castSkill);
 				client.Send(pw.ToPacket(), default).Wait();
@@ -57,7 +57,7 @@ class CS_USE_SKILL_SELF_Handler : PacketHandler
 			coolTime = (uint)(skillLv1 != null ? skillLv1.CoolTime : skill.CoolTime)
 		};
 
-		using (PacketWriter pw = new(client.GetClientRevision() == 345))
+		using (PacketWriter pw = new())
 		{
 			pw.Write(actionSkill);
 			client.Send(pw.ToSizedPacket(), default).Wait();

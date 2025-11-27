@@ -20,7 +20,7 @@ class CS_CHANGE_JOB_CLASS_Handler : PacketHandler
 			jobClass = cs_job.jobClass
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_job);
 
 		client.ChangeJob(cs_job.jobClass);
@@ -36,7 +36,7 @@ class CS_CHANGE_JOB_CLASS_Handler : PacketHandler
 			appearance = client.GetCurrentCharacter().appearance.AsStruct()
 		};
 
-		using PacketWriter pw2 = new(client.GetClientRevision() == 345);
+		using PacketWriter pw2 = new();
 		pw2.Write(sc_update_appearance);
 
 		client.Send(pw2.ToPacket(), default).Wait();

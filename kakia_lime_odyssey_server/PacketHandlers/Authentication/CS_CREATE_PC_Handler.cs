@@ -84,29 +84,7 @@ class CS_CREATE_PC_Handler : PacketHandler
 				scale = 1,
 				showHelm = true,
 				transparent = 1,
-				equiped = new()
-				{
-					NONE = 0,
-					MAIN_EQUIP = 0,
-					SUB_EQUIP = 0,
-					RANGE_MAIN_EQUIP = 0,
-					SPENDING = 0,
-					HEAD = 0,
-					FOREHEAD = 0,
-					EYE = 0,
-					MOUTH = 0,
-					NECK = 0,
-					SHOULDER = 0,
-					UPPER_BODY = 0,
-					HAND = 0,
-					WAIST = 0,
-					LOWER_BODY = 0,
-					FOOT = 0,
-					RELIC = 0,
-					RING_1 = 0,
-					RING_2 = 0,
-					ACCESSORY_1 = 0
-				}
+				equiped = new int[20]
 			}
 		};
 

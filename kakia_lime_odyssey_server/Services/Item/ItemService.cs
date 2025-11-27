@@ -264,9 +264,9 @@ public class ItemService
 	private void SendUseItemResult(PlayerClient pc, long itemInstId, bool success)
 	{
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_USE_ITEM_SLOT_RESULT);
-		pw.Writer.Write(itemInstId);
-		pw.Writer.Write(success);
+		pw.Write((ushort)PacketType.SC_USE_ITEM_SLOT_RESULT);
+		pw.Write(itemInstId);
+		pw.Write(success);
 
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
@@ -277,12 +277,12 @@ public class ItemService
 	private void SendUseItemObjResult(PlayerClient pc, long itemInstId, long targetInstId, bool success)
 	{
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_USE_ITEM_OBJ_RESULT_LIST);
+		pw.Write((ushort)PacketType.SC_USE_ITEM_OBJ_RESULT_LIST);
 		// Variable length packet - write basic result
-		pw.Writer.Write((int)1); // result count
-		pw.Writer.Write(itemInstId);
-		pw.Writer.Write(targetInstId);
-		pw.Writer.Write(success);
+		pw.Write((int)1); // result count
+		pw.Write(itemInstId);
+		pw.Write(targetInstId);
+		pw.Write(success);
 
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
@@ -293,14 +293,14 @@ public class ItemService
 	private void SendUseItemPosResult(PlayerClient pc, long itemInstId, FPOS pos, bool success)
 	{
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_USE_ITEM_POS_RESULT_LIST);
+		pw.Write((ushort)PacketType.SC_USE_ITEM_POS_RESULT_LIST);
 		// Variable length packet - write basic result
-		pw.Writer.Write((int)1); // result count
-		pw.Writer.Write(itemInstId);
-		pw.Writer.Write(pos.x);
-		pw.Writer.Write(pos.y);
-		pw.Writer.Write(pos.z);
-		pw.Writer.Write(success);
+		pw.Write((int)1); // result count
+		pw.Write(itemInstId);
+		pw.Write(pos.x);
+		pw.Write(pos.y);
+		pw.Write(pos.z);
+		pw.Write(success);
 
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
@@ -510,13 +510,13 @@ public class ItemService
 
 		// Send SC_SLOT_ITEM_INFO
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_SLOT_ITEM_INFO);
-		pw.Writer.Write(item.Id);
-		pw.Writer.Write(item.Name ?? "Unknown");
-		pw.Writer.Write(item.Desc ?? "");
-		pw.Writer.Write(item.Grade);
-		pw.Writer.Write(item.Type);
-		pw.Writer.Write(item.Price);
+		pw.Write((ushort)PacketType.SC_SLOT_ITEM_INFO);
+		pw.Write(item.Id);
+		pw.Write(item.Name ?? "Unknown");
+		pw.Write(item.Desc ?? "");
+		pw.Write(item.Grade);
+		pw.Write(item.Type);
+		pw.Write(item.Price);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 

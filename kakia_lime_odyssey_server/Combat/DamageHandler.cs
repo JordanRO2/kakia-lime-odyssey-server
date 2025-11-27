@@ -240,10 +240,12 @@ public static class DamageHandler
 		return weaponType switch
 		{
 			WeaponType.Bow => 20.0f,
-			WeaponType.CrossBow => 25.0f,
-			WeaponType.Gun => 30.0f,
+			WeaponType.Crossbow => 25.0f,
+			WeaponType.Pistol => 30.0f,
+			WeaponType.LongGun => 30.0f,
 			WeaponType.Wand => 12.0f,
-			WeaponType.Staff => 10.0f,
+			WeaponType.OneHandStaff => 10.0f,
+			WeaponType.TwoHandedStaff => 10.0f,
 			_ => 15.0f
 		};
 	}

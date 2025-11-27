@@ -226,7 +226,7 @@ public class TradeService
 
 		// Send trade end packet
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_TRADE_END);
+		pw.Write((ushort)PacketType.SC_TRADE_END);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
@@ -286,7 +286,7 @@ public class TradeService
 		// Set as current target
 		pc.SetCurrentTarget(npcInstId);
 
-		Logger.Log($"[TRADE] {playerName} opened trade with NPC {npc.Appearance.typeID}", LogLevel.Debug);
+		Logger.Log($"[TRADE] {playerName} opened trade with NPC {npc.Appearance.appearance.typeID}", LogLevel.Debug);
 
 		// Send trade description packet with NPC shop items
 		// TODO: Load shop items from NPC definition when shop system is implemented
@@ -301,9 +301,9 @@ public class TradeService
 		// For now, send a basic trade description
 		// TODO: Implement actual shop inventory lookup based on NPC type
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_TRADE_DESC);
-		pw.Writer.Write((long)npc.Id); // NPC instance ID
-		pw.Writer.Write((int)npc.Appearance.typeID); // NPC type ID
+		pw.Write((ushort)PacketType.SC_TRADE_DESC);
+		pw.Write((long)npc.Id); // NPC instance ID
+		pw.Write((int)npc.Appearance.appearance.typeID); // NPC type ID
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
@@ -354,14 +354,14 @@ public class TradeService
 
 		// Send SC_SOLD_ITEM_LIST packet
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_SOLD_ITEM_LIST);
-		pw.Writer.Write(soldItems.Count);
+		pw.Write((ushort)PacketType.SC_SOLD_ITEM_LIST);
+		pw.Write(soldItems.Count);
 
 		foreach (var item in soldItems)
 		{
-			pw.Writer.Write(item.ItemTypeId);
-			pw.Writer.Write(item.Count);
-			pw.Writer.Write(item.SellPrice);
+			pw.Write(item.ItemTypeId);
+			pw.Write(item.Count);
+			pw.Write(item.SellPrice);
 		}
 
 		pc.Send(pw.ToSizedPacket(), default).Wait();
@@ -439,8 +439,8 @@ public class TradeService
 
 		// Send confirmation
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_TRADE_BOUGHT_SOLD_ITEMS);
-		pw.Writer.Write(itemsReturned);
+		pw.Write((ushort)PacketType.SC_TRADE_BOUGHT_SOLD_ITEMS);
+		pw.Write(itemsReturned);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 
 		// Update inventory

@@ -27,7 +27,7 @@ public partial class Monster : INPC
 			return;
 		}
 
-		using (PacketWriter pw = new(false))
+		using (PacketWriter pw = new())
 		{
 			SC_START_COMBATING sc_start_combat = new()
 			{
@@ -42,7 +42,7 @@ public partial class Monster : INPC
 			_startedAttacking = true;
 			_actionStartTick = serverTick;
 
-			using (PacketWriter pw = new(false))
+			using (PacketWriter pw = new())
 			{
 				SC_DO_ACTION actionSkill = new()
 				{
@@ -64,7 +64,7 @@ public partial class Monster : INPC
 
 			if (result.TargetKilled)
 			{
-				using (PacketWriter pw = new(false))
+				using (PacketWriter pw = new())
 				{
 					SC_DEAD dead = new()
 					{

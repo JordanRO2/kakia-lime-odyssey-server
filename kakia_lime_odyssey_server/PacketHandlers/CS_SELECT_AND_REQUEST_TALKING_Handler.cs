@@ -20,7 +20,7 @@ class CS_SELECT_AND_REQUEST_TALKING_Handler : PacketHandler
 			dialog = "I got nothing to say yet."
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(talking);
 
 		client.Send(pw.ToSizedPacket(), default).Wait();

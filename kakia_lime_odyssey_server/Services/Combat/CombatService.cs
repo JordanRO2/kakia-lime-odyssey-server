@@ -131,7 +131,7 @@ public class CombatService : ICombatService
 		}
 
 		// Step 4: Check for critical hit
-		int critChance = Math.Clamp(source.MeleeAttack.CritRate, 0, 100);
+		int critChance = Math.Clamp((int)source.MeleeAttack.CritRate, 0, 100);
 		if (rnd.Next(0, 100) < critChance)
 			return HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT;
 
@@ -170,7 +170,7 @@ public class CombatService : ICombatService
 		}
 
 		// Critical check
-		int critChance = Math.Clamp(subAttack.CritRate, 0, 100);
+		int critChance = Math.Clamp((int)subAttack.CritRate, 0, 100);
 		if (rnd.Next(0, 100) < critChance)
 			return HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT;
 
@@ -302,7 +302,7 @@ public class CombatService : ICombatService
 		double normalVariance = 0.8 + (rnd.NextDouble() * 0.4);
 		double defReduction = targetStatus.MeleeAttack.Def / (targetStatus.MeleeAttack.Def + 100.0);
 		double baseDamage = subAttack.Atk * (1.0 - defReduction) * normalVariance * offHandPenalty;
-		return (uint)Math.Max(1, baseDamage);
+		return (uint)Math.Max(1.0, baseDamage);
 	}
 
 	/// <inheritdoc/>
@@ -332,7 +332,7 @@ public class CombatService : ICombatService
 		bool isMiss = rnd.Next(0, 100) >= hitChance;
 
 		// Critical hit check (capped at 100%)
-		int clampedCritRate = Math.Clamp(critRate, 0, 100);
+		int clampedCritRate = Math.Clamp((int)critRate, 0, 100);
 		bool isCrit = !isMiss && rnd.Next(0, 100) < clampedCritRate;
 
 		// Calculate skill multiplier based on skill level
@@ -381,7 +381,7 @@ public class CombatService : ICombatService
 		bool isMiss = rnd.Next(0, 100) >= hitChance;
 
 		// Critical hit check (capped at 100%)
-		int clampedCrit = Math.Clamp(critRate, 0, 100);
+		int clampedCrit = Math.Clamp((int)critRate, 0, 100);
 		bool isCrit = !isMiss && rnd.Next(0, 100) < clampedCrit;
 
 		uint damage = CalculateMagicalDamage(spellAtk, spellDef, isMiss, isCrit, rnd);
@@ -511,7 +511,7 @@ public class CombatService : ICombatService
 			baseDamage = attackStat * (1.0 - defReduction) * normalVariance * skillMultiplier;
 		}
 
-		return (uint)Math.Max(1, baseDamage);
+		return (uint)Math.Max(1.0, baseDamage);
 	}
 
 	/// <summary>
@@ -540,7 +540,7 @@ public class CombatService : ICombatService
 		double normalVariance = 0.9 + (rnd.NextDouble() * 0.2);
 		double normalDefReduction = spellDef / (spellDef + 120.0); // Magic defense slightly less effective
 		double baseDamage = spellAtk * (1.0 - normalDefReduction) * normalVariance;
-		return (uint)Math.Max(1, baseDamage);
+		return (uint)Math.Max(1.0, baseDamage);
 	}
 
 	/// <inheritdoc/>
@@ -558,7 +558,7 @@ public class CombatService : ICombatService
 	/// <inheritdoc/>
 	public bool RollCritical(int critRate)
 	{
-		int clampedCrit = Math.Clamp(critRate, 0, 100);
+		int clampedCrit = Math.Clamp((int)critRate, 0, 100);
 		return _random.Value!.Next(0, 100) < clampedCrit;
 	}
 
@@ -583,7 +583,7 @@ public class CombatService : ICombatService
 		double normalVariance = 0.8 + (rnd.NextDouble() * 0.4);
 		double defReduction = targetStatus.MeleeAttack.Def / (targetStatus.MeleeAttack.Def + 100.0);
 		double baseDamage = sourceStatus.MeleeAttack.Atk * (1.0 - defReduction) * normalVariance;
-		return (uint)Math.Max(1, baseDamage);
+		return (uint)Math.Max(1.0, baseDamage);
 	}
 
 	/// <summary>
@@ -732,12 +732,14 @@ public class CombatService : ICombatService
 
 		return weaponType switch
 		{
-			WeaponType.Bow => 20.0f,        // Faster arrow velocity
-			WeaponType.CrossBow => 25.0f,   // Crossbow bolts are fastest
-			WeaponType.Gun => 30.0f,        // Bullets are very fast
-			WeaponType.Wand => 12.0f,       // Magic projectiles are slower
-			WeaponType.Staff => 10.0f,      // Staff magic even slower
-			_ => 15.0f                       // Default projectile speed
+			WeaponType.Bow => 20.0f,             // Faster arrow velocity
+			WeaponType.Crossbow => 25.0f,        // Crossbow bolts are fastest
+			WeaponType.Pistol => 30.0f,          // Bullets are very fast
+			WeaponType.LongGun => 30.0f,         // Bullets are very fast
+			WeaponType.Wand => 12.0f,            // Magic projectiles are slower
+			WeaponType.OneHandStaff => 10.0f,    // Staff magic even slower
+			WeaponType.TwoHandedStaff => 10.0f,  // Staff magic even slower
+			_ => 15.0f                            // Default projectile speed
 		};
 	}
 

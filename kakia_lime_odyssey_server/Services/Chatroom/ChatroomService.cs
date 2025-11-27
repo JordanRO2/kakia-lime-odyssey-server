@@ -51,7 +51,7 @@ public class ChatroomService
 
 		SendEntered(creator, room);
 
-		Logger.Log($"[CHATROOM] {member.Name} created chatroom '{name}' (ID: {roomId})", LogLevel.Info);
+		Logger.Log($"[CHATROOM] {member.Name} created chatroom '{name}' (ID: {roomId})", LogLevel.Information);
 
 		return room;
 	}
@@ -75,7 +75,7 @@ public class ChatroomService
 
 		_chatrooms.TryRemove(room.RoomId, out _);
 
-		Logger.Log($"[CHATROOM] Chatroom '{room.Name}' destroyed", LogLevel.Info);
+		Logger.Log($"[CHATROOM] Chatroom '{room.Name}' destroyed", LogLevel.Information);
 
 		return true;
 	}
@@ -236,6 +236,7 @@ public class ChatroomService
 	{
 		using PacketWriter pw = new();
 
+		pw.WriteHeader(PacketType.SC_PRIVATE_CHATROOM_ENTERED);
 		pw.Write(room.MasterId);
 		pw.Write(room.Type);
 
@@ -248,7 +249,7 @@ public class ChatroomService
 			pw.Write(nameBytes);
 		}
 
-		player.Send(pw.ToSizedPacket(PacketType.SC_PRIVATE_CHATROOM_ENTERED), default).Wait();
+		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	private static void SendDestroyed(PlayerClient player)
@@ -262,12 +263,13 @@ public class ChatroomService
 	{
 		using PacketWriter pw = new();
 
+		pw.WriteHeader(PacketType.SC_PRIVATE_CHATROOM_MEMBER_ADDED);
 		pw.Write(instId);
 		var nameBytes = Encoding.ASCII.GetBytes(name);
 		pw.Write((byte)nameBytes.Length);
 		pw.Write(nameBytes);
 
-		player.Send(pw.ToSizedPacket(PacketType.SC_PRIVATE_CHATROOM_MEMBER_ADDED), default).Wait();
+		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	private static void SendLeft(PlayerClient player, long instId)
@@ -281,12 +283,13 @@ public class ChatroomService
 	{
 		using PacketWriter pw = new();
 
+		pw.WriteHeader(PacketType.SC_PRIVATE_CHATROOM_SAY);
 		pw.Write(senderId);
 		var msgBytes = Encoding.ASCII.GetBytes(message);
 		pw.Write(msgBytes);
 		pw.Write((byte)0);
 
-		player.Send(pw.ToSizedPacket(PacketType.SC_PRIVATE_CHATROOM_SAY), default).Wait();
+		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	// ============ REALM-WIDE CHAT ============
@@ -315,6 +318,7 @@ public class ChatroomService
 	{
 		using PacketWriter pw = new();
 
+		pw.WriteHeader(PacketType.SC_REALM_SAY);
 		pw.Write(senderId);
 		pw.Write(maintainTime);
 		pw.Write(type);
@@ -322,7 +326,7 @@ public class ChatroomService
 		pw.Write(msgBytes);
 		pw.Write((byte)0);
 
-		player.Send(pw.ToSizedPacket(PacketType.SC_REALM_SAY), default).Wait();
+		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	// ============ SERVER NOTICES ============
@@ -362,6 +366,8 @@ public class ChatroomService
 	{
 		using PacketWriter pw = new();
 
+		pw.WriteHeader(PacketType.SC_NOTICE);
+
 		// Write fixed 26-byte 'from' field
 		var fromBytes = Encoding.ASCII.GetBytes(from);
 		var fromBuffer = new byte[26];
@@ -373,6 +379,6 @@ public class ChatroomService
 		pw.Write(msgBytes);
 		pw.Write((byte)0);
 
-		player.Send(pw.ToSizedPacket(PacketType.SC_NOTICE), default).Wait();
+		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 }

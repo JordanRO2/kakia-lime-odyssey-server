@@ -28,8 +28,8 @@ class CS_EQUIPPED_ITEM_REPAIR_PRICE_Handler : PacketHandler
 
 		// Send SC_EQUIPPED_ITEM_REPAIR_PRICE with total cost
 		using PacketWriter pw = new();
-		pw.Writer.Write((ushort)PacketType.SC_EQUIPPED_ITEM_REPAIR_PRICE);
-		pw.Writer.Write(price);
+		pw.Write((ushort)PacketType.SC_EQUIPPED_ITEM_REPAIR_PRICE);
+		pw.Write(price);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 }

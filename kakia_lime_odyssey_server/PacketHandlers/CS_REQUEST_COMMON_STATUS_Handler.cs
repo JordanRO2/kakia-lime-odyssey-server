@@ -21,7 +21,7 @@ class CS_REQUEST_COMMON_STATUS_Handler : PacketHandler
 			status = status 
 		};
 
-		using PacketWriter pw = new(client.GetClientRevision() == 345);
+		using PacketWriter pw = new();
 		pw.Write(sc_status);
 
 		client.Send(pw.ToPacket(), default).Wait();
