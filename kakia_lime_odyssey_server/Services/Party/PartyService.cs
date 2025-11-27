@@ -241,6 +241,54 @@ public class PartyService : IPartyService
 	}
 
 	/// <summary>
+	/// Requests to join a player's party.
+	/// </summary>
+	public PartyResult RequestJoin(PlayerClient requester, string targetName)
+	{
+		var requesterChar = requester.GetCurrentCharacter();
+		if (requesterChar == null)
+			return PartyResult.Fail(PartyError.PlayerNotFound);
+
+		// Cannot request to join your own party
+		if (requesterChar.appearance.name.Equals(targetName, StringComparison.OrdinalIgnoreCase))
+			return PartyResult.Fail(PartyError.CannotInviteSelf, "Cannot request to join yourself");
+
+		// Check if requester is already in a party
+		if (_playerPartyMap.ContainsKey(requester.GetId()))
+			return PartyResult.Fail(PartyError.PlayerAlreadyInParty, "You are already in a party");
+
+		// Find target player
+		var target = LimeServer.PlayerClients.FirstOrDefault(p =>
+		{
+			var c = p.GetCurrentCharacter();
+			return c != null && c.appearance.name.Equals(targetName, StringComparison.OrdinalIgnoreCase);
+		});
+
+		if (target == null)
+			return PartyResult.Fail(PartyError.PlayerNotFound, $"Player '{targetName}' not found");
+
+		// Check if target has a party
+		var party = GetParty(target);
+		if (party == null)
+			return PartyResult.Fail(PartyError.PartyNotFound, $"Player '{targetName}' is not in a party");
+
+		// Check if party is full
+		if (party.IsFull)
+			return PartyResult.Fail(PartyError.PartyFull, "Party is full");
+
+		// Get party leader
+		var leader = party.GetLeader();
+		if (leader == null)
+			return PartyResult.Fail(PartyError.NotPartyLeader, "Party has no leader");
+
+		// TODO: Send join request notification to party leader
+		// For now, just log the request
+		Logger.Log($"[PARTY] {requesterChar.appearance.name} requested to join party '{party.Name}'", LogLevel.Debug);
+
+		return PartyResult.Ok(party);
+	}
+
+	/// <summary>
 	/// Player voluntarily leaves party.
 	/// </summary>
 	public bool LeaveParty(PlayerClient player)
