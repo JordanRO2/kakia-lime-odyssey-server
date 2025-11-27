@@ -7,15 +7,12 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 /// <summary>
 /// SC_MOVE - Server broadcasts player movement to clients
 /// Sent when a player character moves in the world
-/// Total size: 59 bytes
-/// IDA verified: 2025-11-26
+/// Total size: 59 bytes (2 byte header handled by IPacketFixed + 57 byte payload)
+/// IDA verified: 2025-11-27
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_MOVE : IPacketFixed
 {
-	/// <summary>Packet header (2 bytes)</summary>
-	public ushort header;
-
 	/// <summary>Object instance ID of the moving character (8 bytes)</summary>
 	public long objInstID;
 

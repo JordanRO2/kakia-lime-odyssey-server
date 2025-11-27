@@ -1,8 +1,10 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 namespace kakia_lime_odyssey_server.Models.FileHandler.Terrain;
 
+[SupportedOSPlatform("windows")]
 public class FullTerrain
 {
 	public List<ParsedTrnData> Quadrants { get; set; }
@@ -44,7 +46,7 @@ public class FullTerrain
 		{
 			if (q?.NormalTable != null) { sample = q; break; }
 		}
-		if (sample == null)
+		if (sample == null || sample.NormalTable == null)
 		{
 			Console.WriteLine("No normal map data available.");
 			return false;

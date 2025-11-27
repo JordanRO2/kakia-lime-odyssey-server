@@ -154,7 +154,7 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	public async Task PacketRecieved(RawPacket packet)
 	{
-		PacketHandler handler = kakia_lime_odyssey_network.Handler.PacketHandlers.GetHandlerFor(packet.PacketId);
+		PacketHandler? handler = kakia_lime_odyssey_network.Handler.PacketHandlers.GetHandlerFor(packet.PacketId);
 		//Logger.Log($"Recieved [{packet.PacketId}]", LogLevel.Debug);
 		if (handler != null)
 		{

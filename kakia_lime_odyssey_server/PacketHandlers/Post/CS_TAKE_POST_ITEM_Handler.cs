@@ -15,7 +15,7 @@ class CS_TAKE_POST_ITEM_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		var packet = PacketConverter.Extract<PACKET_CS_TAKE_POST_ITEM>(p.Payload);
+		var packet = PacketConverter.Extract<CS_TAKE_POST_ITEM>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[POST] {playerName} taking items from mail index {packet.indexNumber}", LogLevel.Debug);

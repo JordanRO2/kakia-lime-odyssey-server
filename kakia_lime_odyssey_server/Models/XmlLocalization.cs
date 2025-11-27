@@ -8,18 +8,18 @@ public class XmlMessage
 	[XmlAttribute(AttributeName = "ID")]
 	public int ID { get; set; }
 	[XmlAttribute(AttributeName = "Text")]
-	public string Text { get; set; } 
+	public string Text { get; set; } = string.Empty;
 	[XmlAttribute(AttributeName = "Note_File")]
-	public string NoteFile { get; set; } 
+	public string NoteFile { get; set; } = string.Empty;
 	[XmlAttribute(AttributeName = "Note_Field")]
-	public string NoteField { get; set; } 
+	public string NoteField { get; set; } = string.Empty; 
 }
 
 [XmlRoot(ElementName = "Localization")]
 public class XmlLocalization
 {
-	[XmlElement(ElementName = "Message")] 
-	public List<XmlMessage> Messages { get; set; }
+	[XmlElement(ElementName = "Message")]
+	public List<XmlMessage> Messages { get; set; } = new();
 
 	public static List<XmlMessage> GetEntries()
 	{

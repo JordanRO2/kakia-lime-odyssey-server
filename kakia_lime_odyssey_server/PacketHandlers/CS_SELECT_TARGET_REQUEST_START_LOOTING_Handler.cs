@@ -17,14 +17,17 @@ class CS_SELECT_TARGET_REQUEST_START_LOOTING_Handler : PacketHandler
 		var monsterId =  client.GetCurrentTarget();
 		if (monsterId == 0) return;
 
-		if (!LimeServer.TryGetEntity(monsterId, out var mob)) return;
+		if (!LimeServer.TryGetEntity(monsterId, out var mob) || mob == null) return;
 
 
 		List<INVENTORY_ITEM> items = new();
 
 		var loot = mob.GetLoot();
-		for (int i = 0; i < loot.Count; i++)
-			items.Add(loot[i].AsInventoryItem(loot[i].Id));
+		if (loot != null)
+		{
+			for (int i = 0; i < loot.Count; i++)
+				items.Add(loot[i].AsInventoryItem(loot[i].Id));
+		}
 
 		SC_LOOTABLE_ITEM_LIST sc_lootable_item_list = new() 
 		{ 

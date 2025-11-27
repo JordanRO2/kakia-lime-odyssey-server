@@ -221,5 +221,5 @@ public class XmlMonster
 	[XmlElement(ElementName = "Subject")] public List<MobSubject> Subjects { get; set; } = default!;
 
 	[XmlIgnore]
-	public Model Model { get; set; }
+	public Model? Model { get; set; }
 }

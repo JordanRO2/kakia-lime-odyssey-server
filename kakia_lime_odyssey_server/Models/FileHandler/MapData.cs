@@ -3,9 +3,11 @@ using kakia_lime_odyssey_server.Models.FileHandler.Terrain;
 using System.Text.Json;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 namespace kakia_lime_odyssey_server.Models.FileHandler;
 
+[SupportedOSPlatform("windows")]
 public class MapData
 {
 	public string Name { get; set; }
@@ -47,7 +49,7 @@ public class MapData
 
 		// Determine per-quadrant tile sizes (assume consistent sizes across quadrants)
 		var sample = terrainQuads.FirstOrDefault(q => q?.HeightTable != null);
-		if (sample == null)
+		if (sample == null || sample.HeightTable == null)
 			throw new InvalidOperationException("No height tables available in any quadrant.");
 
 		int qHeight = sample.HeightTable.GetLength(0);

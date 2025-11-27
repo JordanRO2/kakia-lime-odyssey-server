@@ -18,6 +18,6 @@ public struct SC_SELECTED_COMBAT_JOB : IPacketFixed
 	/// <summary>Instance ID of the player who selected the job</summary>
 	public long objInstID;
 
-	/// <summary>Job type ID (combat job category)</summary>
-	public byte jobTypeID;
+	/// <summary>Job type ID (combat job category) - char in IDA (signed)</summary>
+	public sbyte jobTypeID;
 }

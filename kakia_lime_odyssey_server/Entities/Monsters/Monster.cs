@@ -438,7 +438,7 @@ public partial class Monster : INpc, IEntity
 			},
 			MeleeAttack = new()
 			{
-				WeaponTypeId = (uint)_mobInfo.Model.WeaponType,
+				WeaponTypeId = (uint)(_mobInfo.Model?.WeaponType ?? 0),
 				Atk = (ushort)_mobInfo.BaseMeleeAtk,
 				Def = (ushort)_mobInfo.BaseMeleeDefense,
 				Hit = (ushort)_mobInfo.BaseMeleeHitRate,
@@ -500,7 +500,7 @@ public partial class Monster : INpc, IEntity
 
 	void IEntity.Loot(Item item)
 	{
-		if (Loot.Contains(item))
+		if (Loot != null && Loot.Contains(item))
 			Loot.Remove(item);
 	}
 

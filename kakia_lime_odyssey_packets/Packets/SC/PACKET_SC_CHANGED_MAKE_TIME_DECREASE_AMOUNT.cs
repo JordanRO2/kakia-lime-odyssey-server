@@ -11,12 +11,13 @@
 /// </remarks>
 using System.Runtime.InteropServices;
 using kakia_lime_odyssey_packets.Packets.Common;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using kakia_lime_odyssey_packets.Packets.Models;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PACKET_SC_CHANGED_MAKE_TIME_DECREASE_AMOUNT
+public struct PACKET_SC_CHANGED_MAKE_TIME_DECREASE_AMOUNT : IPacketFixed
 {
 	/// <summary>Packet header</summary>
 	public PACKET_FIX header;
@@ -32,4 +33,6 @@ public struct PACKET_SC_CHANGED_MAKE_TIME_DECREASE_AMOUNT
 
 	/// <summary>Extra value (purpose unknown)</summary>
 	public float extra;
+
+	public const int Size = 22;
 }

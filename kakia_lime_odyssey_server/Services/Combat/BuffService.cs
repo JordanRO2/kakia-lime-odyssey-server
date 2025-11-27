@@ -56,8 +56,6 @@ public class BuffService : IBuffService
 		long targetId = target.GetId();
 		var buffs = _entityBuffs.GetOrAdd(targetId, _ => new List<ActiveBuff>());
 
-		bool replacedExisting = false;
-
 		lock (buffs)
 		{
 			// Check for existing buff of same type

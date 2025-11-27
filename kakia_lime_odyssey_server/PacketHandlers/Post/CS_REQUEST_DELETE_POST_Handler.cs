@@ -15,7 +15,7 @@ class CS_REQUEST_DELETE_POST_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		var packet = PacketConverter.Extract<PACKET_CS_REQUEST_DELETE_POST>(p.Payload);
+		var packet = PacketConverter.Extract<CS_REQUEST_DELETE_POST>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[POST] {playerName} requesting to delete mail index {packet.indexNumber}", LogLevel.Debug);

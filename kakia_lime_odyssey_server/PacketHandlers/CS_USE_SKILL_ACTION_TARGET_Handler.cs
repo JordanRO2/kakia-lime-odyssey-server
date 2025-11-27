@@ -115,7 +115,8 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 			if (result.ExpReward == 0)
 				return;
 
-			var pcEntity = client as IEntity;
+			if (client is not IEntity pcEntity)
+				return;
 			var levelUp = pcEntity.AddExp((ulong)result.ExpReward);
 			var currentStatus = pcEntity.GetEntityStatus();
 

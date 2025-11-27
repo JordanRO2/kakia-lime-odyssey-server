@@ -57,7 +57,7 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 			sc_move.move_list.Add(new()
 			{
 				fromCount = 0,
-				toCount = cs_move.count,
+				toCount = (ulong)cs_move.count,
 				fromSlot = cs_move.from,
 				toSlot = cs_move.to
 			});
@@ -94,16 +94,16 @@ class CS_MOVE_SLOT_ITEM_Handler : PacketHandler
 
 				sc_move.move_list.Add(new()
 				{
-					fromCount = cs_move.count,
-					toCount = cs_move.count,
+					fromCount = (ulong)cs_move.count,
+					toCount = (ulong)cs_move.count,
 					fromSlot = cs_move.from,
 					toSlot = cs_move.to
 				});
 
 				sc_move.move_list.Add(new()
 				{
-					fromCount = cs_move.count,
-					toCount = cs_move.count,
+					fromCount = (ulong)cs_move.count,
+					toCount = (ulong)cs_move.count,
 					fromSlot = cs_move.to,
 					toSlot = cs_move.from
 				});

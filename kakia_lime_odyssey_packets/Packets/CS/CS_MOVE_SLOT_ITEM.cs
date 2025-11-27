@@ -27,6 +27,6 @@ public struct CS_MOVE_SLOT_ITEM : IPacketFixed
 	/// <summary>Destination item slot</summary>
 	public ITEM_SLOT to;
 
-	/// <summary>Number of items to move</summary>
-	public ulong count;
+	/// <summary>Number of items to move (signed __int64 in IDA)</summary>
+	public long count;
 }

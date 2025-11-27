@@ -9,14 +9,11 @@
 /// Sent to the requesting player after CS_REQUEST_EXCHANGE.
 /// </remarks>
 using System.Runtime.InteropServices;
-using kakia_lime_odyssey_packets.Packets.Common;
-using kakia_lime_odyssey_packets.Packets.Models;
+using kakia_lime_odyssey_packets.Packets.Interface;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PACKET_SC_REQUEST_EXCHANGE
+public struct PACKET_SC_REQUEST_EXCHANGE : IPacketFixed
 {
-	/// <summary>Packet header</summary>
-	public PACKET_FIX header;
 }

@@ -54,8 +54,8 @@ public partial class Monster : INPC, IEntity
 	private readonly uint update_distance = 1500;
 	private readonly uint aggro_range = 150;
 
-	private List<LootableItem> Lootable { get; set; }
-	private List<Item> Loot { get; set; }
+	private List<LootableItem> Lootable { get; set; } = new();
+	private List<Item> Loot { get; set; } = new();
 
 	public Monster(XmlMonster mobInfo, uint id, FPOS pos, FPOS dir, uint zone, bool aggro, int lootTable)
 	{
@@ -375,15 +375,8 @@ public partial class Monster : INPC, IEntity
 
 	private float GetCurrentAccel()
 	{
+		// TODO: Enable velocity-based acceleration when needed
 		return 1.0f;
-
-		var velocities = GetVelocities();
-		return _moveType switch
-		{
-			MOVE_TYPE.MOVE_TYPE_RUN => velocities.runAccel,
-			MOVE_TYPE.MOVE_TYPE_WALK => velocities.walkAccel,
-			_ => velocities.walkAccel
-		};
 	}
 
 	private VELOCITIES GetVelocities()
@@ -448,7 +441,7 @@ public partial class Monster : INPC, IEntity
 			},
 			MeleeAttack = new()
 			{
-				WeaponTypeId = (uint)_mobInfo.Model.WeaponType,
+				WeaponTypeId = (uint)(_mobInfo.Model?.WeaponType ?? 0),
 				Atk = (ushort)_mobInfo.BaseMeleeAtk,
 				Def = (ushort)_mobInfo.BaseMeleeDefense,
 				Hit = (ushort)_mobInfo.BaseMeleeHitRate,

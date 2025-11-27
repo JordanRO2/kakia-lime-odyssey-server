@@ -47,7 +47,7 @@ class CS_CHOICED_COMBAT_JOB_Handler : PacketHandler
 		SC_SELECTED_COMBAT_JOB response = new()
 		{
 			objInstID = pc.GetObjInstID(),
-			jobTypeID = packet.index
+			jobTypeID = (sbyte)packet.index
 		};
 
 		using PacketWriter pw = new();
