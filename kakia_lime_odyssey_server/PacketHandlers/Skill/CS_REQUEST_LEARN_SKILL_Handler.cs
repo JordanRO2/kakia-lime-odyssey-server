@@ -23,8 +23,7 @@ class CS_REQUEST_LEARN_SKILL_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_REQUEST_LEARN_SKILL>();
+		var packet = PacketConverter.Extract<CS_REQUEST_LEARN_SKILL>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[SKILL] {playerName} requesting to learn skill {packet.typeID} at level {packet.lv}", LogLevel.Debug);

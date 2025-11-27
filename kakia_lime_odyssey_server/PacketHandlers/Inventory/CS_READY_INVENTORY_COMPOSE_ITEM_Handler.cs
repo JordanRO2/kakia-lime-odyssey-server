@@ -22,8 +22,7 @@ class CS_READY_INVENTORY_COMPOSE_ITEM_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_READY_INVENTORY_COMPOSE_ITEM>();
+		var packet = PacketConverter.Extract<CS_READY_INVENTORY_COMPOSE_ITEM>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMPOSE] {playerName} preparing composition for slot {packet.slot}", LogLevel.Debug);

@@ -23,8 +23,7 @@ class CS_REQUEST_PC_STATUS_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_REQUEST_PC_STATUS>();
+		var packet = PacketConverter.Extract<CS_REQUEST_PC_STATUS>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CHAR] {playerName} requesting status of player {packet.objInstID}", LogLevel.Debug);

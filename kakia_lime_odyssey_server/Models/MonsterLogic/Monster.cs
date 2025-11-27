@@ -8,6 +8,7 @@ using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models.MonsterXML;
 using kakia_lime_odyssey_server.Network;
+using System.Text;
 
 namespace kakia_lime_odyssey_server.Models.MonsterLogic;
 
@@ -105,6 +106,10 @@ public partial class Monster : INPC, IEntity
 
 	public MOB GetMob()
 	{
+		byte[] nameBytes = new byte[31];
+		byte[] sourceBytes = Encoding.GetEncoding(949).GetBytes(Name);
+		Array.Copy(sourceBytes, nameBytes, Math.Min(sourceBytes.Length, 30));
+
 		return new MOB()
 		{
 			Id = (int)Id,
@@ -114,7 +119,7 @@ public partial class Monster : INPC, IEntity
 			{
 				appearance = new()
 				{
-					name = Name,
+					name = nameBytes,
 					action = _mobInfo.Subjects.First().EventID,
 					actionStartTick = 0,
 					scale = 1,
@@ -409,6 +414,15 @@ public partial class Monster : INPC, IEntity
 		return Id;
 	}
 
+	/// <summary>
+	/// Gets the monster type ID from XML definition.
+	/// </summary>
+	/// <returns>Monster type ID.</returns>
+	public int GetEntityTypeId()
+	{
+		return _mobInfo.TypeID;
+	}
+
 	public FPOS GetPosition()
 	{
 		return GetMobCurrentPosition(LimeServer.GetCurrentTick());
@@ -463,7 +477,7 @@ public partial class Monster : INPC, IEntity
 		return new DamageResult()
 		{
 			TargetKilled = HP == 0,
-			ExpReward = _mobInfo.CombatJobEXP + _mobInfo.EXP
+			ExpReward = (ulong)(_mobInfo.CombatJobEXP + _mobInfo.EXP)
 		};
 	}
 

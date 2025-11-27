@@ -23,8 +23,7 @@ class CS_SELECT_AND_REQUEST_BOARD_QUESTS_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_SELECT_AND_REQUEST_BOARD_QUESTS>();
+		var packet = PacketConverter.Extract<CS_SELECT_AND_REQUEST_BOARD_QUESTS>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[QUEST] {playerName} selecting quest board {packet.objInstID} and requesting quests", LogLevel.Debug);

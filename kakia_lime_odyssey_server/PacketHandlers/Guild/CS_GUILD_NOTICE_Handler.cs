@@ -16,8 +16,7 @@ class CS_GUILD_NOTICE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_GUILD_NOTICE>();
+		var packet = PacketConverter.Extract<CS_GUILD_NOTICE>(p.Payload);
 
 		string notice = Encoding.ASCII.GetString(packet.notice).TrimEnd('\0');
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";

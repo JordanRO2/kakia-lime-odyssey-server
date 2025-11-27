@@ -142,7 +142,7 @@ public class HealingService : IHealingService
 		};
 	}
 
-	private static uint GetSkillHealAmount(XmlSkill? skill, XmlSubjectList? skillLevelData, int skillLevel)
+	private static uint GetSkillHealAmount(XmlSkill? skill, SkillSubjectList? skillLevelData, int skillLevel)
 	{
 		if (skill == null)
 			return 50; // Default heal amount
@@ -153,14 +153,11 @@ public class HealingService : IHealingService
 		// Scale with skill level (Level 1: 50, Level 2: 75, ... Level 7: 200)
 		baseHeal = (uint)(50 + (25 * Math.Max(0, skillLevel - 1)));
 
-		// If skill has specific heal values defined, use those
-		if (skillLevelData != null)
+		// If skill has specific heal values defined, use MP cost as a base heal indicator
+		// (Higher MP cost skills generally heal more)
+		if (skillLevelData != null && skillLevelData.UseMP > 0)
 		{
-			// Skills may define heal amount in effect values
-			// For now, use a formula based on skill level
-			baseHeal = (uint)(skillLevelData.PowerBase + skillLevelData.PowerGrow * skillLevel);
-			if (baseHeal == 0)
-				baseHeal = (uint)(50 + (25 * Math.Max(0, skillLevel - 1)));
+			baseHeal = (uint)(skillLevelData.UseMP * 2 + (25 * Math.Max(0, skillLevel - 1)));
 		}
 
 		return baseHeal;
@@ -171,7 +168,7 @@ public class HealingService : IHealingService
 		IEntity target,
 		int skillId,
 		XmlSkill? skill,
-		XmlSubjectList? skillLevelData)
+		SkillSubjectList? skillLevelData)
 	{
 		using PacketWriter pw = new();
 

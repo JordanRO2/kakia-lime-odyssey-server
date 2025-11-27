@@ -23,8 +23,7 @@ class CS_GUILD_REQUEST_JOIN_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_GUILD_REQUEST_JOIN>();
+		var packet = PacketConverter.Extract<CS_GUILD_REQUEST_JOIN>(p.Payload);
 
 		string guildName = Encoding.ASCII.GetString(packet.name).TrimEnd('\0');
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";

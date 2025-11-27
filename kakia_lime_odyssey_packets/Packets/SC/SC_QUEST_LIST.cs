@@ -18,6 +18,8 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 /// 0x0C: int completedSub - number of completed sub quests
 /// 0x10: int completedNormal - number of completed normal quests
 /// Total: 20 bytes
+///
+/// Note: PacketWriter uses a custom format that includes quest details in the same packet
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_QUEST_LIST : IPacketVar
@@ -26,4 +28,22 @@ public struct SC_QUEST_LIST : IPacketVar
 	public int completedMain;
 	public int completedSub;
 	public int completedNormal;
+
+	/// <summary>
+	/// Quest details list (not part of IDA struct layout, handled separately by PacketWriter)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public List<QuestDetail> details { get; set; }
+}
+
+/// <summary>
+/// Helper class for quest detail data used in PacketWriter
+/// Not part of the IDA structure
+/// </summary>
+public class QuestDetail
+{
+	public int questId { get; set; }
+	public int questState { get; set; }
+	public string questDescription { get; set; } = string.Empty;
 }

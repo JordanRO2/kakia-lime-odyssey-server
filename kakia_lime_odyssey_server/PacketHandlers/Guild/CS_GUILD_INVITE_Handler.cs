@@ -16,8 +16,7 @@ class CS_GUILD_INVITE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_GUILD_INVITE>();
+		var packet = PacketConverter.Extract<CS_GUILD_INVITE>(p.Payload);
 
 		string targetName = Encoding.ASCII.GetString(packet.name).TrimEnd('\0');
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";

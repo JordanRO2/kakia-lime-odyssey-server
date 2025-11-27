@@ -16,8 +16,7 @@ class CS_PRIVATE_CHATROOM_CREATE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_PRIVATE_CHATROOM_CREATE>();
+		var packet = PacketConverter.Extract<CS_PRIVATE_CHATROOM_CREATE>(p.Payload);
 
 		string name = Encoding.ASCII.GetString(packet.name).TrimEnd('\0');
 		string password = Encoding.ASCII.GetString(packet.password).TrimEnd('\0');

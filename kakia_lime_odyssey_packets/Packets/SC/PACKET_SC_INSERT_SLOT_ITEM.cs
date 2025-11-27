@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
-using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.Common;
+using kakia_lime_odyssey_packets.Packets.Models;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 

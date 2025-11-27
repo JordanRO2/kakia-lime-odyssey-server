@@ -15,8 +15,7 @@ class CS_PARTY_INVITE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_PARTY_INVITE>();
+		var packet = PacketConverter.Extract<CS_PARTY_INVITE>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[PARTY] {playerName} inviting '{packet.name}' to party", LogLevel.Debug);

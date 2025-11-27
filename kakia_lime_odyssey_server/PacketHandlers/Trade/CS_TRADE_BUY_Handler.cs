@@ -23,8 +23,7 @@ class CS_TRADE_BUY_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_TRADE_BUY>();
+		var packet = PacketConverter.Extract<CS_TRADE_BUY>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} buying item {packet.itemTypeID} x{packet.count} to slot {packet.slot}", LogLevel.Debug);

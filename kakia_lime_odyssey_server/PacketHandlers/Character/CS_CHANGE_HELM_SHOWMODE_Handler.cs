@@ -24,8 +24,7 @@ class CS_CHANGE_HELM_SHOWMODE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_CHANGE_HELM_SHOWMODE>();
+		var packet = PacketConverter.Extract<CS_CHANGE_HELM_SHOWMODE>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CHAR] {playerName} changing helmet visibility to {packet.show}", LogLevel.Debug);

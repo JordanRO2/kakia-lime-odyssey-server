@@ -287,7 +287,7 @@ public class MoveItemResult
 {
 	public bool Success { get; set; }
 	public string? Error { get; set; }
-	public List<SLOT_MOVE> Moves { get; set; } = new();
+	public List<MOVE_SLOT> Moves { get; set; } = new();
 }
 
 public class EquipItemResult

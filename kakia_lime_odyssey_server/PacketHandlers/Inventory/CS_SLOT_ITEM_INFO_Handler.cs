@@ -22,8 +22,7 @@ class CS_SLOT_ITEM_INFO_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_SLOT_ITEM_INFO>();
+		var packet = PacketConverter.Extract<CS_SLOT_ITEM_INFO>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ITEM] {playerName} requesting info for slot type {packet.slot.slotType} index {packet.slot.slotIdx}", LogLevel.Debug);

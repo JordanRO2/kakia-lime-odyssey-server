@@ -528,5 +528,9 @@ public enum PacketType : UInt16
 	SC_PRINT_IMAGE = 0x431,
 	ETC_LAST = 0x432,
 
+	// Character stat/skill distribution
+	CS_DISTRIBUTE_COMBAT_JOB_STATUS_POINT = 0xA33, // 2611
+	CS_DISTRIBUTE_COMBAT_JOB_SKILL_POINT = 0xA34,  // 2612
+
 	UNKNOWN
 }

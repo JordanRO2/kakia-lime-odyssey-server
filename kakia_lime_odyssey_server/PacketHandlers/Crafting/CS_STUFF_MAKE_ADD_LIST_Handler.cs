@@ -22,8 +22,7 @@ class CS_STUFF_MAKE_ADD_LIST_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_STUFF_MAKE_ADD_LIST>();
+		var packet = PacketConverter.Extract<CS_STUFF_MAKE_ADD_LIST>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} adding item to stuff make list", LogLevel.Debug);

@@ -24,5 +24,10 @@ public struct SC_PC_LIST : IPacketVar
 	/// <summary>Number of characters in the list (offset 0x04)</summary>
 	public byte count;
 
-	// Note: Variable-length array of CLIENT_PC follows, handled separately
+	/// <summary>
+	/// Variable-length array of characters (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public CLIENT_PC[] pc_list { get; set; }
 }

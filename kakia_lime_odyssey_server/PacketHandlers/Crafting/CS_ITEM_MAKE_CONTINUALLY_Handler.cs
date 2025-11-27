@@ -22,8 +22,7 @@ class CS_ITEM_MAKE_CONTINUALLY_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_ITEM_MAKE_CONTINUALLY>();
+		var packet = PacketConverter.Extract<CS_ITEM_MAKE_CONTINUALLY>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} starting continuous crafting x{packet.count}", LogLevel.Debug);

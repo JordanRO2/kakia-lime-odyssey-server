@@ -24,8 +24,7 @@ class CS_CHOICED_COMBAT_JOB_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_CHOICED_COMBAT_JOB>();
+		var packet = PacketConverter.Extract<CS_CHOICED_COMBAT_JOB>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[JOB] {playerName} selecting combat job index {packet.index}", LogLevel.Information);

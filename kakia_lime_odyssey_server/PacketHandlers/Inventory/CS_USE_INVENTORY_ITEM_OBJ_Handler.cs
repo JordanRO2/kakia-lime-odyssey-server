@@ -23,8 +23,7 @@ class CS_USE_INVENTORY_ITEM_OBJ_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<PACKET_CS_USE_INVENTORY_ITEM_OBJ>();
+		var packet = PacketConverter.Extract<PACKET_CS_USE_INVENTORY_ITEM_OBJ>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ITEM] {playerName} using item at slot {packet.slot} on object {packet.targetInstID}", LogLevel.Debug);

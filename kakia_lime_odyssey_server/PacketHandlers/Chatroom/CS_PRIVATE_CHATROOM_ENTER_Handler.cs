@@ -16,8 +16,7 @@ class CS_PRIVATE_CHATROOM_ENTER_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_PRIVATE_CHATROOM_ENTER>();
+		var packet = PacketConverter.Extract<CS_PRIVATE_CHATROOM_ENTER>(p.Payload);
 
 		string password = Encoding.ASCII.GetString(packet.password).TrimEnd('\0');
 

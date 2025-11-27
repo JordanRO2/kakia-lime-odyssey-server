@@ -29,5 +29,10 @@ public struct SC_SAY : IPacketVar
 	/// <summary>Message type/flags (offset 0x10)</summary>
 	public int type;
 
-	// Variable length message string follows (not included in struct)
+	/// <summary>
+	/// Chat message text (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public string message { get; set; }
 }

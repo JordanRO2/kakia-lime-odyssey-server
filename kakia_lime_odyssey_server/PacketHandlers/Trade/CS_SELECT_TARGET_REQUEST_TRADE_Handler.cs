@@ -22,8 +22,7 @@ class CS_SELECT_TARGET_REQUEST_TRADE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_SELECT_TARGET_REQUEST_TRADE>();
+		var packet = PacketConverter.Extract<CS_SELECT_TARGET_REQUEST_TRADE>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} requesting trade with NPC {packet.objInstID}", LogLevel.Debug);

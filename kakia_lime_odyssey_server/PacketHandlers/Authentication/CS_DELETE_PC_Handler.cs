@@ -25,8 +25,7 @@ class CS_DELETE_PC_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_DELETE_PC>();
+		var packet = PacketConverter.Extract<CS_DELETE_PC>(p.Payload);
 
 		string accountId = pc.GetAccountId();
 		Logger.Log($"[AUTH] Account {accountId} requesting to delete character at slot {packet.charNum}", LogLevel.Debug);

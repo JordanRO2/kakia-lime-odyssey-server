@@ -15,8 +15,7 @@ class CS_SELECT_TARGET_REQUEST_EXCHANGE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<PACKET_CS_SELECT_TARGET_REQUEST_EXCHANGE>();
+		var packet = PacketConverter.Extract<PACKET_CS_SELECT_TARGET_REQUEST_EXCHANGE>(p.Payload);
 
 		var target = LimeServer.PlayerClients.FirstOrDefault(x => x.GetId() == packet.objInstID);
 		if (target == null)

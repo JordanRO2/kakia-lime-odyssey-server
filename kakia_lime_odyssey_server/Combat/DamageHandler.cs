@@ -114,7 +114,7 @@ public static class DamageHandler
 			subIsMiss = rnd.Next(0, 100) >= subHitChance;
 
 			// Off-hand critical
-			int subCritChance = Math.Clamp(sourceStatus.SubAttack.CritRate, 0, 100);
+			int subCritChance = Math.Clamp((int)sourceStatus.SubAttack.CritRate, 0, 100);
 			subIsCrit = !subIsMiss && rnd.Next(0, 100) < subCritChance;
 
 			// Off-hand damage (50% penalty)

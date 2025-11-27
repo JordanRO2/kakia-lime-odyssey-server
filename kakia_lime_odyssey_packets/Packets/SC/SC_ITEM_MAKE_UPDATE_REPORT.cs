@@ -1,4 +1,4 @@
-using kakia_lime_odyssey_packets.Packets.Common;
+using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 

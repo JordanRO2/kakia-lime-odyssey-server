@@ -20,5 +20,10 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_SKILL_LIST : IPacketVar
 {
-	// Note: Variable-length array of SKILL follows, handled separately
+	/// <summary>
+	/// Variable-length array of skills (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public SKILL[] skills { get; set; }
 }

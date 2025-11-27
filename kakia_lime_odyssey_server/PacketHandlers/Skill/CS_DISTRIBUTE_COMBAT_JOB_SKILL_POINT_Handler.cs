@@ -23,8 +23,7 @@ class CS_DISTRIBUTE_COMBAT_JOB_SKILL_POINT_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_DISTRIBUTE_COMBAT_JOB_SKILL_POINT>();
+		var packet = PacketConverter.Extract<CS_DISTRIBUTE_COMBAT_JOB_SKILL_POINT>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[SKILL] {playerName} distributing {packet.point} points to skill {packet.skillTypeID}", LogLevel.Debug);

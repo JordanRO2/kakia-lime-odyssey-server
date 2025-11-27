@@ -16,8 +16,7 @@ class CS_GUILD_SAY_PC_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_GUILD_SAY_PC>();
+		var packet = PacketConverter.Extract<CS_GUILD_SAY_PC>(p.Payload);
 
 		// Read variable-length message
 		int messageLength = p.Size - 8; // Size minus the fixed fields (maintainTime + type)

@@ -23,8 +23,7 @@ class CS_USE_INVENTORY_COMPOSE_ITEM_SLOTS_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_USE_INVENTORY_COMPOSE_ITEM_SLOTS>();
+		var packet = PacketConverter.Extract<CS_USE_INVENTORY_COMPOSE_ITEM_SLOTS>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMPOSE] {playerName} executing composition on slot {packet.slot}", LogLevel.Debug);

@@ -27,5 +27,14 @@ public struct SC_INVENTORY_ITEM_LIST : IPacketVar
 	/// <summary>Maximum inventory slot count (offset 0x05)</summary>
 	public int maxCount;
 
-	// Note: Variable-length array of INVENTORY_ITEM follows, handled separately
+	/// <summary>Inventory grade/quality level (not in IDA struct, added for functionality)</summary>
+	[field: NonSerialized]
+	public byte inventoryGrade { get; set; }
+
+	/// <summary>
+	/// Variable-length array of inventory items (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public INVENTORY_ITEM[] inventory { get; set; }
 }

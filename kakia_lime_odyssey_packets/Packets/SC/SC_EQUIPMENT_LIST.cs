@@ -18,7 +18,12 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_COMBAT_JOB_EQUIPMENT_LIST : IPacketVar
 {
-	// Variable length equipment data follows (not included in struct)
+	/// <summary>
+	/// Variable-length array of equipment (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public EQUIPMENT[] equips { get; set; }
 }
 
 /// <summary>
@@ -30,5 +35,10 @@ public struct SC_COMBAT_JOB_EQUIPMENT_LIST : IPacketVar
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_LIFE_JOB_EQUIPMENT_LIST : IPacketVar
 {
-	// Variable length equipment data follows (not included in struct)
+	/// <summary>
+	/// Variable-length array of equipment (not part of struct layout, handled separately)
+	/// This field is not marshaled - it's for C# convenience only
+	/// </summary>
+	[field: NonSerialized]
+	public EQUIPMENT[] equips { get; set; }
 }

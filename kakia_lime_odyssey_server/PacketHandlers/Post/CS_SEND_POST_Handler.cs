@@ -17,8 +17,7 @@ class CS_SEND_POST_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<PACKET_CS_SEND_POST>();
+		var packet = PacketConverter.Extract<PACKET_CS_SEND_POST>(p.Payload);
 
 		string toName = Encoding.ASCII.GetString(packet.toName).TrimEnd('\0');
 		string title = Encoding.ASCII.GetString(packet.title).TrimEnd('\0');

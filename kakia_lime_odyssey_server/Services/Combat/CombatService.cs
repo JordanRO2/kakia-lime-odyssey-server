@@ -45,7 +45,7 @@ public class CombatService : ICombatService
 	private const float BlockDamageReduction = 0.75f;
 
 	/// <inheritdoc/>
-	public DamageResult DealWeaponDamage(IEntity source, IEntity target)
+	public AttackResult DealWeaponDamage(IEntity source, IEntity target)
 	{
 		var sourceStatus = source.GetEntityStatus();
 		var targetStatus = target.GetEntityStatus();
@@ -79,7 +79,7 @@ public class CombatService : ICombatService
 			bulletPacket = BuildBulletPacket(source, target, sourceStatus);
 		}
 
-		return new DamageResult
+		return new AttackResult
 		{
 			Damage = damage,
 			IsMiss = hitResult == HIT_FAIL_TYPE.HIT_FAIL_MISS || hitResult == HIT_FAIL_TYPE.HIT_FAIL_AVOID,
@@ -306,7 +306,7 @@ public class CombatService : ICombatService
 	}
 
 	/// <inheritdoc/>
-	public DamageResult DealSkillDamage(IEntity source, IEntity target, int skillId, int skillLevel)
+	public AttackResult DealSkillDamage(IEntity source, IEntity target, int skillId, int skillLevel)
 	{
 		var sourceStatus = source.GetEntityStatus();
 		var targetStatus = target.GetEntityStatus();
@@ -344,7 +344,7 @@ public class CombatService : ICombatService
 		// Build packet (using weapon hit for now - could create skill-specific packet)
 		var packet = BuildWeaponHitPacket(source, target, damage, isMiss, isCrit, sourceStatus);
 
-		return new DamageResult
+		return new AttackResult
 		{
 			Damage = damage,
 			IsMiss = isMiss,
@@ -357,7 +357,7 @@ public class CombatService : ICombatService
 	/// <summary>
 	/// Deals magical damage from source to target.
 	/// </summary>
-	public DamageResult DealMagicalDamage(IEntity source, IEntity target)
+	public AttackResult DealMagicalDamage(IEntity source, IEntity target)
 	{
 		var sourceStatus = source.GetEntityStatus();
 		var targetStatus = target.GetEntityStatus();
@@ -388,7 +388,7 @@ public class CombatService : ICombatService
 
 		var packet = BuildWeaponHitPacket(source, target, damage, isMiss, isCrit, sourceStatus);
 
-		return new DamageResult
+		return new AttackResult
 		{
 			Damage = damage,
 			IsMiss = isMiss,

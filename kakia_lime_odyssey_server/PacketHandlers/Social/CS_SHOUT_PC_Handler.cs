@@ -23,8 +23,7 @@ class CS_SHOUT_PC_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var shout = pr.Read<CS_SHOUT_PC>();
+		var shout = PacketConverter.Extract<CS_SHOUT_PC>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 

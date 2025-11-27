@@ -24,8 +24,7 @@ class CS_QUEST_COMPLETE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_QUEST_COMPLETE>();
+		var packet = PacketConverter.Extract<CS_QUEST_COMPLETE>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 

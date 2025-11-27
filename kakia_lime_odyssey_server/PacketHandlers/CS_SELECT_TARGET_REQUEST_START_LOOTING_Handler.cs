@@ -1,6 +1,6 @@
 ﻿using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
-using kakia_lime_odyssey_network.Interface;
+using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
@@ -32,7 +32,7 @@ class CS_SELECT_TARGET_REQUEST_START_LOOTING_Handler : PacketHandler
 			lootTable = items.ToArray()
 		};
 
-		using PacketWriter pw = new PacketWriter(client.GetClientRevision() == 345);
+		using PacketWriter pw = new PacketWriter();
 		pw.Write(sc_lootable_item_list);
 
 		client.Send(pw.ToSizedPacket(), default).Wait();

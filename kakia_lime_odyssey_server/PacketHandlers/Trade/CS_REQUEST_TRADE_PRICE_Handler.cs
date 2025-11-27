@@ -22,8 +22,7 @@ class CS_REQUEST_TRADE_PRICE_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_REQUEST_TRADE_PRICE>();
+		var packet = PacketConverter.Extract<CS_REQUEST_TRADE_PRICE>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} requesting price for slot {packet.slot}", LogLevel.Debug);

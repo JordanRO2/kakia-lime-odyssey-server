@@ -16,8 +16,7 @@ class CS_GUILD_CHANGE_OPTION_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new(p.Payload);
-		var packet = pr.Read<CS_GUILD_CHANGE_OPTION>();
+		var packet = PacketConverter.Extract<CS_GUILD_CHANGE_OPTION>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[GUILD] {playerName} changing guild option to {packet.type}", LogLevel.Debug);

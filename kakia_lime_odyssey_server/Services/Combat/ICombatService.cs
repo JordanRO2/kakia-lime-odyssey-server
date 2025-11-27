@@ -15,12 +15,12 @@ public interface ICombatService
 	/// <summary>
 	/// Calculates and deals weapon hit damage from source to target.
 	/// </summary>
-	DamageResult DealWeaponDamage(IEntity source, IEntity target);
+	AttackResult DealWeaponDamage(IEntity source, IEntity target);
 
 	/// <summary>
 	/// Calculates and deals skill damage from source to target.
 	/// </summary>
-	DamageResult DealSkillDamage(IEntity source, IEntity target, int skillId, int skillLevel);
+	AttackResult DealSkillDamage(IEntity source, IEntity target, int skillId, int skillLevel);
 
 	/// <summary>
 	/// Checks if an attack hits based on hit rate and dodge.
@@ -34,13 +34,13 @@ public interface ICombatService
 }
 
 /// <summary>
-/// Result of a damage calculation.
+/// Result of a combat attack calculation.
 /// </summary>
 /// <remarks>
 /// IDA Verified: Yes (2025-11-27)
 /// Maps to: AttackInfo (40 bytes) structure for damage/critical/hitFailType
 /// </remarks>
-public class DamageResult
+public class AttackResult
 {
 	/// <summary>Main hand damage dealt</summary>
 	public uint Damage { get; set; }
