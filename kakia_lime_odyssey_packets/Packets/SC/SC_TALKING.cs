@@ -1,45 +1,48 @@
-﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_TALKING - NPC dialog message
-/// IDA Structure: PACKET_SC_TALKING (12 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this to display NPC dialog text to the client.
-/// Variable-length packet with dialog string appended after the base structure.
-///
-/// Structure layout:
-/// 0x00: PACKET_VAR (4 bytes) - base packet header with variable data
-/// 0x04: __int64 objInstID - NPC instance ID
-/// Variable: dialog string data follows
-/// Total: 12 bytes + string data
+/// Server->Client packet for NPC dialog message.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_TALKING
+/// Size: 12 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: __int64 objInstID (8 bytes)
+/// Note: Variable-length - dialog string data follows the fixed fields
+/// Triggered by: CS_REQUEST_TALKING
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_TALKING : IPacketVar
 {
+	/// <summary>NPC instance ID (offset 0x04)</summary>
 	public long objInstID;
-	public string dialog;
+
+	// Variable length dialog string data follows (not included in struct)
 }
 
 /// <summary>
-/// SC_TALKING_CHOICE - NPC dialog choice menu
-/// IDA Structure: PACKET_SC_TALKING_CHOICE (12 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this to display choice menu in NPC dialog.
-/// Variable-length packet with choice strings appended after the base structure.
-///
-/// Structure layout:
-/// 0x00: PACKET_VAR (4 bytes) - base packet header with variable data
-/// 0x04: __int64 objInstID - NPC instance ID
-/// Variable: choice menu data follows
-/// Total: 12 bytes + choice data
+/// Server->Client packet for NPC dialog choice menu.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_TALKING_CHOICE
+/// Size: 12 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: __int64 objInstID (8 bytes)
+/// Note: Variable-length - choice menu data follows the fixed fields
+/// Triggered by: NPC dialog with choices
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_TALKING_CHOICE : IPacketVar
 {
+	/// <summary>NPC instance ID (offset 0x04)</summary>
 	public long objInstID;
+
+	// Variable length choice menu data follows (not included in struct)
 }

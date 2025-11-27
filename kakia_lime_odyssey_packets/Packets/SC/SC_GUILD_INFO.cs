@@ -1,26 +1,29 @@
-using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using kakia_lime_odyssey_packets.Packets.Models;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// Server->Client packet containing complete guild information.
+/// Contains complete guild information sent to a member.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_GUILD_INFO
-/// Size: 208 bytes total (4 byte PACKET_VAR header + 4 byte myID + 200 byte GUILD)
+/// Size: 208 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: unsigned int myID (4 bytes) - Player's member ID in guild
+/// - 0x08: GUILD guildInfo (200 bytes) - Guild information
 /// Triggered by: Guild join, guild info request
-/// Note: Variable length packet - guild member list follows
+/// Note: GUILD_MEMBER array may follow in variable data
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct SC_GUILD_INFO
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_GUILD_INFO : IPacketVar
 {
-	/// <summary>Requesting player's member ID in the guild</summary>
+	/// <summary>Player's member ID in the guild (offset 0x04)</summary>
 	public uint myID;
 
-	/// <summary>Guild information</summary>
+	/// <summary>Guild information (offset 0x08)</summary>
 	public GUILD guildInfo;
-
-	// Variable length guild member list follows (array of GUILD_MEMBER)
 }

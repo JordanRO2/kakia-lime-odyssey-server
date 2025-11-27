@@ -1,18 +1,21 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// Server->Client packet confirming guild has been created.
+/// Confirms that a guild was successfully created.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_GUILD_CREATED
-/// Size: 2 bytes (header only, no payload)
-/// Triggered by: Successful guild creation after CS_GUILD_CREATE
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Triggered by: CS_GUILD_CREATE success
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_GUILD_CREATED
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_GUILD_CREATED : IPacketFixed
 {
-	// Empty payload - header only packet
+	// Empty packet - header only
 }

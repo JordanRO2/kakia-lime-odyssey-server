@@ -1,19 +1,21 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// Server->Client packet notifying that guild has been disbanded.
+/// Notifies client that their guild has been disbanded.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_GUILD_DISBANDED
-/// Size: 2 bytes (header only, no payload)
-/// Triggered by: CS_GUILD_DISBAND
-/// Broadcast to: All guild members
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Triggered by: CS_GUILD_DISBAND, guild master leaving
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_GUILD_DISBANDED
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_GUILD_DISBANDED : IPacketFixed
 {
-	// Empty payload - header only packet
+	// Empty packet - header only
 }

@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
@@ -6,21 +7,26 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 /// Server->Client packet notifying that a member has left the guild.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_GUILD_SECEDED
-/// Size: 14 bytes total (2 byte header + 4 byte idx + 4 byte loginMember + 4 byte totalMember)
+/// Size: 14 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned int idx (4 bytes)
+/// - 0x06: int loginMember (4 bytes)
+/// - 0x0A: int totalMember (4 bytes)
 /// Triggered by: CS_GUILD_SECEDE, CS_GUILD_BAN
 /// Broadcast to: All guild members
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_GUILD_SECEDED
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_GUILD_SECEDED : IPacketFixed
 {
-	/// <summary>Member database index who left</summary>
+	/// <summary>Member database index who left (offset 0x02)</summary>
 	public uint idx;
 
-	/// <summary>Number of members currently logged in</summary>
+	/// <summary>Number of members currently logged in (offset 0x06)</summary>
 	public int loginMember;
 
-	/// <summary>Total number of guild members remaining</summary>
+	/// <summary>Total number of guild members remaining (offset 0x0A)</summary>
 	public int totalMember;
 }

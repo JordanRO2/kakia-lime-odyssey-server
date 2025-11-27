@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
@@ -6,18 +7,22 @@ namespace kakia_lime_odyssey_packets.Packets.SC;
 /// Server->Client packet updating a guild member's combat job level.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_GUILD_UPDATE_MEMBER_COMBAT_JOB_LV
-/// Size: 10 bytes total (2 byte header + 4 byte idx + 4 byte lv)
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned int idx (4 bytes)
+/// - 0x06: int lv (4 bytes)
 /// Triggered by: Member combat job level up
 /// Broadcast to: All guild members
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_GUILD_UPDATE_MEMBER_COMBAT_JOB_LV
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_GUILD_UPDATE_MEMBER_COMBAT_JOB_LV : IPacketFixed
 {
-	/// <summary>Member database index</summary>
+	/// <summary>Member database index (offset 0x02)</summary>
 	public uint idx;
 
-	/// <summary>New combat job level</summary>
+	/// <summary>New combat job level (offset 0x06)</summary>
 	public int lv;
 }

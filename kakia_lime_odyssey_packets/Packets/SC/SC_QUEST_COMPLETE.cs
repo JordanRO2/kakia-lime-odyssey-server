@@ -4,26 +4,32 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_QUEST_COMPLETE - Quest completed and turned in
-/// IDA Structure: PACKET_SC_QUEST_COMPLETE (18 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this when quest is successfully completed and rewards claimed.
-/// Updates the completion counters for quest statistics.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// 0x02: unsigned int typeID - quest type ID
-/// 0x06: int completedMain - updated count of completed main quests
-/// 0x0A: int completedSub - updated count of completed sub quests
-/// 0x0E: int completedNormal - updated count of completed normal quests
-/// Total: 18 bytes
+/// Server->Client packet for quest completed and turned in.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_QUEST_COMPLETE
+/// Size: 18 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned int typeID (4 bytes)
+/// - 0x06: int completedMain (4 bytes)
+/// - 0x0A: int completedSub (4 bytes)
+/// - 0x0E: int completedNormal (4 bytes)
+/// Triggered by: Quest turn-in success
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_QUEST_COMPLETE : IPacketFixed
 {
-    public uint typeID;
-    public int completedMain;
-    public int completedSub;
-    public int completedNormal;
+	/// <summary>Quest type ID (offset 0x02)</summary>
+	public uint typeID;
+
+	/// <summary>Updated count of completed main quests (offset 0x06)</summary>
+	public int completedMain;
+
+	/// <summary>Updated count of completed sub quests (offset 0x0A)</summary>
+	public int completedSub;
+
+	/// <summary>Updated count of completed normal quests (offset 0x0E)</summary>
+	public int completedNormal;
 }
