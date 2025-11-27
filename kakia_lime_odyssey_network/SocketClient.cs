@@ -12,7 +12,6 @@ namespace kakia_lime_odyssey_network
 		private byte[] _buffer { get; set; }
 		private int _position = 0;
 		public bool IsAlive { get; set; }
-		public bool UseCrypto { get; set; } = true;
 
 		public int Id { get; set; }		
 
@@ -48,7 +47,7 @@ namespace kakia_lime_odyssey_network
 		{
 			try
 			{
-				var packets = RawPacket.ParsePackets(_buffer[_position..len], UseCrypto);
+				var packets = RawPacket.ParsePackets(_buffer[_position..len]);
 				foreach(var packet in packets)
 					await PacketReceived!.Invoke(packet);
 			}
