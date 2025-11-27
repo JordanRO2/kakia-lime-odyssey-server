@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<AreaInfoPropertyRoot>
+    <AreaInfoProperty nameID="20311200" pos="-719.542786 -1407.553711 1120.850098" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="300.000000" boundRadius="0.000000" />
+    <AreaInfoProperty nameID="20311200" pos="-854.569519 -983.214233 979.604492" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="300.000000" boundRadius="0.000000" />
+    <AreaInfoProperty nameID="20311100" pos="-1638.162231 -1546.964111 802.134277" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="500.000000" boundRadius="0.000000" />
+    <AreaInfoProperty nameID="20311100" pos="-2045.011108 -1087.981812 793.156128" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="500.000000" boundRadius="0.000000" />
+    <AreaInfoProperty nameID="20311100" pos="-1440.206543 -1013.422607 834.472534" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="200.000000" boundRadius="0.000000" />
+</AreaInfoPropertyRoot>

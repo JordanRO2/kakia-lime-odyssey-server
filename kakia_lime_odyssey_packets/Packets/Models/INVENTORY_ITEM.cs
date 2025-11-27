@@ -2,7 +2,12 @@
 
 namespace kakia_lime_odyssey_packets.Packets.Models;
 
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
+/// <summary>
+/// IDA Verified: 2025-11-26
+/// Structure: INVENTORY_ITEM @ 336 bytes
+/// Represents a single inventory item with all its properties and inherited stats.
+/// </summary>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct INVENTORY_ITEM
 {
 	public int slot;

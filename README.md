@@ -1,22 +1,82 @@
 # Lime Odyssey Server Emulator
-### Built for the Korean CBT3 Client of the game (rev 211)
-_There are some references to the AriaGames client in the code, but that will not work at the moment with this emulator_
 
-This is built in C# .NET 10, when you run the server the first time it will generate a default config.json file listening on localhost as default.
-If you are running the server on the same PC as you are playing on, then you shouldn't need to make any changes to the config file.
-The `"Crypto": true` part in the config need to be set in order to work with the Korean CBT3 client, this option is here only because we disabled it when experimenting with the AriaGames client.
+A server emulator for the Korean CBT3 client (rev 211) of Lime Odyssey Online, built in C# .NET 10.
 
-### Get the Lime Odyssey CBT3 client
-This server emulator will currently only work with the Korean CBT3 client (rev 211) which can be found here from kaitodomoto: \
-https://forum.ragezone.com/threads/lime-odyssey-obt-english-client.1160226/post-8951757
+## Requirements
 
-### Required mods
-_In order to properly connect to the server, you'll need the unpacked data ref files (as things are buggy otherwise) and our modified LimeOdyssey.exe, you can find them here:_ \
-\
-**Mega link:** https://mega.nz/file/IBVQ2aBK#BjVEykVzCsPR-CtawmM-XRoOr8oQKKurJZBES068Qs0 \
-**Google Drive link:** https://drive.google.com/file/d/1zxn8gLw53bkdXV4e6fDIi9I-nEfFXQSi/view
+- .NET 10 SDK
+- Korean CBT3 Client (rev 211)
 
+## Quick Start
 
-Finally, make a shortcut to `LimeOdyssey.exe` and add `-localhost` as a start arguement, making the target look like this `<path>\LimeOdysseyOnline\LimeOdyssey.exe -localhost`.
+1. Clone the repository
+2. Build the solution: `dotnet build`
+3. Run the server: `dotnet run --project kakia_lime_odyssey_server`
+4. On first run, a `config.json` file will be generated
 
-That should hopefully be all that is required.
+### Configuration
+
+The default config listens on localhost. Key settings:
+- `Crypto: true` - Required for Korean CBT3 client compatibility
+
+## Getting the Client
+
+This emulator works with the Korean CBT3 client (rev 211). Download from kaitodomoto:
+- [RageZone Thread](https://forum.ragezone.com/threads/lime-odyssey-obt-english-client.1160226/post-8951757)
+
+Create a shortcut to `LimeOdyssey.exe` with `-localhost` argument:
+```
+<path>\LimeOdysseyOnline\LimeOdyssey.exe -localhost
+```
+
+## Implemented Features
+
+### Core Systems
+- Player authentication and character creation
+- Zone loading and player spawning
+- Movement and positioning
+- NPC and monster spawning
+
+### Combat
+- Basic weapon attacks
+- Skill system with casting and cooldowns
+- Buff/debuff system
+- HP/MP regeneration
+- Death and resurrection
+
+### Social
+- Party system (create, invite, kick, leave, disband)
+- Guild system (create, invite, promote, demote, disband)
+- Chat (local, party, guild, whisper)
+
+### Inventory
+- Item management
+- Equipment system (combat and life jobs)
+- Looting system
+
+### NPCs
+- NPC dialogue system
+- Monster AI (roaming, chasing, attacking)
+- Respawn system
+
+## Project Structure
+
+```
+kakia_lime_odyssey_server/      # Main server application
+kakia_lime_odyssey_packets/     # Packet definitions (CS/SC)
+kakia_lime_odyssey_network/     # Network layer
+kakia_lime_odyssey_contracts/   # Shared interfaces
+kakia_lime_odyssey_logging/     # Logging utilities
+kakia_lime_odyssey_utils/       # Common utilities
+```
+
+## Contributing
+
+Contributions are welcome. Please ensure:
+- Code compiles with 0 warnings
+- Follow existing code patterns
+- Test changes before submitting
+
+## License
+
+This project is for educational and preservation purposes only.

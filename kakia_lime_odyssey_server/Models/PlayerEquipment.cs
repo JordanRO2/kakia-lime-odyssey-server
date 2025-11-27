@@ -1,4 +1,4 @@
-﻿using kakia_lime_odyssey_network.Interface;
+using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
@@ -59,6 +59,18 @@ public class PlayerEquipment : IPlayerEquipment
 		};
 	}
 
+	public SC_LIFE_JOB_EQUIP_ITEM_LIST GetLifeEquipList()
+	{
+		return new()
+		{
+			equipList = equipment
+						.Values
+						.Where(e => e is not null)
+						.Select(m => m!.AsEquipItem())
+						.ToArray()
+		};
+	}
+
 	private int GetSlotID(EQUIP_SLOT slot)
 	{
 		return equipment[slot] is null ? 0 : equipment[slot]!.Id;
@@ -96,5 +108,49 @@ public class PlayerEquipment : IPlayerEquipment
 	public IItem? GetItemInSlot(EQUIP_SLOT slot)
 	{
 		return equipment[slot];
+	}
+
+	/// <summary>
+	/// Gets the total bonus value for a specific inherit type from all equipped items
+	/// </summary>
+	public int GetInheritBonus(InheritType inheritType)
+	{
+		int total = 0;
+		foreach (var item in equipment.Values)
+		{
+			if (item?.Inherits == null)
+				continue;
+
+			foreach (var inherit in item.Inherits)
+			{
+				if (inherit.typeID == (int)inheritType)
+					total += inherit.val;
+			}
+		}
+		return total;
+	}
+
+	/// <summary>
+	/// Gets all inherit bonuses from equipped items as a dictionary
+	/// </summary>
+	public Dictionary<InheritType, int> GetAllInheritBonuses()
+	{
+		var bonuses = new Dictionary<InheritType, int>();
+
+		foreach (var item in equipment.Values)
+		{
+			if (item?.Inherits == null)
+				continue;
+
+			foreach (var inherit in item.Inherits)
+			{
+				var type = (InheritType)inherit.typeID;
+				if (!bonuses.ContainsKey(type))
+					bonuses[type] = 0;
+				bonuses[type] += inherit.val;
+			}
+		}
+
+		return bonuses;
 	}
 }

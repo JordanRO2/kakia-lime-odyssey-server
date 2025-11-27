@@ -69,7 +69,25 @@ namespace kakia_lime_odyssey_network
 			if (!_socket.Connected)
 				return string.Empty;
 			var ip = _socket.RemoteEndPoint as IPEndPoint;
-			return ip.Address.ToString();
+			return ip?.Address.ToString() ?? string.Empty;
+		}
+
+		/// <summary>
+		/// Forcibly disconnect this client
+		/// </summary>
+		public void Disconnect()
+		{
+			try
+			{
+				IsAlive = false;
+				_socket.Shutdown(SocketShutdown.Both);
+				_socket.Close();
+				Logger.Log($"[DISCONNECT] Client {GetIP()} forcibly disconnected");
+			}
+			catch (Exception ex)
+			{
+				Logger.Log($"[DISCONNECT] Error disconnecting client: {ex.Message}");
+			}
 		}
 	}
 }

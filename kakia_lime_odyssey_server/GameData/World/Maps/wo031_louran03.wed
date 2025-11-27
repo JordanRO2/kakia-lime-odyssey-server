@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<World revision="11">
+    <ModelResRoot>
+        <ModelRes name="al_nor_alcandlestick01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_alcarpet01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alcarpet02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alcarpet03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alcarpet04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_aldisplay04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alflag01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alflag02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_allight01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alpipel01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_alpipel02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_alpipeu01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_alroadlight01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_altent01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_alweaponsign01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_alwindmill01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_basket01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_blacksmithsign01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_blacktree01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_blacktree02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_bluebox01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_bluemangotree01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_bluemangotree02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_bluemangotree03.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_bluemangotree04.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_box01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_buriedpot01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_buriedpot02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_cactus01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_cactus02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_cactus03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_cactus04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_city01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_city02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_city03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_city04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_cotton01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_drower01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_fruit03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_goblindrum01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_grass03.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="al_nor_grass05.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="al_nor_haschair01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_house01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_house02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_hugemansionprop01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_inn01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_innsign01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_innsign02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_longcloth02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_longcloth03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_louranpathpost01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_louranpathstone01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_mat01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_officialresidence01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_oldfence01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01a.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01b.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01c.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01d.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01e.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil01f.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_oldfossil02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_palmtree01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_pathbridge01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_pathbridge02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_plate01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_pot01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_pot02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_pot03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_pot04.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_pumpkin01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_roadlight01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_ruinspost01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_ruinspost02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_ruinswall01_oldb.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_sandclock01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_smallrock01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_smallrock02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_smallrock03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_smallsign01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_smallsign02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_smallsign03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_smallsign04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_stall01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_stall02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_stall03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_stallcarpet01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_stonedeco01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_stonehole03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_stonehole04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_tent01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_tradingcomp01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_vase02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_wall02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_watermill02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_watertank01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_watertank02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_weaponshop02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_xianglodstone01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_xianglodstone02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="al_nor_xiangrass01.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="al_nor_xianrock01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_xianrock02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="al_nor_xiantree01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_xiantree02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="al_nor_xiantree03.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="article_box01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="article_hammer01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="article_smallbush.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="article_wheel01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="eff_env_article_fish01.nif" relativeDir="eff\" cullingType="1" />
+        <ModelRes name="eff_env_bg_dust00.nif" relativeDir="eff\" cullingType="2" />
+        <ModelRes name="eff_env_candle00.nif" relativeDir="eff\" cullingType="1" />
+        <ModelRes name="eff_env_lmap_light.nif" relativeDir="eff\" cullingType="2" />
+        <ModelRes name="eff_env_louranSwaterfall_01_01.nif" relativeDir="eff\" cullingType="1" />
+        <ModelRes name="eff_env_louranSwaterfall_01_02.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_louranSwaterfall_01_03.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_waterLouran03_00.nif" relativeDir="eff\" cullingType="6" />
+        <ModelRes name="eff_env_waterLouran03_01.nif" relativeDir="eff\" cullingType="6" />
+        <ModelRes name="eff_env_waterLouran03_02.nif" relativeDir="eff\" cullingType="6" />
+        <ModelRes name="eff_env_waterLouran03_03.nif" relativeDir="eff\" cullingType="6" />
+        <ModelRes name="eff_obj_roadlight01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="garona_nor_bottle01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="garona_nor_bottle02.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="garona_nor_bottle03.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="garona_nor_jar01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="garona_nor_jar02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="garona_nor_jar03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="garona_nor_jar04.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="garona_nor_treasurebox01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_aritcle_book01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_barrel02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_bellows.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="hum_article_bottle02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_box03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_bread01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_article_desk02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="hum_article_hammer01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_paper01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_article_paperroll01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_picture02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_article_picture03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_deco_bag.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_deco_bundle01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_deco_map01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_deco_paper01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_deco_paper02.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_deco_pen01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_deco_strongbox.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="hum_deco_waterbottle01.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="hum_nor_waterplant01.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="hum_nor_waterplant_pollute01.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="pikin_nor_card.nif" relativeDir="bg\" cullingType="5" />
+        <ModelRes name="sukar_nor_jar01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_banana01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_book01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_book02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_book03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_book04.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_food-bread01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_grass08.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="tur_nor_grass10.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="tur_nor_grass11.nif" relativeDir="bg\" cullingType="0" />
+        <ModelRes name="tur_nor_shield02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="tur_nor_shield03.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="val_deco_bonfire01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="val_nor_bottle01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="val_nor_box01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="val_nor_drum01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="val_nor_scroll02.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="val_nor_skull01.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="val_nor_skull02.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="val_nor_skull03.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="val_nor_skull04.nif" relativeDir="bg\" cullingType="2" />
+        <ModelRes name="val_nor_treasurebox01.nif" relativeDir="bg\" cullingType="1" />
+        <ModelRes name="eff_obj_humBlueSprial_01_00.nif" relativeDir="eff\" cullingType="2" />
+    </ModelResRoot>
+    <ModelInstanceRoot fileName="wo031_louran03.mdi" loadFromXml="0" quadrant="1" />
+    <GrassModelInstanceRoot fileName="wo031_louran03.gmdi" loadFromXml="0" quadrant="1" />
+    <GlobalLightRoot>
+        <Light name="Global Directional Light" type="1" pos="659.609009 22.721001 0.000000" rot="0.785000 0.000000 -1.000000 0.000000">
+            <StepLight name="Global Directional Light" ambient="0.780000 0.720000 0.710000" diffuse="0.670000 0.700000 0.600000" specular="0.900000 0.700000 0.550000" dimmer="1.000000" />
+            <StepLight name="Global Directional Light" ambient="0.650000 0.570000 0.720000" diffuse="0.830000 0.770000 0.400000" specular="0.700000 0.500000 0.200000" dimmer="1.000000" />
+            <StepLight name="Global Directional Light" ambient="0.400000 0.520000 0.700000" diffuse="0.320000 0.420000 0.780000" specular="0.500000 0.850000 0.900000" dimmer="1.000000" />
+            <StepLight name="Global Directional Light" ambient="0.520000 0.720000 0.900000" diffuse="0.850000 0.700000 0.350000" specular="0.750000 0.550000 0.300000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Ambient Light" type="0" pos="0.000000 0.000000 0.000000">
+            <StepLight name="Global Ambient Light" ambient="1.000000 1.000000 0.980000" dimmer="1.000000" />
+            <StepLight name="Global Ambient Light" ambient="0.950000 0.900000 0.800000" dimmer="1.000000" />
+            <StepLight name="Global Ambient Light" ambient="0.520000 0.620000 0.920000" dimmer="1.000000" />
+            <StepLight name="Global Ambient Light" ambient="0.820000 0.870000 0.980000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Character Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight characterAmbient="1.100000 1.050000 1.050000" characterDiffuse="0.110000 0.180000 0.160000" />
+            <StepLight characterAmbient="0.960000 0.950000 0.870000" characterDiffuse="0.230000 0.220000 0.150000" />
+            <StepLight characterAmbient="0.630000 0.630000 0.950000" characterDiffuse="0.200000 0.300000 0.480000" />
+            <StepLight characterAmbient="0.970000 1.120000 1.270000" characterDiffuse="0.320000 0.220000 0.270000" />
+        </Light>
+        <Light name="Global Lightmap Shadow Ambient Light" type="0" pos="10.000000 0.000000 0.000000">
+            <StepLight name="Noon_LightMap" ambient="0.620000 0.620000 0.690000" dimmer="1.000000" />
+            <StepLight name="Dusk_LightMap" ambient="0.620000 0.600000 0.650000" dimmer="0.900000" />
+            <StepLight name="Midnight_LightMap" ambient="0.430000 0.500000 0.740000" dimmer="0.800000" />
+            <StepLight name="Dawn_LightMap" ambient="0.550000 0.630000 0.700000" dimmer="0.900000" />
+        </Light>
+        <Light name="Global Indoor Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <IndoorLight name="Indoor" ambient="1.100000 1.100000 1.100000" diffuse="1.000000 1.300000 1.300000" specular="1.000000 1.000000 1.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Character Indoor Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <IndoorLight name="IndoorCharacter" ambient="0.950000 0.880000 0.880000" diffuse="0.350000 0.280000 0.250000" specular="1.000000 1.000000 1.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Water Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight name="Noon_Water" ambient="0.850000 1.150000 1.150000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dusk_Water" ambient="1.050000 1.100000 1.350000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Midnight_Water" ambient="0.750000 0.850000 1.050000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dawn_Water" ambient="0.850000 1.250000 1.250000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Effect Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight name="Noon_Effect" ambient="0.920000 0.670000 0.270000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dusk_Effect" ambient="0.800000 0.600000 0.150000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Midnight_Effect" ambient="0.200000 0.400000 0.400000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dawn_Effect" ambient="0.870000 0.720000 0.470000" diffuse="0.000000 0.000000 0.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Character Ambient Light" type="0" pos="0.000000 0.000000 0.000000">
+            <StepLight name="Noon_CharAmb" ambient="0.920000 0.870000 0.920000" dimmer="1.000000" />
+            <StepLight name="Dusk_CharAmb" ambient="0.800000 0.800000 0.900000" dimmer="1.000000" />
+            <StepLight name="Midnight_CharAmb" ambient="0.500000 0.530000 0.680000" dimmer="1.000000" />
+            <StepLight name="Dawn_CharAmb" ambient="0.820000 0.920000 1.000000" dimmer="1.000000" />
+        </Light>
+    </GlobalLightRoot>
+    <LightRoot />
+    <WorldInfoRoot lowestHeight="0.000000" showModelABV="0" curEffectModelHeight="1.000000" blurForce="1.000000" dofDistance="1.000000" dofFallOff="1.000000" singleColorSky="0" ignoreAlphaEnterBg="0" />
+    <WorldGrid worldGridZpos="0.000000" bRenderWorldGrid="0" />
+    <CameraInfo lookAt="1098.637329 138.191940 635.015442" radius="208.500000" longitude="4.693937" latitude="0.588342" bOrthogonal="0" />
+    <Terrain quadrant="1" terrainFileName="wo031_louran03.trn" terrainCursorRadius="40.000000" terrainHeightEditDensity="0.300000" terrainLayerEditDensity="10.000000" terrainCursorEdgeSize="5" terrainCursorColor="0.000000 1.000000 0.000000 1.000000" bTerrainForceNewLayer="0" curLayerTextureIndex="7" bTerrainSmoothLayering="1" terrainBound="0.000000 0.000000 624.133728 3662.676270" lightmapLowRes="0">
+        <LayerTexture textureName="louran_sand01.dds" floorStyle="0" />
+        <LayerTexture textureName="louran_sand02.dds" floorStyle="0" />
+        <LayerTexture textureName="louran_wall02.dds" floorStyle="5" />
+        <LayerTexture textureName="louran_road01.dds" floorStyle="5" />
+        <LayerTexture textureName="louran_grass02.dds" floorStyle="2" />
+        <LayerTexture textureName="louran_city01.dds" floorStyle="1" />
+        <LayerTexture textureName="louran_wall01.dds" floorStyle="5" />
+        <LayerTexture textureName="louran_grass03.dds" floorStyle="2" />
+    </Terrain>
+    <FogParam bFog="1">
+        <StepFog fogColor="0.660000 0.800000 0.670000" fogDepth="0.780000" fNearAdjust="0.000000" SkyfogColor="0.350000 0.750000 1.000000" SkyfogLow="0.000000" SkyfogHigh="21000.000000" SkyfogColor1="0.460000 0.850000 0.770000" SkyfogColor2="0.650000 0.800000 0.650000" SkyfogHigh1="16000.000000" SkyfogHigh2="8000.000000" SkyColor="0.250000 0.500000 0.950000" />
+        <StepFog fogColor="0.900000 0.550000 0.400000" fogDepth="0.850000" fNearAdjust="0.000000" SkyfogColor="0.850000 0.520000 0.101000" SkyfogLow="0.000000" SkyfogHigh="19000.000000" SkyfogColor1="0.890000 0.820000 0.400000" SkyfogColor2="0.900000 0.550000 0.400000" SkyfogHigh1="7000.000000" SkyfogHigh2="1500.000000" SkyColor="0.800000 0.350000 0.100000" />
+        <StepFog fogColor="0.100000 0.200000 0.400000" fogDepth="1.100000" fNearAdjust="0.000000" SkyfogColor="0.000000 0.200000 0.400000" SkyfogLow="0.000000" SkyfogHigh="18000.000000" SkyfogColor1="0.000000 0.250000 0.452000" SkyfogColor2="0.000000 0.310000 0.502000" SkyfogHigh1="10000.000000" SkyfogHigh2="3500.000000" SkyColor="0.000000 0.070000 0.270000" />
+        <StepFog fogColor="0.760000 0.800000 0.760000" fogDepth="0.850000" fNearAdjust="0.000000" SkyfogColor="1.000000 0.822000 0.720000" SkyfogLow="0.000000" SkyfogHigh="18000.000000" SkyfogColor1="0.930000 0.940000 0.600000" SkyfogColor2="0.760000 0.800000 0.760000" SkyfogHigh1="7000.000000" SkyfogHigh2="1500.000000" SkyColor="0.500000 0.702000 0.800000" />
+    </FogParam>
+    <FogVolumeRoot />
+    <WaterVolumeRoot>
+        <WaterVolume name="WaterVolume_000" pos="317.887695 -437.501892 198.427155" rot="0.000000 1.000000 0.000000 0.000000" extent="4000.000000 3500.000000 300.000000" boundRadius="2661.766357" fogColor="0.000000 0.650000 0.700000" fogDepth="2.000000" fogNearAdjust="2.000000" fogColorDusk="0.500000 0.500000 0.750000" fogDepthDusk="2.000000" fogNearAdjustDusk="2.000000" fogColorMidNight="0.000000 0.300000 0.450000" fogDepthMidNight="2.250000" fogNearAdjustMidNight="2.000000" fogColorDawn="0.000000 0.600000 0.600000" fogDepthDawn="2.000000" fogNearAdjustDawn="2.000000" waterVolumeBGM="33 33 35 35" />
+        <WaterVolume name="WaterVolume_001" pos="-456.508362 1728.144531 420.325623" rot="0.000000 1.000000 0.000000 0.000000" extent="300.000000 300.000000 100.000000" boundRadius="217.944946" fogColor="0.000000 0.650000 0.700000" fogDepth="2.000000" fogNearAdjust="0.000000" fogColorDusk="0.500000 0.500000 0.750000" fogDepthDusk="2.000000" fogNearAdjustDusk="0.000000" fogColorMidNight="0.000000 0.300000 0.450000" fogDepthMidNight="2.000000" fogNearAdjustMidNight="0.000000" fogColorDawn="0.000000 0.600000 0.600000" fogDepthDawn="2.000000" fogNearAdjustDawn="0.000000" waterVolumeBGM="33 33 35 35" />
+    </WaterVolumeRoot>
+    <FogBoxRoot />
+    <ModelVertexColorRoot />
+    <BackGroundRoot>
+        <BackGroundParam sunColor="0.000000 0.440000 1.000000" sunScatterHgRsMs="1.000000 1.000000 1.000000" sunScatterIsEsRp="1.000000 1.000000 1.000000" cloud1Speed="0.400000 0.400000" cloud2Speed="0.200000 0.200000" cloud1Segment="0.000000" cloud2Segment="0.000000" starSegment="8.000000" FarCloudSegment="3.000000" FarCloundSpeedOffsetX="0.100000" kCloudColor="1.000000 0.980000 0.950000" kFarCloudColor="1.000000 0.950000 0.920000" fCloud1Alpha="0.900000" fCloud2Alpha="1.000000" fFarCloudAlpha="0.980000" silhouetteColor="0.500000 0.400000 0.200000" furriness="20.000000" sheen="0.650000" silhouetteStart="0.000000" silhouetteEnd="1200.000000" terrainFurriness="85.000000" terrainSheen="0.500000" skinFurriness="10.000000" skinSheen="0.600000" LightmapColor="1.000000 1.000000 1.000000" />
+        <BackGroundParam sunColor="1.000000 0.800000 0.000000" sunScatterHgRsMs="1.000000 1.000000 1.000000" sunScatterIsEsRp="1.000000 1.000000 1.000000" cloud1Speed="0.400000 0.400000" cloud2Speed="0.200000 0.200000" cloud1Segment="0.000000" cloud2Segment="0.000000" starSegment="8.000000" FarCloudSegment="3.000000" FarCloundSpeedOffsetX="0.100000" kCloudColor="1.000000 0.900000 0.700000" kFarCloudColor="1.300000 1.100000 0.850000" fCloud1Alpha="0.900000" fCloud2Alpha="1.000000" fFarCloudAlpha="0.900000" silhouetteColor="0.500000 0.350000 0.000000" furriness="10.000000" sheen="0.700000" silhouetteStart="30.000000" silhouetteEnd="1200.000000" terrainFurriness="75.000000" terrainSheen="0.600000" skinFurriness="10.000000" skinSheen="0.750000" LightmapColor="0.980000 0.950000 0.950000" />
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="0.400000 0.400000" cloud2Speed="0.200000 0.200000" cloud1Segment="0.000000" cloud2Segment="0.000000" starSegment="8.000000" FarCloudSegment="3.000000" FarCloundSpeedOffsetX="0.100000" kCloudColor="0.400000 0.500000 0.600000" kFarCloudColor="0.250000 0.350000 0.650000" fCloud1Alpha="1.000000" fCloud2Alpha="1.000000" fFarCloudAlpha="0.920000" silhouetteColor="0.200000 0.450000 0.600000" furriness="25.000000" sheen="0.350000" silhouetteStart="100.000000" silhouetteEnd="1200.000000" terrainFurriness="80.000000" terrainSheen="0.500000" skinFurriness="15.000000" skinSheen="0.500000" LightmapColor="0.240000 0.300000 1.250000" />
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="0.400000 0.400000" cloud2Speed="0.200000 0.200000" cloud1Segment="0.000000" cloud2Segment="0.000000" starSegment="8.000000" FarCloudSegment="3.000000" FarCloundSpeedOffsetX="0.100000" kCloudColor="0.850000 0.900000 0.850000" kFarCloudColor="1.250000 1.120000 0.950000" fCloud1Alpha="1.000000" fCloud2Alpha="1.000000" fFarCloudAlpha="1.000000" silhouetteColor="0.450000 0.450000 0.350000" furriness="10.000000" sheen="0.600000" silhouetteStart="150.000000" silhouetteEnd="1200.000000" terrainFurriness="80.000000" terrainSheen="0.600000" skinFurriness="10.000000" skinSheen="0.450000" LightmapColor="0.850000 0.950000 1.800000" />
+    </BackGroundRoot>
+</World>

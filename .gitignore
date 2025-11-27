@@ -1,8 +1,13 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+# Lime Odyssey Server - .gitignore
+# Only source code is tracked
 ################################################################################
 
+# Visual Studio
 /.vs
+*.user
+
+# Build output
 /kakia_lime_odyssey_logging/bin
 /kakia_lime_odyssey_logging/obj
 /kakia_lime_odyssey_network/bin
@@ -11,6 +16,28 @@
 /kakia_lime_odyssey_packets/obj
 /kakia_lime_odyssey_server/bin
 /kakia_lime_odyssey_server/obj
-*.user
 /kakia_lime_odyssey_utils/bin
 /kakia_lime_odyssey_utils/obj
+/kakia_lime_odyssey_contracts/bin
+/kakia_lime_odyssey_contracts/obj
+
+# Documentation (except README)
+*.txt
+*.toon
+/docs/
+/.claude/
+!README.md
+
+# Data files
+*.xml
+*.json
+
+# Backup files
+*.backup_*
+*.bak
+
+# Addon folder
+/addon/
+
+# GitHub workflows (if any)
+/.github/

@@ -3,6 +3,21 @@ using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
+/// <summary>
+/// IDA Verification: PACKET_CS_SLIDE_PC
+/// Size: 47 bytes
+/// Structure verified: 2025-11-26
+/// Fields:
+///   +0x00 PACKET_FIX (2 bytes) - packet header (implicit)
+///   +0x02 FPOS pos (12 bytes) - position
+///   +0x0E float deltaLookAtRadian (4 bytes)
+///   +0x12 FPOS dir (12 bytes) - direction vector
+///   +0x1E unsigned int tick (4 bytes)
+///   +0x22 float turningSpeed (4 bytes)
+///   +0x26 unsigned __int8 moveType (1 byte)
+///   +0x27 float deltaBodyRadian (4 bytes)
+///   +0x2B float velDecRatio (4 bytes)
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct CS_SLIDE_PC
 {

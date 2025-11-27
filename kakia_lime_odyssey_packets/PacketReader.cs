@@ -56,5 +56,27 @@ namespace kakia_lime_odyssey_packets
 			say.message = ReadFixedLengthAscii(size - 8);
 			return say;
 		}
+
+		public CS_WHISPER_PC Read_CS_WHISPER_PC(int size)
+		{
+			// CS_WHISPER_PC structure:
+			// +0x00: targetPCName (char[26]) - 26 bytes
+			// +0x1A: message (variable length)
+			CS_WHISPER_PC whisper = new()
+			{
+				targetPCName = ReadFixedLengthAscii(26)
+			};
+			// Remaining bytes are the message (size - 26 for the name)
+			int messageLength = size - 26;
+			if (messageLength > 0)
+			{
+				whisper.message = ReadFixedLengthAscii(messageLength);
+			}
+			else
+			{
+				whisper.message = string.Empty;
+			}
+			return whisper;
+		}
 	}
 }

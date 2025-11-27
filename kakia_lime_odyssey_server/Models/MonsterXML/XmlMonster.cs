@@ -4,9 +4,9 @@ namespace kakia_lime_odyssey_server.Models.MonsterXML;
 [XmlRoot(ElementName = "Monster")]
 public class XmlMonster
 {
-	[XmlAttribute(AttributeName = "typeName")] public string TypeName { get; set; }
-	[XmlAttribute(AttributeName = "name")] public string Name { get; set; }
-	[XmlAttribute(AttributeName = "note")] public string Note { get; set; }
+	[XmlAttribute(AttributeName = "typeName")] public string TypeName { get; set; } = default!;
+	[XmlAttribute(AttributeName = "name")] public string Name { get; set; } = default!;
+	[XmlAttribute(AttributeName = "note")] public string Note { get; set; } = default!;
 	[XmlAttribute(AttributeName = "typeID")] public int TypeID { get; set; }
 	[XmlAttribute(AttributeName = "questID")] public int QuestID { get; set; }
 	[XmlAttribute(AttributeName = "QUESTEVENT")] public int QuestEvent { get; set; }
@@ -15,19 +15,19 @@ public class XmlMonster
 	[XmlAttribute(AttributeName = "series")] public int Series { get; set; }
 	[XmlAttribute(AttributeName = "Seriesignorerate")] public int SeriesIgnoreRate { get; set; }
 	[XmlAttribute(AttributeName = "area")] public int Area { get; set; }
-	[XmlAttribute(AttributeName = "raceTypeName")] public string RaceTypeName { get; set; }
+	[XmlAttribute(AttributeName = "raceTypeName")] public string RaceTypeName { get; set; } = default!;
 	[XmlAttribute(AttributeName = "raceTypeID")] public int RaceTypeID { get; set; }
 	[XmlAttribute(AttributeName = "realmTypeID")] public int RealmTypeID { get; set; }
 	[XmlAttribute(AttributeName = "requestHelpRange")] public int RequestHelpRange { get; set; }
-	[XmlAttribute(AttributeName = "formName")] public string FormName { get; set; }
+	[XmlAttribute(AttributeName = "formName")] public string FormName { get; set; } = default!;
 	[XmlAttribute(AttributeName = "formID")] public int FormID { get; set; }
 	[XmlAttribute(AttributeName = "modelTypeID")] public int ModelTypeID { get; set; }
 	[XmlAttribute(AttributeName = "waitClipNum")] public int WaitClipNum { get; set; }
 	[XmlAttribute(AttributeName = "surfaceType")] public int SurfaceType { get; set; }
 	[XmlAttribute(AttributeName = "shapeSize")] public int ShapeSize { get; set; }
-	[XmlAttribute(AttributeName = "sameRace")] public string SameRace { get; set; }
-	[XmlAttribute(AttributeName = "onMessage")] public string OnMessage { get; set; }
-	[XmlAttribute(AttributeName = "weaponHit")] public string WeaponHit { get; set; }
+	[XmlAttribute(AttributeName = "sameRace")] public string SameRace { get; set; } = default!;
+	[XmlAttribute(AttributeName = "onMessage")] public string OnMessage { get; set; } = default!;
+	[XmlAttribute(AttributeName = "weaponHit")] public string WeaponHit { get; set; } = default!;
 	[XmlAttribute(AttributeName = "walkVelocity")] public double WalkVelocity { get; set; }
 	[XmlAttribute(AttributeName = "walkAccel")] public double WalkAccel { get; set; }
 	[XmlAttribute(AttributeName = "runVelocity")] public double RunVelocity { get; set; }
@@ -172,16 +172,16 @@ public class XmlMonster
 	[XmlAttribute(AttributeName = "adjustSkillApplyingRange")] public int AdjustSkillApplyingRange { get; set; }
 	[XmlAttribute(AttributeName = "adjustItemApplyingRange")] public int AdjustItemApplyingRange { get; set; }
 	[XmlAttribute(AttributeName = "adjustSkillUseMP")] public int AdjustSkillUseMP { get; set; }
-	[XmlAttribute(AttributeName = "movePlace")] public string MovePlace { get; set; }
+	[XmlAttribute(AttributeName = "movePlace")] public string MovePlace { get; set; } = default!;
 	[XmlAttribute(AttributeName = "kneeHeight")] public double KneeHeight { get; set; }
 	[XmlAttribute(AttributeName = "height")] public double Height { get; set; }
 	[XmlAttribute(AttributeName = "nonInterruptMove")] public int NonInterruptMove { get; set; }
-	[XmlAttribute(AttributeName = "talk")] public string Talk { get; set; }
+	[XmlAttribute(AttributeName = "talk")] public string Talk { get; set; } = default!;
 	[XmlAttribute(AttributeName = "shineWhenHitted")] public int ShineWhenHitted { get; set; }
 	[XmlAttribute(AttributeName = "weaponSpellAtk")] public int WeaponSpellAtk { get; set; }
-	[XmlAttribute(AttributeName = "FoodDEF1")] public string FoodDEF1 { get; set; }
-	[XmlAttribute(AttributeName = "FoodDEF2")] public string FoodDEF2 { get; set; }
-	[XmlAttribute(AttributeName = "TeaDEF")] public string TeaDEF { get; set; }
+	[XmlAttribute(AttributeName = "FoodDEF1")] public string FoodDEF1 { get; set; } = default!;
+	[XmlAttribute(AttributeName = "FoodDEF2")] public string FoodDEF2 { get; set; } = default!;
+	[XmlAttribute(AttributeName = "TeaDEF")] public string TeaDEF { get; set; } = default!;
 	[XmlAttribute(AttributeName = "Immune")] public int Immune { get; set; }
 	[XmlAttribute(AttributeName = "groupID")] public int GroupID { get; set; }
 	[XmlAttribute(AttributeName = "rankIsBoss")] public int RankIsBoss { get; set; }
@@ -218,7 +218,7 @@ public class XmlMonster
 	[XmlAttribute(AttributeName = "MonsterHP4")] public int MonsterHP4 { get; set; }
 	[XmlAttribute(AttributeName = "MonsterPage5")] public int MonsterPage5 { get; set; }
 	[XmlAttribute(AttributeName = "MonsterHP5")] public int MonsterHP5 { get; set; }
-	[XmlElement(ElementName = "Subject")] public List<MobSubject> Subjects { get; set; }
+	[XmlElement(ElementName = "Subject")] public List<MobSubject> Subjects { get; set; } = default!;
 
 	[XmlIgnore]
 	public Model Model { get; set; }

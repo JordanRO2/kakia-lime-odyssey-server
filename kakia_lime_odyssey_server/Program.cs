@@ -13,7 +13,7 @@ Logger.SetLogLevel(LogLevel.Debug);
  * Used for generating navmeshes (as well as testing it by creating navmesh images and height/lightmap images)
  * 
 
-var mapNames = Directory.GetFiles("db/maps/", "*.trn*")
+var mapNames = Directory.GetFiles(GameDataPaths.World.MapsFolder, "*.trn*")
 	.Select(Path.GetFileName)
 	.Select(fn => Regex.Replace(fn, @"\.trn.*$", "", RegexOptions.IgnoreCase))
 	.Distinct()

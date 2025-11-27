@@ -1,4 +1,4 @@
-﻿using kakia_lime_odyssey_network.Interface;
+using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets;
 using System.Reflection;
 
@@ -38,7 +38,11 @@ public static class PacketHandlers
 			{
 				var attr = (PacketHandlerAttr)attrs[0];
 				if (!Handlers.ContainsKey(attr.packetId))
-					Handlers.Add(attr.packetId, (PacketHandler)Activator.CreateInstance(t));
+				{
+					var instance = Activator.CreateInstance(t) as PacketHandler;
+					if (instance != null)
+						Handlers.Add(attr.packetId, instance);
+				}
 			}
 		}
 	}
@@ -65,18 +69,18 @@ public static class PacketHandlers
 			{
 				var attr = (PacketHandlerAttr)attrs[0];
 				if (!Handlers.ContainsKey(attr.packetId))
-					Handlers.Add(attr.packetId, (PacketHandler)Activator.CreateInstance(t));
+				{
+					var instance = Activator.CreateInstance(t) as PacketHandler;
+					if (instance != null)
+						Handlers.Add(attr.packetId, instance);
+				}
 			}
 		}
 	}
 
-	public static PacketHandler GetHandlerFor(PacketType id)
+	public static PacketHandler? GetHandlerFor(PacketType id)
 	{
-		PacketHandler handler = null;
-
-		if (Handlers.ContainsKey(id))
-			Handlers.TryGetValue(id, out handler);
-
+		Handlers.TryGetValue(id, out var handler);
 		return handler;
 	}
 

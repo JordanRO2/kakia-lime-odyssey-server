@@ -1,11 +1,13 @@
-﻿using kakia_lime_odyssey_logging;
+using kakia_lime_odyssey_contracts.Interfaces;
+using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
-using kakia_lime_odyssey_network.Interface;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.AntiCheat;
+using kakia_lime_odyssey_server.Combat;
 using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
@@ -19,26 +21,38 @@ public class PlayerClient : IPlayerClient, IEntity
 	public Func<PlayerClient, byte[], CancellationToken, Task>? SendGlobal;
 	public Func<PlayerClient, CancellationToken, Task>? RequestZonePresence;
 	public Func<long, COMMON_STATUS>? RequestStatus;
-	public Func<INPC, bool>? AddNPC;
+	public Func<INpc, bool>? AddNpc;
 
 	private SocketClient _socketClient { get; set; }
 	private int _clientRevision { get; set; }
-	private string _accountId { get; set; }
-	private ModClientPC _currentCharacter { get; set; }
+	private string _accountId { get; set; } = default!;
+	private ModClientPC _currentCharacter { get; set; } = default!;
 	private uint _objInstID = 0;
 	private long _target = 0;
 	private bool _inCombat = false;
+	private DateTime _lastCombatTime = DateTime.MinValue;
 	private int _jobId = 1;
 
 	private WorldPosition _worldPosition = new();
 	private VELOCITIES _velocities;
-	private ModCommonStatus _status;
+	private ModCommonStatus _status = default!;
 
 	private PlayerInventory _inventory { get; set; } = new();
 	private PlayerEquips _equipment { get; set; } = new();
+	private PlayerQuestsTracker _quests { get; set; } = new();
 
 	private bool _inMotion = false;
-	private ulong _lastTick = 0;
+
+	// Anti-cheat tracking fields
+	private uint _lastClientTick = 0;
+	private FPOS _lastPosition = new();
+	private DateTime _lastMoveTime = DateTime.Now;
+	private uint _movePacketCount = 0;
+	private bool _isJumping = false;
+	private DateTime _jumpStartTime = DateTime.MinValue;
+
+	// Skill cooldown tracking (server-side validation)
+	private SkillCooldownTracker? _skillCooldownTracker = null;
 
 	private List<uint> _knownPc { get; set; }
 
@@ -72,16 +86,20 @@ public class PlayerClient : IPlayerClient, IEntity
 	public void Save()
 	{
 		if (!_isLoaded) return;
-		JsonDB.SaveWorldPosition(_accountId, _currentCharacter.appearance.name, _worldPosition);
-		JsonDB.SavePlayerInventory(_accountId, _currentCharacter.appearance.name, _inventory);
-		JsonDB.SavePlayerEquipment(_accountId, _currentCharacter.appearance.name, _equipment);
+		var db = DatabaseFactory.Instance;
+		db.SaveWorldPosition(_accountId, _currentCharacter.appearance.name, _worldPosition);
+		db.SavePlayerInventory(_accountId, _currentCharacter.appearance.name, _inventory);
+		db.SavePlayerEquipment(_accountId, _currentCharacter.appearance.name, _equipment);
+		db.SavePlayerQuests(_accountId, _currentCharacter.appearance.name, _quests.GetPersistenceData());
 	}
 
 	public void Load()
 	{
-		_worldPosition = JsonDB.GetWorldPosition(_accountId, _currentCharacter.appearance.name);
-		_inventory = JsonDB.GetPlayerInventory(_accountId, _currentCharacter.appearance.name);
-		_equipment = JsonDB.GetPlayerEquipment(_accountId, _currentCharacter.appearance.name);
+		var db = DatabaseFactory.Instance;
+		_worldPosition = db.GetWorldPosition(_accountId, _currentCharacter.appearance.name);
+		_inventory = db.GetPlayerInventory(_accountId, _currentCharacter.appearance.name);
+		_equipment = db.GetPlayerEquipment(_accountId, _currentCharacter.appearance.name);
+		_quests = new PlayerQuestsTracker(db.GetPlayerQuests(_accountId, _currentCharacter.appearance.name));
 		_currentCharacter.appearance.equiped = new ModEquipped(_equipment.Combat.GetEquipped());
 	}
 
@@ -190,9 +208,12 @@ public class PlayerClient : IPlayerClient, IEntity
 			mhp = pc.status.hp,
 			hp = pc.status.hp,
 			mmp = pc.status.mp,
-			mp = pc.status.mp			
+			mp = pc.status.mp
 		};
-		
+
+		// Initialize skill cooldown tracker
+		_skillCooldownTracker = new SkillCooldownTracker(_objInstID, pc.appearance.name);
+
 		Load();
 		SetEquipToCurrentJob();
 	}
@@ -233,37 +254,190 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	private AttackStatus GetMeleeAttack()
 	{
-		// Factor in gear here later too..
 		var stats = CombatBaseStats();
 		var level = _currentCharacter.status.combatJob.lv;
-		var weapon = GetEquipment(true).GetItemInSlot(EQUIP_SLOT.MAIN_EQUIP) as Item;
+		var equip = GetEquipment(true);
+		var weapon = equip.GetItemInSlot(EQUIP_SLOT.MAIN_EQUIP) as Item;
+
+		// Get equipment bonuses
+		int equipAtk = equip.GetInheritBonus(InheritType.ExtraMeleeAtk);
+		int equipDef = equip.GetInheritBonus(InheritType.ExtraMeleeDefense);
+		int equipHit = equip.GetInheritBonus(InheritType.HitAccurate);
+		int equipCrit = equip.GetInheritBonus(InheritType.ExtraCriticalRate);
+		int equipDodge = equip.GetInheritBonus(InheritType.ExtraDodge);
+
+		// Equipment stat bonuses
+		int equipStr = equip.GetInheritBonus(InheritType.ExtraSTR);
+		int equipDex = equip.GetInheritBonus(InheritType.ExtraDEX);
+		int equipAgi = equip.GetInheritBonus(InheritType.ExtraAGI);
+		int equipVit = equip.GetInheritBonus(InheritType.ExtraVIT);
+		int equipLuk = equip.GetInheritBonus(InheritType.ExtraLUK);
+
+		// Total stats including equipment
+		int totalStr = stats.Strength + equipStr;
+		int totalDex = stats.Dexterity + equipDex;
+		int totalAgi = stats.Agility + equipAgi;
+		int totalVit = stats.Vitality + equipVit;
+		int totalLuk = stats.Lucky + equipLuk;
+
+		// Base calculations from stats
+		int baseAtk = 3 * ((level * 5) + (totalStr + (totalStr / 5)) + (totalDex / 8) + (totalLuk / 10));
+		int baseDef = (level * 3) + (totalVit + (totalVit / 5));
+		int baseHit = (level * 2) + (totalDex + (totalDex / 5));
+		int baseCrit = 1 + (totalLuk / 5);
+		int baseFlee = (level * 3) + (totalAgi + (totalAgi / 5));
 
 		return new AttackStatus()
 		{
 			WeaponTypeId = weapon is null ? 0 : (uint)weapon.WeaponType,
-			Atk = (ushort) (3 * ((level * 5) + (stats.Strength + (stats.Strength / 5)) + (stats.Dexterity / 8) + (stats.Lucky / 10))),
-			CritRate = (ushort)(1 + (stats.Lucky/5)),
-			Def = (ushort)((level * 3) + (stats.Vitality + (stats.Vitality/5))),
-			Hit = (ushort)((level * 2) + (stats.Dexterity + (stats.Dexterity / 5))),
-			FleeRate = (ushort)((level * 3) + (stats.Agility + (stats.Agility / 5)))
+			Atk = (ushort)(baseAtk + equipAtk),
+			CritRate = (ushort)(baseCrit + equipCrit),
+			Def = (ushort)(baseDef + equipDef),
+			Hit = (ushort)(baseHit + equipHit),
+			FleeRate = (ushort)(baseFlee + equipDodge)
 		};
+	}
+
+	/// <summary>
+	/// Gets the off-hand weapon attack stats for dual-wielding.
+	/// Returns null if no off-hand weapon is equipped.
+	/// </summary>
+	private AttackStatus? GetSubAttack()
+	{
+		var equip = GetEquipment(true);
+		var subWeapon = equip.GetItemInSlot(EQUIP_SLOT.SUB_EQUIP) as Item;
+
+		// Check if sub slot has a weapon (not a shield)
+		if (subWeapon == null || !IsOffHandWeapon(subWeapon))
+			return null;
+
+		var stats = CombatBaseStats();
+		var level = _currentCharacter.status.combatJob.lv;
+
+		// Equipment stat bonuses (shared across both weapons)
+		int equipStr = equip.GetInheritBonus(InheritType.ExtraSTR);
+		int equipDex = equip.GetInheritBonus(InheritType.ExtraDEX);
+		int equipAgi = equip.GetInheritBonus(InheritType.ExtraAGI);
+		int equipLuk = equip.GetInheritBonus(InheritType.ExtraLUK);
+
+		int totalStr = stats.Strength + equipStr;
+		int totalDex = stats.Dexterity + equipDex;
+		int totalLuk = stats.Lucky + equipLuk;
+
+		// Off-hand weapon uses same formula but with weapon-specific bonuses
+		// Get inherits from the off-hand weapon specifically
+		int subWeaponAtk = 0;
+		int subWeaponHit = 0;
+		int subWeaponCrit = 0;
+		if (subWeapon.Inherits != null)
+		{
+			foreach (var inherit in subWeapon.Inherits)
+			{
+				switch ((InheritType)inherit.typeID)
+				{
+					case InheritType.ExtraMeleeAtk:
+						subWeaponAtk += inherit.val;
+						break;
+					case InheritType.HitAccurate:
+						subWeaponHit += inherit.val;
+						break;
+					case InheritType.ExtraCriticalRate:
+						subWeaponCrit += inherit.val;
+						break;
+				}
+			}
+		}
+
+		int baseAtk = 3 * ((level * 5) + (totalStr + (totalStr / 5)) + (totalDex / 8) + (totalLuk / 10));
+		int baseHit = (level * 2) + (totalDex + (totalDex / 5));
+		int baseCrit = 1 + (totalLuk / 5);
+
+		return new AttackStatus()
+		{
+			WeaponTypeId = (uint)subWeapon.WeaponType,
+			Atk = (ushort)(baseAtk + subWeaponAtk),
+			CritRate = (ushort)(baseCrit + subWeaponCrit),
+			Def = 0, // Off-hand doesn't contribute to defense
+			Hit = (ushort)(baseHit + subWeaponHit),
+			FleeRate = 0 // Off-hand doesn't contribute to flee
+		};
+	}
+
+	/// <summary>
+	/// Checks if the item in the off-hand slot is a weapon (not a shield).
+	/// </summary>
+	private static bool IsOffHandWeapon(Item item)
+	{
+		// Shields are not weapons for dual-wield purposes
+		var weaponType = (WeaponType)item.WeaponType;
+		return weaponType != WeaponType.WoodenShield &&
+		       weaponType != WeaponType.MetalShield &&
+		       weaponType != WeaponType.BareHand &&
+		       item.Type == (int)ItemType.AuxiliaryEquipment;
+	}
+
+	/// <summary>
+	/// Checks if the main weapon is a ranged weapon.
+	/// </summary>
+	private bool IsUsingRangedWeapon()
+	{
+		var equip = GetEquipment(true);
+		var weapon = equip.GetItemInSlot(EQUIP_SLOT.MAIN_EQUIP) as Item;
+		if (weapon == null)
+			return false;
+
+		var weaponType = (WeaponType)weapon.WeaponType;
+		return weaponType == WeaponType.Pistol ||
+		       weaponType == WeaponType.LongGun ||
+		       weaponType == WeaponType.Bow ||
+		       weaponType == WeaponType.Crossbow;
 	}
 
 	private AttackStatus GetSpellAttack()
 	{
-		// Factor in gear here later too..
 		var stats = CombatBaseStats();
 		var level = _currentCharacter.status.combatJob.lv;
-		var weapon = GetEquipment(true).GetItemInSlot(EQUIP_SLOT.MAIN_EQUIP) as Item;
+		var equip = GetEquipment(true);
+		var weapon = equip.GetItemInSlot(EQUIP_SLOT.MAIN_EQUIP) as Item;
+
+		// Get equipment bonuses
+		int equipAtk = equip.GetInheritBonus(InheritType.ExtraSpellAtk);
+		int equipDef = equip.GetInheritBonus(InheritType.ExtraSpellDefense);
+		int equipHit = equip.GetInheritBonus(InheritType.HitAccurate);
+		int equipCrit = equip.GetInheritBonus(InheritType.ExtraCriticalRate);
+		int equipDodge = equip.GetInheritBonus(InheritType.ExtraDodge);
+
+		// Equipment stat bonuses
+		int equipInt = equip.GetInheritBonus(InheritType.ExtraINT);
+		int equipDex = equip.GetInheritBonus(InheritType.ExtraDEX);
+		int equipAgi = equip.GetInheritBonus(InheritType.ExtraAGI);
+		int equipVit = equip.GetInheritBonus(InheritType.ExtraVIT);
+		int equipSpi = equip.GetInheritBonus(InheritType.ExtraSPI);
+		int equipLuk = equip.GetInheritBonus(InheritType.ExtraLUK);
+
+		// Total stats including equipment
+		int totalInt = stats.Intelligence + equipInt;
+		int totalDex = stats.Dexterity + equipDex;
+		int totalAgi = stats.Agility + equipAgi;
+		int totalVit = stats.Vitality + equipVit;
+		int totalSpi = stats.Spirit + equipSpi;
+		int totalLuk = stats.Lucky + equipLuk;
+
+		// Base calculations from stats (magic uses INT and SPI instead of STR)
+		int baseAtk = (level * 5) + (totalInt + (totalInt / 5)) + (totalDex / 8) + (totalSpi / 10);
+		int baseDef = (level * 3) + (totalVit + (totalVit / 5));
+		int baseHit = (level * 2) + (totalDex + (totalDex / 5));
+		int baseCrit = 1 + (totalLuk / 5);
+		int baseFlee = (level * 3) + (totalAgi + (totalAgi / 5));
 
 		return new AttackStatus()
 		{
 			WeaponTypeId = weapon is null ? 0 : (uint)weapon.WeaponType,
-			Atk = (ushort)((level * 5) + (stats.Intelligence + (stats.Intelligence / 5)) + (stats.Dexterity / 8) + (stats.Spirit / 10)),
-			CritRate = (ushort)(1 + (stats.Lucky / 5)),
-			Def = (ushort)((level * 3) + (stats.Vitality + (stats.Vitality / 5))),
-			Hit = (ushort)((level * 2) + (stats.Dexterity + (stats.Dexterity / 5))),
-			FleeRate = (ushort)((level * 3) + (stats.Agility + (stats.Agility / 5)))
+			Atk = (ushort)(baseAtk + equipAtk),
+			CritRate = (ushort)(baseCrit + equipCrit),
+			Def = (ushort)(baseDef + equipDef),
+			Hit = (ushort)(baseHit + equipHit),
+			FleeRate = (ushort)(baseFlee + equipDodge)
 		};
 	}
 
@@ -275,6 +449,41 @@ public class PlayerClient : IPlayerClient, IEntity
 			MaxHp = _status.mhp,
 			Mp = _status.mp,
 			MaxMp = _status.mmp
+		};
+	}
+
+	/// <summary>
+	/// Gets the player's life job stats with equipment bonuses applied.
+	/// Used for crafting, gathering, and other life skill activities.
+	/// </summary>
+	public LifeJobStats GetLifeJobStats()
+	{
+		var lifeStatus = _currentCharacter.status.lifeJob;
+		var equip = (PlayerEquipment)GetEquipment(false); // Life job equipment
+
+		// Get equipment stat bonuses (using life job inherit types)
+		int equipIdea = equip.GetInheritBonus(InheritType.ExtraIDE);
+		int equipMind = equip.GetInheritBonus(InheritType.ExtraMID);
+		int equipCraft = equip.GetInheritBonus(InheritType.ExtraCRT);
+		int equipSense = equip.GetInheritBonus(InheritType.ExtraSES);
+
+		// Get equipment-based derived stat bonuses
+		int collectSuccessRate = equip.GetInheritBonus(InheritType.TransMeleeHitRate); // Note: No direct mapping, using placeholder
+		int collectionIncreaseRate = equip.GetInheritBonus(InheritType.TransDodge); // Note: No direct mapping, using placeholder
+		int makeTimeDecrease = equip.GetInheritBonus(InheritType.ExtraCastingTimeDecrease);
+
+		return new LifeJobStats()
+		{
+			Lv = lifeStatus.lv,
+			Exp = lifeStatus.exp,
+			StatusPoint = lifeStatus.statusPoint,
+			Idea = (ushort)(lifeStatus.idea + equipIdea),
+			Mind = (ushort)(lifeStatus.mind + equipMind),
+			Craft = (ushort)(lifeStatus.craft + equipCraft),
+			Sense = (ushort)(lifeStatus.sense + equipSense),
+			CollectSuccessRate = collectSuccessRate,
+			CollectionIncreaseRate = collectionIncreaseRate,
+			MakeTimeDecrease = makeTimeDecrease
 		};
 	}
 
@@ -435,12 +644,12 @@ public class PlayerClient : IPlayerClient, IEntity
 		_knownPc.Remove(id);
 	}
 
-	public VELOCITIES GetVELOCITIES()
+	public VELOCITIES GetVelocities()
 	{
 		return _velocities;
 	}
 
-	public void UpdateVELOCITIES(VELOCITIES vel)
+	public void UpdateVelocities(VELOCITIES vel)
 	{
 		_velocities = vel;
 	}
@@ -465,9 +674,9 @@ public class PlayerClient : IPlayerClient, IEntity
 		_status = status;
 	}
 
-	public void AddNpcOrMob(INPC npc)
+	public void AddNpcOrMob(INpc npc)
 	{
-		AddNPC!.Invoke(npc);
+		AddNpc!.Invoke(npc);
 	}
 
 	public void SetCurrentTarget(long target)
@@ -483,6 +692,7 @@ public class PlayerClient : IPlayerClient, IEntity
 	public void InitCombat()
 	{
 		_inCombat = true;
+		_lastCombatTime = DateTime.Now;
 	}
 
 	public bool InCombat()
@@ -493,6 +703,50 @@ public class PlayerClient : IPlayerClient, IEntity
 	public void StopCombat()
 	{
 		_inCombat = false;
+		_lastCombatTime = DateTime.MinValue;
+	}
+
+	/// <summary>
+	/// Checks if player is currently in combat or was recently in combat.
+	/// Used for natural regeneration checks.
+	/// </summary>
+	public bool IsInCombat()
+	{
+		if (_inCombat)
+			return true;
+
+		// Consider "in combat" if combat ended less than 10 seconds ago
+		if (_lastCombatTime != DateTime.MinValue &&
+		    (DateTime.Now - _lastCombatTime).TotalSeconds < 10)
+			return true;
+
+		return false;
+	}
+
+	/// <summary>
+	/// Records the last combat time for out-of-combat regen checks.
+	/// </summary>
+	public void RecordCombatActivity()
+	{
+		_lastCombatTime = DateTime.Now;
+	}
+
+	/// <summary>
+	/// Sends a full status update packet to the client and nearby players.
+	/// </summary>
+	public void SendStatusUpdate()
+	{
+		SC_COMMON_STATUS statusPacket = new()
+		{
+			objInstID = GetObjInstID(),
+			status = _status.AsStruct()
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(statusPacket);
+		byte[] packet = pw.ToPacket();
+
+		Send(packet, default).Wait();
 	}
 
 	public async Task Update(ulong tick)
@@ -510,18 +764,40 @@ public class PlayerClient : IPlayerClient, IEntity
 		return combat ? _equipment.Combat : _equipment.Life;
 	}
 
+	public IPlayerQuests GetQuests()
+	{
+		return _quests;
+	}
+
 	public void SendInventory()
 	{
-		using PacketWriter pw = new(_clientRevision == 345);
+		using PacketWriter pw = new();
 		pw.Write(_inventory.AsInventoryPacket());
 		Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	public void SendEquipment()
 	{
-		using PacketWriter pw = new(_clientRevision == 345);
-		pw.Write(_equipment.Combat.GetCombatEquipList());
-		Send(pw.ToSizedPacket(), default).Wait();
+		using (PacketWriter pw = new())
+		{
+			pw.Write(_equipment.Combat.GetCombatEquipList());
+			Send(pw.ToSizedPacket(), default).Wait();
+		}
+
+		using (PacketWriter pw = new())
+		{
+			pw.Write(_equipment.Life.GetLifeEquipList());
+			Send(pw.ToSizedPacket(), default).Wait();
+		}
+	}
+
+	/// <summary>
+	/// Sends the list of active buffs/debuffs to the client.
+	/// </summary>
+	public void SendBuffList()
+	{
+		var buffPacket = LimeServer.BuffService.BuildDefListPacket(this);
+		Send(buffPacket, default).Wait();
 	}
 
 	public long GetId()
@@ -531,30 +807,37 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	public EntityStatus GetEntityStatus()
 	{
-		switch (_jobId)
+		// Combat job (jobId 1) - return combat-focused stats
+		if (_jobId == 1)
 		{
-			case 1:
-				return new EntityStatus()
-				{
-					Lv = _currentCharacter.status.combatJob.lv,
-					Exp = _currentCharacter.status.combatJob.exp,
-					BaseStats = CombatBaseStats(),
-					BasicStatus = GetBasicStatus(),
-					MeleeAttack = GetMeleeAttack(),
-					SpellAttack = GetSpellAttack()
-				};
-
-			default: // Not entirely sure yet how I wanna handle life jobs here..
-				return new EntityStatus()
-				{
-					Lv = _currentCharacter.status.combatJob.lv,
-					Exp = _currentCharacter.status.combatJob.exp,
-					BaseStats = CombatBaseStats(),
-					BasicStatus = GetBasicStatus(),
-					MeleeAttack = GetMeleeAttack(),
-					SpellAttack = GetSpellAttack()
-				};
+			return new EntityStatus()
+			{
+				Lv = _currentCharacter.status.combatJob.lv,
+				Exp = _currentCharacter.status.combatJob.exp,
+				BaseStats = CombatBaseStats(),
+				BasicStatus = GetBasicStatus(),
+				MeleeAttack = GetMeleeAttack(),
+				SpellAttack = GetSpellAttack(),
+				SubAttack = GetSubAttack(),
+				IsRanged = IsUsingRangedWeapon(),
+				LifeJobStats = null
+			};
 		}
+
+		// Life job (any other jobId) - return life job stats with basic combat
+		// Life jobs still have combat stats for when attacked, but primarily use life stats
+		return new EntityStatus()
+		{
+			Lv = _currentCharacter.status.lifeJob.lv,
+			Exp = _currentCharacter.status.lifeJob.exp,
+			BaseStats = CombatBaseStats(), // Combat stats still apply for defense
+			BasicStatus = GetBasicStatus(),
+			MeleeAttack = GetMeleeAttack(), // Reduced combat effectiveness could be applied here
+			SpellAttack = GetSpellAttack(),
+			SubAttack = GetSubAttack(),
+			IsRanged = IsUsingRangedWeapon(),
+			LifeJobStats = GetLifeJobStats()
+		};
 	}
 
 	public DamageResult UpdateHealth(int healthChange)
@@ -567,6 +850,101 @@ public class PlayerClient : IPlayerClient, IEntity
 			TargetKilled = _status.hp == 0,
 			ExpReward = 0
 		};
+	}
+
+	/// <summary>
+	/// Updates the player's HP and optionally broadcasts the change to nearby players
+	/// </summary>
+	/// <param name="newHP">The new HP value</param>
+	/// <param name="broadcast">Whether to broadcast the change to nearby players</param>
+	public void UpdateHP(int newHP, bool broadcast = true)
+	{
+		_status.hp = newHP < 0 ? 0 : (uint)newHP;
+		if (_status.hp > _status.mhp)
+			_status.hp = _status.mhp;
+
+		SC_CHANGED_HP hpPacket = new()
+		{
+			objInstID = GetObjInstID(),
+			hp = _status.hp
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(hpPacket);
+		byte[] packet = pw.ToPacket();
+
+		Send(packet, default).Wait();
+		if (broadcast)
+			SendGlobalPacket(packet, default).Wait();
+	}
+
+	/// <summary>
+	/// Updates the player's MP and optionally broadcasts the change to nearby players
+	/// </summary>
+	/// <param name="newMP">The new MP value</param>
+	/// <param name="broadcast">Whether to broadcast the change to nearby players</param>
+	public void UpdateMP(int newMP, bool broadcast = true)
+	{
+		_status.mp = newMP < 0 ? 0 : (uint)newMP;
+		if (_status.mp > _status.mmp)
+			_status.mp = _status.mmp;
+
+		SC_CHANGED_MP mpPacket = new()
+		{
+			objInstID = GetObjInstID(),
+			mp = _status.mp
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(mpPacket);
+		byte[] packet = pw.ToPacket();
+
+		Send(packet, default).Wait();
+		if (broadcast)
+			SendGlobalPacket(packet, default).Wait();
+	}
+
+	/// <summary>
+	/// Handles taking damage, updating HP and handling death if HP reaches 0
+	/// </summary>
+	/// <param name="damage">Amount of damage to take</param>
+	/// <returns>DamageResult containing whether target was killed</returns>
+	public DamageResult TakeDamage(int damage)
+	{
+		int newHP = (int)_status.hp - damage;
+		UpdateHP(newHP, true);
+
+		bool killed = _status.hp == 0;
+		if (killed)
+		{
+			SendDeath();
+		}
+
+		return new DamageResult()
+		{
+			TargetKilled = killed,
+			ExpReward = 0
+		};
+	}
+
+	/// <summary>
+	/// Sends death notification to player and nearby players
+	/// </summary>
+	public void SendDeath()
+	{
+		SC_DEAD deathPacket = new()
+		{
+			objInstID = GetObjInstID()
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(deathPacket);
+		byte[] packet = pw.ToPacket();
+
+		Send(packet, default).Wait();
+		SendGlobalPacket(packet, default).Wait();
+
+		Logger.Log($"[PlayerClient] Player {GetCurrentCharacter().appearance.name} ({GetObjInstID()}) has died");
 	}
 
 	public bool AddExp(ulong exp)
@@ -591,5 +969,77 @@ public class PlayerClient : IPlayerClient, IEntity
 	public void Loot(Item item)
 	{
 		throw new NotImplementedException();
+	}
+
+	// Anti-cheat helper methods
+	public uint GetLastClientTick() => _lastClientTick;
+	public void UpdateClientTick(uint tick) => _lastClientTick = tick;
+
+	public FPOS GetLastPosition() => _lastPosition;
+	public void UpdateLastPosition(FPOS pos) => _lastPosition = pos;
+
+	public DateTime GetLastMoveTime() => _lastMoveTime;
+	public void UpdateLastMoveTime() => _lastMoveTime = DateTime.Now;
+
+	public uint GetMovePacketCount() => _movePacketCount;
+	public void IncrementMovePacketCount() => _movePacketCount++;
+
+	public bool IsJumping() => _isJumping;
+	public void SetJumping(bool jumping)
+	{
+		_isJumping = jumping;
+		if (jumping)
+		{
+			_jumpStartTime = DateTime.Now;
+		}
+	}
+
+	public TimeSpan GetJumpDuration()
+	{
+		if (!_isJumping || _jumpStartTime == DateTime.MinValue)
+			return TimeSpan.Zero;
+		return DateTime.Now - _jumpStartTime;
+	}
+
+	/// <summary>
+	/// Get the skill cooldown tracker for this player
+	/// </summary>
+	public SkillCooldownTracker? GetSkillCooldownTracker() => _skillCooldownTracker;
+
+	/// <summary>
+	/// Calculate maximum allowed speed based on movement type and player stats
+	/// </summary>
+	public float GetMaxSpeed(byte moveType)
+	{
+		// Base speed from constants
+		float baseSpeed = moveType switch
+		{
+			1 => Constants.GameConstants.Movement.PC_RUN_SPEED,           // MOVE_RUN
+			2 => Constants.GameConstants.Movement.PC_WALK_SPEED,          // MOVE_WALK
+			3 => Constants.GameConstants.Movement.PC_WALK_BACK_SPEED,     // MOVE_WALK_BACK
+			4 => Constants.GameConstants.Movement.PC_SWIMMING_SPEED,      // MOVE_SWIM
+			5 => Constants.GameConstants.Movement.PC_SWIMMING_BACK_SPEED, // MOVE_SWIM_BACK
+			_ => Constants.GameConstants.Movement.PC_RUN_SPEED
+		};
+
+		// Apply velocity ratio from player stats
+		return baseSpeed * _velocities.ratio;
+	}
+
+	/// <summary>
+	/// Get the client's IP address
+	/// </summary>
+	public string GetIpAddress()
+	{
+		return _socketClient.GetIP();
+	}
+
+	/// <summary>
+	/// Forcibly disconnect this player
+	/// </summary>
+	public void Disconnect()
+	{
+		Save();
+		_socketClient.Disconnect();
 	}
 }

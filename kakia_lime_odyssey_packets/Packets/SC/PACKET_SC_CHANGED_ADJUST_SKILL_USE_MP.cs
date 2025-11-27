@@ -1,0 +1,30 @@
+/// <summary>
+/// Server packet sent when skill MP usage adjustment changes.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-26)
+/// IDA Struct: PACKET_SC_CHANGED_ADJUST_SKILL_USE_MP
+/// Size: 18 bytes
+/// Ordinal: 21696
+/// Affects how much MP is consumed when using skills (MP cost reduction/increase).
+/// </remarks>
+using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Common;
+
+namespace kakia_lime_odyssey_packets.Packets.SC;
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PACKET_SC_CHANGED_ADJUST_SKILL_USE_MP
+{
+	/// <summary>Packet header</summary>
+	public PACKET_FIX header;
+
+	/// <summary>Instance ID of the object</summary>
+	public long objInstID;
+
+	/// <summary>Current skill MP usage adjustment value</summary>
+	public int current;
+
+	/// <summary>Skill MP usage adjustment change amount (delta)</summary>
+	public int update;
+}

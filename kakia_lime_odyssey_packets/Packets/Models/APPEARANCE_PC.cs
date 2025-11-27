@@ -2,11 +2,45 @@
 
 namespace kakia_lime_odyssey_packets.Packets.Models;
 
-[StructLayout(LayoutKind.Sequential)]
+/// <summary>
+/// Character appearance data for the character selection screen (Korean CBT3 version).
+/// Contains character name, race, gender, job, visual customization, and equipped items.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-26)
+/// IDA Struct: APPEARANCE_PC
+/// Size: 152 bytes
+/// Memory Layout (IDA):
+/// - 0x00-0x19: char[26] name (26 bytes) - Character name
+/// - 0x1C: unsigned int raceTypeID (4 bytes)
+/// - 0x20: char lifeJobTypeID (1 byte)
+/// - 0x21: char combatJobTypeID (1 byte)
+/// - 0x22: bool genderType (1 byte)
+/// - 0x23: char headType (1 byte)
+/// - 0x24: char hairType (1 byte)
+/// - 0x25: char eyeType (1 byte)
+/// - 0x26: char earType (1 byte)
+/// - 0x27: unsigned __int8 playingJobClass (1 byte)
+/// - 0x28: __int16 underwearType (2 bytes)
+/// - 0x2C: int[20] equiped (80 bytes) - Array of equipped item IDs
+/// - 0x7C: char familyNameType (1 byte)
+/// - 0x80: unsigned int action (4 bytes)
+/// - 0x84: unsigned int actionStartTick (4 bytes)
+/// - 0x88: float scale (4 bytes)
+/// - 0x8C: float transparent (4 bytes)
+/// - 0x90: bool showHelm (1 byte)
+/// - 0x91: COLOR color (3 bytes) - RGB color
+/// - 0x94: unsigned __int8 skinColorType (1 byte)
+/// - 0x95: unsigned __int8 hairColorType (1 byte)
+/// - 0x96: unsigned __int8 eyeColorType (1 byte)
+/// - 0x97: unsigned __int8 eyeBrowColorType (1 byte)
+/// Total: 152 bytes (0x98)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct APPEARANCE_PC_KR
 {
-	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 26)]
-	public string name;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 26)]
+	public byte[] name;
 	public uint raceTypeID;
 	public byte lifeJobTypeID;
 	public byte combatJobTypeID;
@@ -18,7 +52,8 @@ public struct APPEARANCE_PC_KR
 	public byte earType;
 	public byte playingJobClass;
 	public short underwearType;
-	public EQUIPPED equiped { get; set; }
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+	public int[] equiped;
 	public byte familyNameType;
 	public uint action;
 	public uint actionStartTick;
@@ -88,7 +123,7 @@ public class ModAppearance
 	public byte earType;
 	public byte playingJobClass;
 	public short underwearType;
-	public ModEquipped equiped { get; set; }
+	public int[] equiped { get; set; }
 	public byte familyNameType;
 	public uint action;
 	public uint actionStartTick;
@@ -104,7 +139,7 @@ public class ModAppearance
 
 	public ModAppearance(APPEARANCE_PC_KR other)
 	{
-		this.name = other.name;
+		this.name = System.Text.Encoding.ASCII.GetString(other.name).TrimEnd('\0');
 		this.raceTypeID = other.raceTypeID;
 		this.lifeJobTypeID = other.lifeJobTypeID;
 		this.combatJobTypeID = other.combatJobTypeID;
@@ -115,7 +150,7 @@ public class ModAppearance
 		this.earType = other.earType;
 		this.playingJobClass = other.playingJobClass;
 		this.underwearType = other.underwearType;
-		this.equiped = new ModEquipped(other.equiped);
+		this.equiped = other.equiped;
 		this.familyNameType = other.familyNameType;
 		this.action = other.action;
 		this.actionStartTick = other.actionStartTick;
@@ -131,9 +166,13 @@ public class ModAppearance
 
 	public APPEARANCE_PC_KR AsStruct()
 	{
+		var nameBytes = new byte[26];
+		var nameData = System.Text.Encoding.ASCII.GetBytes(name);
+		Array.Copy(nameData, nameBytes, Math.Min(nameData.Length, 25));
+
 		return new APPEARANCE_PC_KR()
 		{
-			name = name,
+			name = nameBytes,
 			raceTypeID = raceTypeID,
 			lifeJobTypeID = lifeJobTypeID,
 			combatJobTypeID = combatJobTypeID,
@@ -144,7 +183,7 @@ public class ModAppearance
 			earType = earType,
 			playingJobClass = playingJobClass,
 			underwearType = underwearType,
-			equiped = equiped.AsStruct(),
+			equiped = equiped,
 			familyNameType = familyNameType,
 			action = action,
 			actionStartTick = actionStartTick,

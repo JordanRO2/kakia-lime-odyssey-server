@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\kakia_lime_odyssey_contracts\kakia_lime_odyssey_contracts.csproj" />
     <ProjectReference Include="..\kakia_lime_odyssey_logging\kakia_lime_odyssey_logging.csproj" />
     <ProjectReference Include="..\kakia_lime_odyssey_packets\kakia_lime_odyssey_packets.csproj" />
   </ItemGroup>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<World revision="11">
+    <ModelResRoot>
+        <ModelRes name="eff_etc_loginFlowers08.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers02.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers03.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers04.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers05.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers06.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_etc_loginFlowers07.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="login_map01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="login_map03.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="login_map02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="geass_01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="flower01.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="eff_env_vlight02.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="flower02.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="login_cloud.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="eff_env_lightglowt01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="login_map04.nif" relativeDir="bg\" cullingType="3" />
+        <ModelRes name="eff_env_vlight03.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_bgcolor01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_lfog01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_loginfog01.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_firefly03.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_ledfog02.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_vlight04.nif" relativeDir="eff\" cullingType="3" />
+        <ModelRes name="eff_env_darkline.nif" relativeDir="eff\" cullingType="3" />
+    </ModelResRoot>
+    <ModelInstanceRoot fileName="login_01.mdi" loadFromXml="0" quadrant="1" />
+    <GrassModelInstanceRoot fileName="login_01.gmdi" loadFromXml="0" quadrant="1" />
+    <GlobalLightRoot>
+        <Light name="Global Directional Light" type="1" pos="659.609009 22.721001 0.000000" rot="0.785000 0.000000 -1.000000 0.000000">
+            <StepLight name="Noon_Dir" ambient="0.950000 0.950000 0.900000" diffuse="0.300000 0.350000 0.250000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dusk_Dir" ambient="0.950000 0.950000 0.900000" diffuse="0.300000 0.350000 0.250000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Midnight_Dir" ambient="0.950000 0.950000 0.900000" diffuse="0.300000 0.350000 0.250000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dawn_Dir" ambient="0.950000 0.950000 0.900000" diffuse="0.300000 0.350000 0.250000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Ambient Light(only no vertex color mesh)" type="0" pos="10.000000 0.000000 0.000000">
+            <StepLight name="Noon_Amb" ambient="0.000000 0.000000 0.000000" dimmer="0.000000" />
+            <StepLight name="Dusk_Amb" ambient="0.000000 0.000000 0.000000" dimmer="0.000000" />
+            <StepLight name="Midnight_Amb" ambient="0.000000 0.000000 0.000000" dimmer="0.000000" />
+            <StepLight name="Dawn_Amb" ambient="0.000000 0.000000 0.000000" dimmer="0.000000" />
+        </Light>
+        <Light name="Global Character Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight characterAmbient="1.000000 1.010000 1.050000" characterDiffuse="0.240000 0.200000 0.150000" />
+            <StepLight characterAmbient="1.000000 1.010000 1.050000" characterDiffuse="0.240000 0.200000 0.150000" />
+            <StepLight characterAmbient="1.000000 1.010000 1.050000" characterDiffuse="0.240000 0.200000 0.150000" />
+            <StepLight characterAmbient="1.000000 1.010000 1.050000" characterDiffuse="0.240000 0.200000 0.150000" />
+        </Light>
+        <Light name="Global Lightmap Shadow Ambient Light" type="0" pos="10.000000 0.000000 0.000000">
+            <StepLight name="Noon_LightMap" ambient="0.600000 0.600000 0.700000" dimmer="1.000000" />
+            <StepLight name="Dusk_LightMap" ambient="0.600000 0.600000 0.700000" dimmer="1.000000" />
+            <StepLight name="Midnight_LightMap" ambient="0.600000 0.600000 0.700000" dimmer="1.000000" />
+            <StepLight name="Dawn_LightMap" ambient="0.600000 0.600000 0.700000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Indoor Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <IndoorLight name="Indoor" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="1.000000 1.000000 1.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Character Indoor Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <IndoorLight name="IndoorCharacter" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="1.000000 1.000000 1.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Water Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight name="Noon_Water" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dusk_Water" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Midnight_Water" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dawn_Water" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+        </Light>
+        <Light name="Global Effect Directional Light" type="1" pos="0.000000 0.000000 0.000000" rot="0.785398 0.000000 -1.000000 0.000000">
+            <StepLight name="Noon_Effect" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dusk_Effect" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Midnight_Effect" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+            <StepLight name="Dawn_Effect" ambient="1.000000 1.000000 1.000000" diffuse="1.000000 1.000000 1.000000" specular="0.000000 0.000000 0.000000" dimmer="1.000000" />
+        </Light>
+    </GlobalLightRoot>
+    <LightRoot />
+    <WorldInfoRoot lowestHeight="0.000000" showModelABV="0" curEffectModelHeight="1.000000" blurForce="1.000000" dofDistance="1.000000" dofFallOff="1.000000" singleColorSky="0" ignoreAlphaEnterBg="1" />
+    <WorldGrid worldGridZpos="0.000000" bRenderWorldGrid="1" />
+    <CameraInfo lookAt="103.414154 1507.857178 -56.378052" radius="2040.000000" longitude="6.202965" latitude="0.173344" bOrthogonal="0" />
+    <FogParam bFog="1">
+        <StepFog fogColor="0.420000 0.750000 0.970000" fogDepth="1.000000" fNearAdjust="0.000000" SkyfogColor="0.456000 0.729000 0.914000" SkyfogLow="-2000.000000" SkyfogHigh="6000.000000" SkyfogColor1="0.600000 0.900000 0.800000" SkyfogColor2="0.520000 0.850000 0.970000" SkyfogHigh1="5000.000000" SkyfogHigh2="3000.000000" SkyColor="0.456000 0.729000 0.914000" />
+        <StepFog fogColor="0.420000 0.750000 0.970000" fogDepth="1.000000" fNearAdjust="0.000000" SkyfogColor="0.456000 0.729000 0.914000" SkyfogLow="-2000.000000" SkyfogHigh="6000.000000" SkyfogColor1="0.600000 0.900000 0.800000" SkyfogColor2="0.520000 0.850000 0.970000" SkyfogHigh1="5000.000000" SkyfogHigh2="3000.000000" SkyColor="0.456000 0.729000 0.914000" />
+        <StepFog fogColor="0.420000 0.750000 0.970000" fogDepth="1.000000" fNearAdjust="0.000000" SkyfogColor="0.456000 0.729000 0.914000" SkyfogLow="-2000.000000" SkyfogHigh="6000.000000" SkyfogColor1="0.600000 0.900000 0.800000" SkyfogColor2="0.520000 0.850000 0.970000" SkyfogHigh1="5000.000000" SkyfogHigh2="3000.000000" SkyColor="0.456000 0.729000 0.914000" />
+        <StepFog fogColor="0.420000 0.750000 0.970000" fogDepth="1.000000" fNearAdjust="0.000000" SkyfogColor="0.456000 0.729000 0.914000" SkyfogLow="-2000.000000" SkyfogHigh="6000.000000" SkyfogColor1="0.600000 0.900000 0.800000" SkyfogColor2="0.520000 0.850000 0.970000" SkyfogHigh1="5000.000000" SkyfogHigh2="3000.000000" SkyColor="0.456000 0.729000 0.914000" />
+    </FogParam>
+    <FogVolumeRoot />
+    <WaterVolumeRoot />
+    <FogBoxRoot />
+    <ModelVertexColorRoot />
+    <BackGroundRoot>
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="1.000000 1.000000" cloud2Speed="1.000000 1.000000" cloud1Segment="1.000000" cloud2Segment="1.000000" starSegment="1.000000" FarCloudSegment="1.000000" FarCloundSpeedOffsetX="1.000000" kCloudColor="1.000000 1.000000 1.000000" kFarCloudColor="0.000000 1.000000 1.000000" fCloud1Alpha="0.000000" fCloud2Alpha="0.000000" fFarCloudAlpha="0.000000" silhouetteColor="0.800000 0.720000 0.710000" furriness="50.000000" sheen="0.600000" silhouetteStart="0.000000" silhouetteEnd="1200.000000" terrainFurriness="10.000000" terrainSheen="0.600000" skinFurriness="15.000000" skinSheen="0.600000" LightmapColor="1.000000 1.000000 1.000000" />
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="1.000000 1.000000" cloud2Speed="1.000000 1.000000" cloud1Segment="1.000000" cloud2Segment="1.000000" starSegment="1.000000" FarCloudSegment="1.000000" FarCloundSpeedOffsetX="1.000000" kCloudColor="1.000000 1.000000 1.000000" kFarCloudColor="1.000000 1.000000 1.000000" fCloud1Alpha="0.000000" fCloud2Alpha="0.000000" fFarCloudAlpha="0.000000" silhouetteColor="0.000000 0.000000 1.000000" furriness="10.000000" sheen="0.600000" silhouetteStart="600.000000" silhouetteEnd="1200.000000" terrainFurriness="10.000000" terrainSheen="0.600000" skinFurriness="10.000000" skinSheen="0.000000" LightmapColor="1.000000 1.000000 1.000000" />
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="1.000000 1.000000" cloud2Speed="1.000000 1.000000" cloud1Segment="1.000000" cloud2Segment="1.000000" starSegment="1.000000" FarCloudSegment="1.000000" FarCloundSpeedOffsetX="1.000000" kCloudColor="1.000000 1.000000 1.000000" kFarCloudColor="1.000000 1.000000 1.000000" fCloud1Alpha="0.000000" fCloud2Alpha="0.000000" fFarCloudAlpha="0.000000" silhouetteColor="0.000000 0.000000 1.000000" furriness="10.000000" sheen="0.600000" silhouetteStart="600.000000" silhouetteEnd="1200.000000" terrainFurriness="10.000000" terrainSheen="0.600000" skinFurriness="10.000000" skinSheen="0.000000" LightmapColor="1.000000 1.000000 1.000000" />
+        <BackGroundParam sunColor="1.000000 1.000000 1.000000" sunScatterHgRsMs="0.980000 0.060000 0.001000" sunScatterIsEsRp="0.270000 1.330000 0.100000" cloud1Speed="1.000000 1.000000" cloud2Speed="1.000000 1.000000" cloud1Segment="1.000000" cloud2Segment="1.000000" starSegment="1.000000" FarCloudSegment="1.000000" FarCloundSpeedOffsetX="1.000000" kCloudColor="1.000000 1.000000 1.000000" kFarCloudColor="1.000000 1.000000 1.000000" fCloud1Alpha="0.000000" fCloud2Alpha="0.000000" fFarCloudAlpha="0.000000" silhouetteColor="0.000000 0.000000 1.000000" furriness="10.000000" sheen="0.600000" silhouetteStart="600.000000" silhouetteEnd="1200.000000" terrainFurriness="10.000000" terrainSheen="0.600000" skinFurriness="10.000000" skinSheen="0.000000" LightmapColor="1.000000 1.000000 1.000000" />
+    </BackGroundRoot>
+</World>

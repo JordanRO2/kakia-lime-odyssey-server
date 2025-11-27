@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<SoundPropertyRoot>
+    <SoundProperty pos="0.000000 0.000000 1.000000" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="2000.000000" boundRadius="0.000000" delay="20.000000" fade="0.100000" volume="1.000000" loop="1" third="1" bgm="0" soundID="9524" />
+    <SoundProperty pos="697.251709 689.463562 1571.208496" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="1000.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="0.800000" loop="0" third="1" bgm="0" soundID="9523" />
+    <SoundProperty pos="-74.292175 -166.704346 1580.947388" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="300.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="0.800000" loop="0" third="1" bgm="0" soundID="9523" />
+    <SoundProperty pos="681.500977 171.195129 1968.663208" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="200.000000" boundRadius="0.000000" delay="15.000000" fade="0.100000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9524" />
+</SoundPropertyRoot>

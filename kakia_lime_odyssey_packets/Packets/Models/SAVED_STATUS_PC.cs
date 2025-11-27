@@ -2,6 +2,16 @@
 
 namespace kakia_lime_odyssey_packets.Packets.Models;
 
+/// <summary>
+/// Saved status information for a character (Korean CBT3 version).
+/// Contains HP/MP/LP, breath, fatigue, and job status information.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-26)
+/// IDA Struct: SAVED_STATUS_PC
+/// Size: 68 bytes
+/// Used in: CLIENT_PC (part of SC_PC_LIST)
+/// </remarks>
 [StructLayout(LayoutKind.Sequential)]
 public struct SAVED_STATUS_PC_KR
 {

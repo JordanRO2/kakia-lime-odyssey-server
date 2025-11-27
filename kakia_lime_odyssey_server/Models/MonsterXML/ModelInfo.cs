@@ -23,12 +23,12 @@ public class ModelInfo
 	public int ModelShadowTextureSize { get; set; }
 
 	[XmlElement("Model")]
-	public List<Model> Models { get; set; }
+	public List<Model> Models { get; set; } = default!;
 
 	public static List<Model> GetEntries()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(ModelInfo));
-		using FileStream fileStream = new FileStream("db/xmls/ModelsInfo.xml", FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Entities.Models, FileMode.Open);
 		var modelsInfo = (ModelInfo)serializer.Deserialize(fileStream)!;
 
 		return modelsInfo.Models;
@@ -41,16 +41,16 @@ public class Model
 	public int TypeId { get; set; }
 
 	[XmlAttribute("category")]
-	public string Category { get; set; }
+	public string Category { get; set; } = default!;
 
 	[XmlAttribute("nifName")]
-	public string NifName { get; set; }
+	public string NifName { get; set; } = default!;
 
 	[XmlAttribute("fileName")]
-	public string FileName { get; set; }
+	public string FileName { get; set; } = default!;
 
 	[XmlAttribute("tciName")]
-	public string TciName { get; set; }
+	public string TciName { get; set; } = default!;
 
 	[XmlAttribute("grass")]
 	public int Grass { get; set; }
@@ -74,7 +74,7 @@ public class Model
 	public float AutoEffectScale { get; set; }
 
 	[XmlAttribute("autoEffectPos")]
-	public string AutoEffectPos { get; set; }
+	public string AutoEffectPos { get; set; } = default!;
 
 	[XmlAttribute("runFreq")]
 	public float RunFreq { get; set; }
@@ -98,7 +98,7 @@ public class Model
 	public int Type { get; set; }
 
 	[XmlElement("Ani")]
-	public List<Ani> Anis { get; set; }
+	public List<Ani> Anis { get; set; } = default!;
 }
 
 public class Ani

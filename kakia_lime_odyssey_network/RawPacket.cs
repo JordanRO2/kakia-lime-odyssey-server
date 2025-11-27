@@ -7,10 +7,11 @@ namespace kakia_lime_odyssey_network;
 
 public class RawPacket
 {
+	private const int MAX_PACKET_SIZE = 4096;
+
 	public PacketType PacketId { get; set; }
-	public PacketType_REV345 PacketId_REV345 { get; set; }
 	public UInt16 Size { get; set; }
-	public byte[] Payload { get; set; }
+	public byte[] Payload { get; set; } = Array.Empty<byte>();
 
 	public static List<RawPacket> ParsePackets(byte[] data, bool useCrypto)
 	{
@@ -22,18 +23,28 @@ public class RawPacket
 			{
 				if (!useCrypto)
 				{
+					if (data.Length > MAX_PACKET_SIZE)
+					{
+						throw new InvalidOperationException($"Packet exceeds maximum size: {data.Length} bytes (max: {MAX_PACKET_SIZE})");
+					}
+
 					var p1 = new RawPacket()
 					{
 						Size = (ushort)data.Length,
 						Payload = data[2..],
-						PacketId_REV345 = (PacketType_REV345)BitConverter.ToUInt16(data.AsSpan(0, 2))
+						PacketId = (PacketType)BitConverter.ToUInt16(data.AsSpan(0, 2))
 					};
-					p1.PacketId = (PacketType)Enum.Parse(typeof(PacketType), p1.PacketId_REV345.ToString());
 					packets.Add(p1);
 					break;
 				}
 
 				int totalSize = BitConverter.ToUInt16(data, pos);
+
+				if (totalSize > MAX_PACKET_SIZE)
+				{
+					throw new InvalidOperationException($"Packet exceeds maximum size: {totalSize} bytes (max: {MAX_PACKET_SIZE})");
+				}
+
 				var p = new RawPacket()
 				{
 					Size = BitConverter.ToUInt16(data.AsSpan(pos + 2, 2))

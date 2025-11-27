@@ -1,4 +1,4 @@
-﻿using kakia_lime_odyssey_network.Interface;
+using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets.Packets.SC;
 using Newtonsoft.Json;
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<GlobalBgmData>
+    <Noon bgm="40" />
+    <Dusk bgm="40" />
+    <MidNight bgm="40" />
+    <Dawn bgm="40" />
+</GlobalBgmData>

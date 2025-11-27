@@ -58,12 +58,10 @@ public class PosCalc
 
 	}
 
-	public void Start(uint startTick, FPOS startPos, float velocity, float accel, float angleRadian, float angleRadianSpeed) 
-	{ 
-		FPOS centerVec = new FPOS();		
-		FPOS leftVec = new FPOS(); 
-
-		FPOS result;
+	public void Start(uint startTick, FPOS startPos, float velocity, float accel, float angleRadian, float angleRadianSpeed)
+	{
+		FPOS centerVec = new FPOS();
+		FPOS leftVec = new FPOS();
 
 		Initialized = true;
 		StartTick = startTick; 

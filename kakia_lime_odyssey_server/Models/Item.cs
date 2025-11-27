@@ -1,4 +1,4 @@
-﻿using kakia_lime_odyssey_network.Interface;
+using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
 using System.Xml.Serialization;
@@ -9,12 +9,12 @@ namespace kakia_lime_odyssey_server.Models;
 public class ItemInfo
 {
 	[XmlElement("Item")]
-	public List<Item> Items { get; set; }
+	public List<Item> Items { get; set; } = default!;
 
 	public static List<Item> GetItems()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(ItemInfo));
-		using FileStream fileStream = new FileStream("db/xmls/ItemInfo.xml", FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.Items, FileMode.Open);
 		var info = (ItemInfo)serializer.Deserialize(fileStream)!;
 
 		return info.Items;
@@ -99,9 +99,9 @@ public class Item : IItem
 	[XmlAttribute(AttributeName = "modelId")]
 	public int ModelId { get; set; }
 	[XmlAttribute(AttributeName = "name")]
-	public string Name { get; set; }
+	public string Name { get; set; } = default!;
 	[XmlAttribute(AttributeName = "desc")]
-	public string Desc { get; set; }
+	public string Desc { get; set; } = default!;
 	[XmlAttribute(AttributeName = "grade")]
 	public int Grade { get; set; }
 	[XmlAttribute(AttributeName = "maxEnchantCount")]
@@ -127,9 +127,9 @@ public class Item : IItem
 	[XmlAttribute(AttributeName = "skillId")]
 	public int SkillId { get; set; }
 	[XmlAttribute(AttributeName = "imageName")]
-	public string ImageName { get; set; }
+	public string ImageName { get; set; } = default!;
 	[XmlAttribute(AttributeName = "smallImageName")]
-	public string SmallImageName { get; set; }
+	public string SmallImageName { get; set; } = default!;
 	[XmlAttribute(AttributeName = "sortingType")]
 	public int SortingType { get; set; }
 	[XmlAttribute(AttributeName = "series")]
@@ -147,7 +147,7 @@ public class Item : IItem
 	[XmlAttribute(AttributeName = "price")]
 	public int Price { get; set; }
 	[XmlElement(ElementName = "Inherit")]
-	public List<Inherit> Inherits { get; set; }
+	public List<Inherit> Inherits { get; set; } = default!;
 
 	[XmlIgnore]
 	public ulong Count { get; set; } = 1;
@@ -269,13 +269,13 @@ public class ItemNA
 	[XmlAttribute]
 	public int modelId { get; set; }
 	[XmlAttribute]
-	public string note1 { get; set; }
+	public string note1 { get; set; } = default!;
 	[XmlAttribute]
-	public string name { get; set; }
+	public string name { get; set; } = default!;
 	[XmlAttribute]
-	public string note2 { get; set; }
+	public string note2 { get; set; } = default!;
 	[XmlAttribute]
-	public string desc { get; set; }
+	public string desc { get; set; } = default!;
 	[XmlAttribute]
 	public int category { get; set; }
 	[XmlAttribute]
@@ -309,13 +309,13 @@ public class ItemNA
 	[XmlAttribute]
 	public int skillId { get; set; }
 	[XmlAttribute]
-	public string imageName { get; set; }
+	public string imageName { get; set; } = default!;
 	[XmlAttribute]
-	public string smallImageName { get; set; }
+	public string smallImageName { get; set; } = default!;
 	[XmlAttribute]
-	public string bigImageName { get; set; }
+	public string bigImageName { get; set; } = default!;
 	[XmlAttribute]
-	public string cardImageName { get; set; }
+	public string cardImageName { get; set; } = default!;
 	[XmlAttribute]
 	public int sortingType { get; set; }
 	[XmlAttribute]
@@ -366,7 +366,7 @@ public class ItemNA
 	public int hitDuration { get; set; }
 
 	[XmlElement]
-	public List<Inherit> Inherits { get; set; }
+	public List<Inherit> Inherits { get; set; } = default!;
 
 	public INVENTORY_ITEM AsInventoryItem()
 	{

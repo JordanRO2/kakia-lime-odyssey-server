@@ -3,7 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.Models;
 
-[StructLayout(LayoutKind.Sequential)]
+/// <summary>
+/// 3D floating-point position structure.
+/// </summary>
+/// <remarks>
+/// IDA Verified: 2025-11-26
+/// IDA Struct: FPOS
+/// Size: 12 bytes (3 floats: x, y, z)
+/// Used for world positions, directions, and vectors.
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct FPOS
 {
 	private static double HalfPI = Math.PI / 2;

@@ -17,8 +17,8 @@ public class MapData
 	public MapData(string mapName)
 	{
 		Name = mapName;
-		Terrain = new FullTerrain(Name, "db/maps/");
-		Models = new FullModels(Name, "db/maps/");
+		Terrain = new FullTerrain(Name, GameDataPaths.World.MapsFolder + "/");
+		Models = new FullModels(Name, GameDataPaths.World.MapsFolder + "/");
 
 
 		GeneratedNavMesh = GenerateNavMeshFromTerrainAndModels();

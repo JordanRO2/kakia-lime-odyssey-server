@@ -1,14 +1,20 @@
-﻿using kakia_lime_odyssey_logging;
+using kakia_lime_odyssey_contracts.Interfaces;
+using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Database;
+using kakia_lime_odyssey_server.Entities.Monsters;
+using kakia_lime_odyssey_server.Entities.Npcs;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
-using kakia_lime_odyssey_server.Models.MonsterLogic;
 using kakia_lime_odyssey_server.Models.MonsterXML;
 using kakia_lime_odyssey_server.Models.SkillXML;
+using kakia_lime_odyssey_server.Services.Ban;
+using kakia_lime_odyssey_server.Services.Combat;
+using kakia_lime_odyssey_server.Services.Guild;
+using kakia_lime_odyssey_server.Services.Party;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -23,35 +29,49 @@ public class LimeServer : SocketServer
 	public static List<XmlSkill> SkillDB = SkillInfo.GetSkills();
 
 	public static List<PlayerClient> PlayerClients = new();
-	public static Dictionary<uint, List<NPC>> Npcs = new();
+	public static Dictionary<uint, List<Npc>> Npcs = new();
 	public static Dictionary<uint, List<Monster>> Mobs = new();
 	public static DateTime StartTime = DateTime.Now;
+
+	/// <summary>Service for managing buffs/debuffs on entities</summary>
+	public static BuffService BuffService { get; } = new();
+
+	/// <summary>Service for managing parties</summary>
+	public static PartyService PartyService { get; } = new();
+
+	/// <summary>Service for managing guilds</summary>
+	public static GuildService GuildService { get; } = new();
 
 	public Config Config { get; set; }
 
 	public BackgroundTask BackgroundTask { get; set; }
 
 	private static uint _currentObjInstID = 200000;
+	private uint _lastTickTime;
+	private uint _regenTickAccumulator;
+	private const uint RegenTickIntervalMs = 5000; // Natural regen every 5 seconds
 
 	public LimeServer(Config cfg) : base(cfg.ServerIP, cfg.Port)
 	{
 		Config = cfg;
-		var villagers = JsonDB.LoadVillagers();
+		var villagers = WorldDataLoader.LoadNpcSpawns();
 		foreach(var v in villagers)
 		{
 			if(!Npcs.ContainsKey(v.ZoneId))
-				Npcs.Add(v.ZoneId, new List<NPC>());
+				Npcs.Add(v.ZoneId, new List<Npc>());
 			Npcs[v.ZoneId].Add(v);
 		}
-		Logger.Log("Villagers loaded.", LogLevel.Information);
+		Logger.Log($"NPCs loaded: {villagers.Count}", LogLevel.Information);
 
 		MonsterDB.AddRange(MonsterInfo.GetEntries());
 		Logger.Log("Monster DB loaded.", LogLevel.Information);
 
-		var mapMobs = JsonDB.LoadMapMobs();
+		var mapMobs = WorldDataLoader.LoadMobSpawns();
 		foreach (var mob in  mapMobs)
 		{
 			var monster = MonsterDB.FirstOrDefault(mDb => mDb.ModelTypeID == mob.ModelTypeId);
+			if (monster == null)
+				continue;
 			Monster newMob = new Monster(monster, GenerateUniqueObjectId(), mob.Pos, new FPOS() { x = 0.9f, y = 0, z = 0}, (uint)mob.ZoneId, false, mob.LootTableId);
 			AddNPC(newMob);
 		}
@@ -59,6 +79,22 @@ public class LimeServer : SocketServer
 		BackgroundTask = new BackgroundTask(TimeSpan.FromMilliseconds(1000/60));
 		BackgroundTask.Run += ServerTick;
 		BackgroundTask.Start();
+
+		// Subscribe to ban service kick events
+		BanService.OnPlayerBanned += HandlePlayerBan;
+	}
+
+	/// <summary>
+	/// Handle player ban/kick requests from the anti-cheat system
+	/// </summary>
+	private void HandlePlayerBan(uint playerId, string reason)
+	{
+		var player = PlayerClients.FirstOrDefault(p => p.GetObjInstID() == playerId);
+		if (player != null)
+		{
+			Logger.Log($"[BAN] Kicking player {player.GetCurrentCharacter()?.appearance.name ?? "Unknown"} ({playerId}): {reason}", LogLevel.Warning);
+			player.Disconnect();
+		}
 	}
 
 	public ReadOnlySpan<PlayerClient> GetReadonlyPlayers()
@@ -102,17 +138,31 @@ public class LimeServer : SocketServer
 
 	private async Task ServerTick()
 	{
+		uint currentTick = GetCurrentTick();
+		uint deltaMs = currentTick - _lastTickTime;
+		_lastTickTime = currentTick;
+
+		// Update buff timers and handle expirations
+		var expiredBuffs = BuffService.UpdateBuffTimers((int)deltaMs);
+		await SendBuffExpirationPackets(expiredBuffs);
+
+		// Natural HP/MP regeneration tick (every 5 seconds)
+		_regenTickAccumulator += deltaMs;
+		if (_regenTickAccumulator >= RegenTickIntervalMs)
+		{
+			_regenTickAccumulator -= RegenTickIntervalMs;
+			await ProcessNaturalRegeneration();
+		}
 
 		await UnloadLoggedOutPCs();
 		DetectPlayersEnteringSight();
 
 		// MONSTER STUFF
-
 		foreach (var kv in Mobs)
 		{
 			foreach(var mob in kv.Value)
 			{
-				mob.Update(GetCurrentTick(), GetReadonlyPlayers());
+				mob.Update(currentTick, GetReadonlyPlayers());
 			}
 		}
 	}
@@ -139,7 +189,7 @@ public class LimeServer : SocketServer
 			pc.SendGlobal -= SendGlobal;
 			pc.RequestZonePresence -= LoadOthersInZone;
 			pc.RequestStatus -= GetStatusFor;
-			pc.AddNPC -= AddNPC;
+			pc.AddNpc -= AddNPC;
 			pc.Save();
 
 			SC_LEAVE_SIGHT_PC leave_pc = new()
@@ -150,7 +200,7 @@ public class LimeServer : SocketServer
 				}
 			};
 
-			using PacketWriter pw = new(pc.GetClientRevision() == 345);
+			using PacketWriter pw = new();
 			pw.Write(leave_pc);
 			await SendGlobal(pc, pw.ToPacket(), default);
 		}
@@ -171,7 +221,7 @@ public class LimeServer : SocketServer
 				requester.Seen(pc.GetObjInstID());
 
 				var loadPC = pc.GetEnterSight();
-				using PacketWriter pw = new(requester.GetClientRevision() == 345);
+				using PacketWriter pw = new();
 				pw.Write(loadPC);
 				requester.Send(pw.ToSizedPacket(), default).Wait();
 			}
@@ -185,29 +235,32 @@ public class LimeServer : SocketServer
 		pc.SendGlobal += SendGlobal;
 		pc.RequestZonePresence += LoadOthersInZone;
 		pc.RequestStatus += GetStatusFor;
-		pc.AddNPC += AddNPC;
+		pc.AddNpc += AddNPC;
 		PlayerClients.Add(pc);
 	}
 
-	public bool AddNPC(INPC npc)
+	public bool AddNPC(INpc npc)
 	{
 		uint zone = 0;
 
-		switch(npc.GetNPCType())
+		switch(npc.GetNpcType())
 		{
-			case NPC_TYPE.MOB:
-				var mob = npc as Monster;
-				zone = mob.Zone;
-				if (!Mobs.ContainsKey(zone)) Mobs.Add(zone, new List<Monster>());
-
-				Mobs[zone].Add(mob);
+			case NpcType.Mob:
+				if (npc is Monster mob)
+				{
+					zone = mob.Zone;
+					if (!Mobs.ContainsKey(zone)) Mobs.Add(zone, new List<Monster>());
+					Mobs[zone].Add(mob);
+				}
 				break;
 
-			case NPC_TYPE.NPC:
-				var np = npc as NPC;
-				zone = np.ZoneId;
-				if (!Npcs.ContainsKey(zone)) Npcs.Add(zone, new List<NPC>());
-				Npcs[zone].Add(np);
+			case NpcType.Npc:
+				if (npc is Npc np)
+				{
+					zone = np.ZoneId;
+					if (!Npcs.ContainsKey(zone)) Npcs.Add(zone, new List<Npc>());
+					Npcs[zone].Add(np);
+				}
 				break;
 		}
 
@@ -216,17 +269,21 @@ public class LimeServer : SocketServer
 			if (!pc.IsLoaded() || pc.GetZone() != zone)
 				continue;
 
-			using PacketWriter pw = new(pc.GetClientRevision() == 345);
-			switch (npc.GetNPCType())
+			using PacketWriter pw = new();
+			switch (npc.GetNpcType())
 			{
-				case NPC_TYPE.MOB:
-					if ((npc as Monster).Despawned)
-						continue;
-					pw.Write((npc as Monster).GetEnterSight());
+				case NpcType.Mob:
+					if (npc is Monster monster)
+					{
+						if (monster.Despawned)
+							continue;
+						pw.Write(monster.GetEnterSight());
+					}
 					break;
 
-				case NPC_TYPE.NPC:
-					pw.Write((npc as NPC).GetEnterSight());
+				case NpcType.Npc:
+					if (npc is Npc npcEntity)
+						pw.Write(npcEntity.GetEnterSight());
 					break;
 			}
 			pc.Send(pw.ToSizedPacket(), default).Wait();
@@ -265,7 +322,7 @@ public class LimeServer : SocketServer
 			foreach(var npc in Npcs[requester.GetZone()].Where(n => !requester.KnowOf((uint)n.Id)))
 			{
 				var loadNPC = npc.GetEnterSight();
-				using PacketWriter pw = new(requester.GetClientRevision() == 345);
+				using PacketWriter pw = new();
 				pw.Write(loadNPC);
 				await requester.Send(pw.ToSizedPacket(), token);
 			}
@@ -276,7 +333,7 @@ public class LimeServer : SocketServer
 			foreach (var mob in Mobs[requester.GetZone()].Where(n => !requester.KnowOf((uint)n.Id)))
 			{
 				var loadMob = mob.GetEnterSight();
-				using PacketWriter pw = new(requester.GetClientRevision() == 345);
+				using PacketWriter pw = new();
 				pw.Write(loadMob);
 				await requester.Send(pw.ToSizedPacket(), token);
 			}
@@ -293,7 +350,63 @@ public class LimeServer : SocketServer
 	}
 
 	public static uint GenerateUniqueObjectId()
-	{ 	
+	{
 		return Interlocked.Increment(ref _currentObjInstID);
+	}
+
+	private async Task SendBuffExpirationPackets(List<(IEntity Entity, ActiveBuff Buff)> expiredBuffs)
+	{
+		foreach (var (entity, buff) in expiredBuffs)
+		{
+			var removePacket = BuffService.BuildRemoveDefPacket(buff.InstanceId);
+
+			if (entity is PlayerClient pc && pc.IsConnected())
+			{
+				await pc.Send(removePacket, default);
+			}
+		}
+	}
+
+	private async Task ProcessNaturalRegeneration()
+	{
+		var healingService = new HealingService();
+
+		foreach (var pc in GetReadonlyPlayers())
+		{
+			if (!pc.IsLoaded() || !pc.IsConnected())
+				continue;
+
+			var status = pc.GetStatus();
+
+			// Skip regen if dead
+			if (status.hp <= 0)
+				continue;
+
+			// Skip regen if in combat (has recent combat activity)
+			if (pc.IsInCombat())
+				continue;
+
+			// HP regeneration
+			if (status.hp < status.mhp)
+			{
+				uint hpRegen = healingService.CalculateNaturalRegenHP(pc);
+				if (hpRegen > 0)
+				{
+					uint newHP = Math.Min(status.hp + hpRegen, status.mhp);
+					pc.UpdateHP((int)newHP, false);
+				}
+			}
+
+			// MP regeneration
+			if (status.mp < status.mmp)
+			{
+				uint mpRegen = healingService.CalculateNaturalRegenMP(pc);
+				if (mpRegen > 0)
+				{
+					uint newMP = Math.Min(status.mp + mpRegen, status.mmp);
+					pc.UpdateMP((int)newMP, false);
+				}
+			}
+		}
 	}
 }

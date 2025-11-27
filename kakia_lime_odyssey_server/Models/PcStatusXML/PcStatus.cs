@@ -7,12 +7,12 @@ namespace kakia_lime_odyssey_server.Models.PcStatusXML;
 public class PcStatus
 {
 	[XmlElement("Exp")]
-	public List<Exp> Exps { get; set; }
+	public List<Exp> Exps { get; set; } = default!;
 
 	public static Dictionary<int, Exp> GetEntries()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(PcStatus));
-		using FileStream fileStream = new FileStream("db/xmls/PcStatus.xml", FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Characters.ExperienceTable, FileMode.Open);
 		var pcStatus = (PcStatus)serializer.Deserialize(fileStream)!;
 
 		var entries = new Dictionary<int, Exp>();

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<AreaInfoPropertyRoot>
+    <AreaInfoProperty nameID="40221300" pos="-1338.246460 1249.358643 719.303223" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="1200.000000" boundRadius="0.000000" />
+    <AreaInfoProperty nameID="40221300" pos="-103.207886 1029.293213 440.305176" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="1.000000" radius="300.000000" boundRadius="0.000000" />
+</AreaInfoPropertyRoot>

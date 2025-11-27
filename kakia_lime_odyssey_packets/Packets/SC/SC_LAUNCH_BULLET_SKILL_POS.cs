@@ -1,0 +1,21 @@
+using kakia_lime_odyssey_packets.Packets.Common;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
+
+namespace kakia_lime_odyssey_packets.Packets.SC;
+
+[StructLayout(LayoutKind.Sequential, Pack = 2)]
+public struct SC_LAUNCH_BULLET_SKILL_POS : IPacketFixed
+{
+	public long fromInstID;
+	public FPOS toPos;
+	public uint typeID;
+	public ushort useHP;
+	public ushort useMP;
+	public ushort useSP;
+	public ushort useLP;
+	public uint coolTime;
+	public long bulletID;
+	public uint tick;
+	public float velocity;
+}

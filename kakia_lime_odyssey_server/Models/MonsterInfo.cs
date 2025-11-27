@@ -8,26 +8,19 @@ namespace kakia_lime_odyssey_server.Models;
 public class MonsterInfo
 {
 	[XmlElement(ElementName = "Monster")]
-	public List<XmlMonster> Monsters {	get; set; }
+	public List<XmlMonster> Monsters {	get; set; } = default!;
 
 	public static List<XmlMonster> GetEntries()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(MonsterInfo));
-		using FileStream fileStream = new FileStream("db/monster.xml", FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Entities.Monsters, FileMode.Open);
 		var mobInfo = (MonsterInfo)serializer.Deserialize(fileStream)!;
 
-
-		var loc = XmlLocalization.GetEntries();
 		var models = ModelInfo.GetEntries();
 
 		foreach (var mob in mobInfo.Monsters)
 		{
-			var translation = loc.FirstOrDefault(m => m.ID.ToString().Equals(mob.Name));
-			if (translation is not null)
-			{
-				mob.Name = translation.Text;
-			}
-
+			// Name is used directly from XML (localization is client-side)
 			mob.Model = models.FirstOrDefault(model => model.TypeId.Equals(mob.ModelTypeID)) ?? new();
 		}
 
@@ -40,7 +33,7 @@ public class MapMob
 	public int Id { get; set; }
 	public int ZoneId { get; set; }
 	public int ModelTypeId { get; set; }
-	public string Name { get; set; }
+	public string Name { get; set; } = default!;
 	public FPOS Pos { get; set; }
 	public int LootTableId { get; set; }
 }

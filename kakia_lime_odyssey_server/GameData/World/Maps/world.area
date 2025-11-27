@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!-- edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by Administrator (EMBRACE) -->
+<WorldLayout>
+	<!--월드에어리어xml파일과 맞추기 위한 더미 존  꼭 있어야됨-->
+	<Area name="더미" width="1" height="1">
+		<Map name="dummy" wedName="test01.wed" tokName=""/>
+	</Area>
+	<!--북오르타 Type id=1 -->
+	<Area name="북오르타 " width="15" height="9">
+		<!--1줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="000"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="001"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="002"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="003"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="004"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="005"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="006"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="007"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="008"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="009"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="010"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="011"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="012"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="013"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="014"/>
+		<!--2줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="015"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="016"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="017"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="018"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="019"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="020"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="021"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="022"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="023"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="024"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="025"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="026"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="027"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="028"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="029"/>
+		<!--3줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="030"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="031"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_143.wed" tokName="032"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_144.wed" tokName="033"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_145.wed" tokName="034"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_146.wed" tokName="035"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_147.wed" tokName="036"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_148.wed" tokName="037"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_149.wed" tokName="038"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_150.wed" tokName="039"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="040"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="041"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="042"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="043"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="044"/>
+		<!--4줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="045"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="046"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_170.wed" tokName="047"/>
+		<Map name="no021_dubal00" wedName="no021_dubal00.wed" tokName="048"/>
+		<Map name="no021_dubal01" wedName="no021_dubal01.wed" tokName="049"/>
+		<Map name="no021_dubal02" wedName="no021_dubal02.wed" tokName="050"/>
+		<Map name="no022_wtum00" wedName="no022_wtum00.wed" tokName="051"/>
+		<Map name="no022_wtum01" wedName="no022_wtum01.wed" tokName="052"/>
+		<Map name="no022_wtum02" wedName="no022_wtum02.wed" tokName="053"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_177.wed" tokName="054"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="055"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="056"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="057"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="058"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="059"/>
+		<!--5줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="060"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="061"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_197.wed" tokName="062"/>
+		<Map name="no021_dubal03" wedName="no021_dubal03.wed" tokName="063"/>
+		<Map name="no021_dubal04" wedName="no021_dubal04.wed" tokName="064"/>
+		<Map name="no021_dubal05" wedName="no021_dubal05.wed" tokName="065"/>
+		<Map name="no022_wtum03" wedName="no022_wtum03.wed" tokName="066"/>
+		<Map name="no022_wtum04" wedName="no022_wtum04.wed" tokName="067"/>
+		<Map name="no022_wtum05" wedName="no022_wtum05.wed" tokName="068"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_204.wed" tokName="069"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="070"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="071"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="072"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="073"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="074"/>
+		<!--6줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="075"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="076"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_224.wed" tokName="077"/>
+		<Map name="no021_dubal06" wedName="no021_dubal06.wed" tokName="078"/>
+		<Map name="no021_dubal07" wedName="no021_dubal07.wed" tokName="079"/>
+		<Map name="no021_dubal08" wedName="no021_dubal08.wed" tokName="080"/>
+		<Map name="no022_wtum06" wedName="no022_wtum06.wed" tokName="081"/>
+		<Map name="no022_wtum07" wedName="no022_wtum07.wed" tokName="082"/>
+		<Map name="no022_wtum08" wedName="no022_wtum08.wed" tokName="083"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_231.wed" tokName="084"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="085"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="086"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="087"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="088"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="089"/>
+		<!--7줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="090"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="091"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_251.wed" tokName="092"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_252.wed" tokName="093"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_253.wed" tokName="094"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_254.wed" tokName="095"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_255.wed" tokName="096"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_256.wed" tokName="097"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_257.wed" tokName="098"/>
+		<Map name="nOrta_dummy" wedName="no_dummy_258.wed" tokName="099"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="100"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="101"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="102"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="103"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="104"/>
+		<!--8줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="105"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="106"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="107"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="108"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="109"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="110"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="111"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="112"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="113"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="114"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="115"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="116"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="117"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="118"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="119"/>
+		<!--9줄-->
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="120"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="121"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="122"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="123"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="124"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="125"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="126"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="127"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="128"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="129"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="130"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="131"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="132"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="133"/>
+		<Map name="nOrta_dummy" wedName="dummy.wed" tokName="134"/>
+	</Area>
+	<!--서오르타(로우란,푸른산호숲)  Type id=2 -->
+	<Area name="서오르타" width="15" height="9">
+		<!--1줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="000"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="001"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="002"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="003"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="004"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="005"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="006"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="007"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="008"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="009"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="010"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="011"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="012"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="013"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="014"/>
+		<!--2줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="015"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="016"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="017"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="018"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="019"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="020"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="021"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="022"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="023"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="024"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="025"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="026"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="027"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="028"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="029"/>
+		<!--3줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="030"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="031"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_239.wed" tokName="032"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_240.wed" tokName="033"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_241.wed" tokName="034"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_242.wed" tokName="035"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_243.wed" tokName="036"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_244.wed" tokName="037"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_245.wed" tokName="038"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_246.wed" tokName="039"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="040"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="041"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="042"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="043"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="044"/>
+		<!--4줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="045"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="046"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_260.wed" tokName="047"/>
+		<Map name="wo031_louran00" wedName="wo031_louran00.wed" tokName="048"/>
+		<Map name="wo031_louran01" wedName="wo031_louran01.wed" tokName="049"/>
+		<Map name="wo031_louran02" wedName="wo031_louran02.wed" tokName="050"/>
+		<Map name="wo032_bluecoral00" wedName="wo032_bluecoral00.wed" tokName="051"/>
+		<Map name="wo032_bluecoral01" wedName="wo032_bluecoral01.wed" tokName="052"/>
+		<Map name="wo032_bluecoral02" wedName="wo032_bluecoral02.wed" tokName="053"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_267.wed" tokName="054"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="055"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="056"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="057"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="058"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="059"/>
+		<!--5줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="060"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="061"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_281.wed" tokName="062"/>
+		<Map name="wo031_louran03" wedName="wo031_louran03.wed" tokName="063"/>
+		<Map name="wo031_louran04" wedName="wo031_louran04.wed" tokName="064"/>
+		<Map name="wo031_louran05" wedName="wo031_louran05.wed" tokName="065"/>
+		<Map name="wo032_bluecoral03" wedName="wo032_bluecoral03.wed" tokName="066"/>
+		<Map name="wo032_bluecoral04" wedName="wo032_bluecoral04.wed" tokName="067"/>
+		<Map name="wo032_bluecoral05" wedName="wo032_bluecoral05.wed" tokName="068"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_288.wed" tokName="069"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="070"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="071"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="072"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="073"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="074"/>
+		<!--6줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="075"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="076"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_302.wed" tokName="077"/>
+		<Map name="wo031_louran06" wedName="wo031_louran06.wed" tokName="078"/>
+		<Map name="wo031_louran07" wedName="wo031_louran07.wed" tokName="079"/>
+		<Map name="wo031_louran08" wedName="wo031_louran08.wed" tokName="080"/>
+		<Map name="wo032_bluecoral06" wedName="wo032_bluecoral06.wed" tokName="081"/>
+		<Map name="wo032_bluecoral07" wedName="wo032_bluecoral07.wed" tokName="082"/>
+		<Map name="wo032_bluecoral08" wedName="wo032_bluecoral08.wed" tokName="083"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_309.wed" tokName="084"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="085"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="086"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="087"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="088"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="089"/>
+		<!--7줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="090"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="091"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_323.wed" tokName="092"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_324.wed" tokName="093"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_325.wed" tokName="094"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_326.wed" tokName="095"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_327.wed" tokName="096"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_328.wed" tokName="097"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_329.wed" tokName="098"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_330.wed" tokName="099"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="100"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="101"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="102"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="103"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="104"/>
+		<!--8줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="105"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="106"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="107"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="108"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="109"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="110"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="111"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="112"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="113"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="114"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="115"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="116"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="117"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="118"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="119"/>
+		<!--9줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="120"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="121"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="122"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="123"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="124"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="125"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="126"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="127"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="128"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="129"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="130"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="131"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="132"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="133"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="134"/>
+	</Area>
+	<!--서오르타 남작성 지하 패턴던젼  Type id=3 -->
+	<Area name="패턴던젼" width="1" height="1">
+		<Map name="pattern" wedName="dun_wo032_nospel.wed" tokName="dun_wo032_nospel"/>
+	</Area>
+	<!--컨텐츠 테스트용 맵  Type id=4 -->
+	<Area name="테스트맵" width="1" height="1">
+		<Map name="test" wedName="contents_test.wed" tokName=""/>
+	</Area>
+	<!-- 북오르타 서툼바라 카툼바골짜기 전직의 동굴 Type id=5 -->
+	<Area name="시험의동굴" width="1" height="1">
+		<Map name="cave" wedName="dun_no023_start01.wed" tokName="dun_no023_start01"/>
+	</Area>
+	<!-- 푸른산호숲 산호채취장 산호동굴 Type id=6 -->
+	<Area name="산호동굴" width="1" height="1">
+		<Map name="cave" wedName="dun_wo032_start01.wed" tokName="dun_wo032_start01"/>
+	</Area>
+	<!-- talun던전 Type id=7-->
+	<Area name="talun던전" width="1" height="1">
+		<Map name="talun" wedName="dun_no022_talrun01.wed" tokName="dun_no022_talrun01"/>
+	</Area>
+	<!-- 크로나그던전 Type id=8-->
+	<Area name="크로나그 던전" width="1" height="1">
+		<Map name="kronag" wedName="dun_no21_kronag_01.wed" tokName="dun_no21_kronag_01"/>
+	</Area>
+	<!-- 테스트지원맵 Type id=9-->
+	<Area name="테스트지원맵" width="1" height="1">
+		<Map name="contents_jiwon" wedName="Contents_jiwon.wed" tokName="Contents_jiwon"/>
+	</Area>
+	<!-- 푸른산호숲 튜토리얼맵 Type id=10-->
+	<Area name="푸른산호숲 0번맵" width="3" height="3">
+		<Map name="tutorial_human01_00.wed" wedName="tutorial_human01_00.wed" tokName="tutorial_human0"/>
+		<Map name="tutorial_human01_01.wed" wedName="tutorial_human01_01.wed" tokName="tutorial_human1"/>
+		<Map name="tutorial_human01_02.wed" wedName="tutorial_human01_02.wed" tokName="tutorial_human2"/>
+		<Map name="tutorial_human01_03.wed" wedName="tutorial_human01_03.wed" tokName="tutorial_human3"/>
+		<Map name="tutorial_human01_04.wed" wedName="tutorial_human01_04.wed" tokName="tutorial_human4"/>
+		<Map name="tutorial_human01_05.wed" wedName="tutorial_human01_05.wed" tokName="tutorial_human5"/>
+		<Map name="tutorial_human01_06.wed" wedName="tutorial_human01_06.wed" tokName="tutorial_human6"/>
+		<Map name="tutorial_human01_07.wed" wedName="tutorial_human01_07.wed" tokName="tutorial_human7"/>
+		<Map name="tutorial_human01_08.wed" wedName="tutorial_human01_08.wed" tokName="tutorial_human8"/>
+	</Area>
+	<!-- 서툼바라 튜토리얼맵 Type id=11-->
+	<Area name="서툼바라 0번" width="3" height="3">
+		<Map name="tutorial_turga01_00.wed" wedName="tutorial_turga01_00.wed" tokName="tutorial_turga0"/>
+		<Map name="tutorial_turga01_01.wed" wedName="tutorial_turga01_01.wed" tokName="tutorial_turga1"/>
+		<Map name="tutorial_turga01_02.wed" wedName="tutorial_turga01_02.wed" tokName="tutorial_turga2"/>
+		<Map name="tutorial_turga01_03.wed" wedName="tutorial_turga01_03.wed" tokName="tutorial_turga3"/>
+		<Map name="tutorial_turga01_04.wed" wedName="tutorial_turga01_04.wed" tokName="tutorial_turga4"/>
+		<Map name="tutorial_turga01_05.wed" wedName="tutorial_turga01_05.wed" tokName="tutorial_turga5"/>
+		<Map name="tutorial_turga01_06.wed" wedName="tutorial_turga01_06.wed" tokName="tutorial_turga6"/>
+		<Map name="tutorial_turga01_07.wed" wedName="tutorial_turga01_07.wed" tokName="tutorial_turga7"/>
+		<Map name="tutorial_turga01_08.wed" wedName="tutorial_turga01_08.wed" tokName="tutorial_turga8"/>
+	</Area>
+	<!--서오르타 로우란사막 소금광산  Type id=12 -->
+	<Area name="소금광산" width="1" height="1">
+		<Map name="saltmine" wedName="dun_wo031_saltmine.wed" tokName="dun_wo031_saltmine"/>
+	</Area>
+	<!--서버에 없음. 알사르바나임시지역  Type id=13 -->
+	<Area name="알사르바나임시지역" width="3" height="3">
+		<Map name="wo024_alsarvana00" wedName="wo024_alsarvana00.wed" tokName="wo024_alsarvana000"/>
+		<Map name="wo024_alsarvana01" wedName="wo024_alsarvana01.wed" tokName="wo024_alsarvana001"/>
+		<Map name="wo024_alsarvana02" wedName="wo024_alsarvana02.wed" tokName="wo024_alsarvana002"/>
+		<Map name="wo024_alsarvana03" wedName="wo024_alsarvana03.wed" tokName="wo024_alsarvana003"/>
+		<Map name="wo024_alsarvana04" wedName="wo024_alsarvana04.wed" tokName="wo024_alsarvana004"/>
+		<Map name="wo024_alsarvana05" wedName="wo024_alsarvana05.wed" tokName="wo024_alsarvana005"/>
+		<Map name="wo024_alsarvana06" wedName="wo024_alsarvana06.wed" tokName="wo024_alsarvana006"/>
+		<Map name="wo024_alsarvana07" wedName="wo024_alsarvana07.wed" tokName="wo024_alsarvana007"/>
+		<Map name="wo024_alsarvana08" wedName="wo024_alsarvana08.wed" tokName="wo024_alsarvana008"/>
+	</Area>
+	<!--서버에 없음. 팜임시지역 Type id=14 -->
+	<Area name="팜임시지역" width="3" height="3">
+		<Map name="is001_haze06" wedName="dummy.wed" tokName="is001_haze06"/>
+		<Map name="is001_haze07" wedName="dummy.wed" tokName="is001_haze07"/>
+		<Map name="is001_haze08" wedName="dummy.wed" tokName="is001_haze08"/>
+		<Map name="is001_haze11" wedName="dummy.wed" tokName="is001_haze11"/>
+		<Map name="is001_haze12" wedName="is001_haze12.wed" tokName="is001_haze12"/>
+		<Map name="is001_haze13" wedName="is001_haze13.wed" tokName="is001_haze13"/>
+		<Map name="is001_haze16" wedName="dummy.wed" tokName="is001_haze16"/>
+		<Map name="is001_haze17" wedName="is001_haze17.wed" tokName="is001_haze17"/>
+		<Map name="is001_haze18" wedName="is001_haze18.wed" tokName="is001_haze18"/>
+	</Area>
+	<!-- 로그인화면 서버에없음 -->
+	<Area name="시작맵" width="3" height="1">
+		<Map name="MAP_01" wedName="start_wtum01.wed" tokName=""/>
+		<Map name="MAP_02" wedName="start_bluecoral01.wed" tokName=""/>
+		<Map name="MAP_03" wedName="start_dun01.wed" tokName=""/>
+	</Area>
+	<!-- 서버에없음 (서오르타에 알사르바나만 추가된 지역) -->
+	<Area name="로우란/푸산/알사르바나" width="15" height="15">
+		<!--1줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="000"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="001"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="002"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="003"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="004"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="005"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="006"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="007"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="008"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="009"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="010"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="011"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="012"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="013"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="014"/>
+		<!--2줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="015"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="016"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_155.wed" tokName="017"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_156.wed" tokName="018"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_157.wed" tokName="019"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_158.wed" tokName="020"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_159.wed" tokName="021"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="022"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="023"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="024"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="025"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="026"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="027"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="028"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="029"/>
+		<!--3줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="030"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="031"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_176.wed" tokName="032"/>
+		<Map name="Al_Sarvana_00" wedName="wo024_alsarvana00.wed" tokName="033"/>
+		<Map name="Al_Sarvana_01" wedName="wo024_alsarvana01.wed" tokName="034"/>
+		<Map name="Al_Sarvana_02" wedName="wo024_alsarvana02.wed" tokName="035"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_180.wed" tokName="036"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="037"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="038"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="039"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="040"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="041"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="042"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="043"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="044"/>
+		<!--4줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="045"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="046"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_197.wed" tokName="047"/>
+		<Map name="Al Sarvana_03" wedName="wo024_alsarvana03.wed" tokName="048"/>
+		<Map name="Al Sarvana_04" wedName="wo024_alsarvana04.wed" tokName="049"/>
+		<Map name="Al Sarvana_05" wedName="wo024_alsarvana05.wed" tokName="050"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_201.wed" tokName="051"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="052"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="053"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="054"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="055"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="056"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="057"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="058"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="059"/>
+		<!--5줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="060"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="061"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_218.wed" tokName="062"/>
+		<Map name="Al Sarvana_06" wedName="wo024_alsarvana06.wed" tokName="063"/>
+		<Map name="Al Sarvana_07" wedName="wo024_alsarvana07.wed" tokName="064"/>
+		<Map name="Al Sarvana_08" wedName="wo024_alsarvana08.wed" tokName="065"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_222.wed" tokName="066"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="067"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="068"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="069"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="070"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="071"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="072"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="073"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="074"/>
+		<!--6줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="075"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="076"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_239.wed" tokName="077"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_240.wed" tokName="078"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_241.wed" tokName="079"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_242.wed" tokName="080"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_243.wed" tokName="081"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="082"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="083"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="084"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="085"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="086"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="087"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="088"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="089"/>
+		<!--7줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="090"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="091"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_260.wed" tokName="092"/>
+		<Map name="wo031_louran00" wedName="wo031_louran00.wed" tokName="093"/>
+		<Map name="wo031_louran01" wedName="wo031_louran01.wed" tokName="094"/>
+		<Map name="wo031_louran02" wedName="wo031_louran02.wed" tokName="095"/>
+		<Map name="wo032_bluecoral00" wedName="wo032_bluecoral00.wed" tokName="096"/>
+		<Map name="wo032_bluecoral01" wedName="wo032_bluecoral01.wed" tokName="097"/>
+		<Map name="wo032_bluecoral02" wedName="wo032_bluecoral02.wed" tokName="098"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_267.wed" tokName="099"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="100"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="101"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="102"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="103"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="104"/>
+		<!--8줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="105"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="106"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_281.wed" tokName="107"/>
+		<Map name="wo031_louran03" wedName="wo031_louran03.wed" tokName="108"/>
+		<Map name="wo031_louran04" wedName="wo031_louran04.wed" tokName="109"/>
+		<Map name="wo031_louran05" wedName="wo031_louran05.wed" tokName="110"/>
+		<Map name="wo032_bluecoral03" wedName="wo032_bluecoral03.wed" tokName="111"/>
+		<Map name="wo032_bluecoral04" wedName="wo032_bluecoral04.wed" tokName="112"/>
+		<Map name="wo032_bluecoral05" wedName="wo032_bluecoral05.wed" tokName="113"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_288.wed" tokName="114"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="115"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="116"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="117"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="118"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="119"/>
+		<!--9줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="120"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="121"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_302.wed" tokName="122"/>
+		<Map name="wo031_louran06" wedName="wo031_louran06.wed" tokName="123"/>
+		<Map name="wo031_louran07" wedName="wo031_louran07.wed" tokName="124"/>
+		<Map name="wo031_louran08" wedName="wo031_louran08.wed" tokName="125"/>
+		<Map name="wo032_bluecoral06" wedName="wo032_bluecoral06.wed" tokName="126"/>
+		<Map name="wo032_bluecoral07" wedName="wo032_bluecoral07.wed" tokName="127"/>
+		<Map name="wo032_bluecoral08" wedName="wo032_bluecoral08.wed" tokName="128"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_309.wed" tokName="129"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="130"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="131"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="132"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="133"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="134"/>
+		<!--10줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="135"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="136"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_323.wed" tokName="137"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_324.wed" tokName="138"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_325.wed" tokName="139"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_326.wed" tokName="140"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_327.wed" tokName="141"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="142"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="143"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="144"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="145"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="146"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="147"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="148"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="149"/>
+		<!--11줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="150"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="151"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="152"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="153"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="154"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="155"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="156"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="157"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="158"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="159"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="160"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="161"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="162"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="163"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="164"/>
+		<!--12줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="165"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="166"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="167"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="168"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="169"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="170"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="171"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="172"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="173"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="174"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="175"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="176"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="177"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="178"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="179"/>
+		<!--13줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="180"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="181"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="182"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="183"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="184"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="185"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="186"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="187"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="188"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="189"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="190"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="191"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="192"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="193"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="194"/>
+		<!--14줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="195"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="196"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="197"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="198"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="199"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="200"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="201"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="202"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="203"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="204"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="205"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="206"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="207"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="208"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="209"/>
+		<!--15줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="210"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="211"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="212"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="213"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="214"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="215"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="216"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="217"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="218"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="219"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="220"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="221"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="222"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="223"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="224"/>
+	</Area>
+	<!-- 서버에없음 -->
+	<Area name="알사르바나/알바할임시지역" width="15" height="9">
+		<!--1줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="000"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="001"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="002"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="003"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="004"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="005"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="006"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="007"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="008"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="009"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="010"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="011"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="012"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="013"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="014"/>
+		<!--2줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="015"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="016"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="017"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="018"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="019"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="020"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="021"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="022"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="023"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="024"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="025"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="026"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="027"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="028"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="029"/>
+		<!--3줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="030"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="031"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_176.wed" tokName="032"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_177.wed" tokName="033"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_178.wed" tokName="034"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_179.wed" tokName="035"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_180.wed" tokName="036"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_181.wed" tokName="037"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_182.wed" tokName="038"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_183.wed" tokName="039"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="040"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="041"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="042"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="043"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="044"/>
+		<!--4줄 -->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="045"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="046"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_197.wed" tokName="047"/>
+		<Map name="Al_Sarvana_00" wedName="wo024_alsarvana00.wed" tokName="048"/>
+		<Map name="Al_Sarvana_01" wedName="wo024_alsarvana01.wed" tokName="049"/>
+		<Map name="Al_Sarvana_02" wedName="wo024_alsarvana02.wed" tokName="050"/>
+		<Map name="Al_bahal_00" wedName="wo025_00.wed" tokName="051"/>
+		<Map name="Al_bahal_01" wedName="wo025_01.wed" tokName="052"/>
+		<Map name="Al_bahal_02" wedName="wo025_02.wed" tokName="053"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_204.wed" tokName="054"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="055"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="056"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="057"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="058"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="059"/>
+		<!--5줄 -->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="060"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="061"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_218.wed" tokName="062"/>
+		<Map name="Al Sarvana_03" wedName="wo024_alsarvana03.wed" tokName="063"/>
+		<Map name="Al Sarvana_04" wedName="wo024_alsarvana04.wed" tokName="064"/>
+		<Map name="Al Sarvana_05" wedName="wo024_alsarvana05.wed" tokName="065"/>
+		<Map name="Al bahal_03" wedName="wo025_03.wed" tokName="066"/>
+		<Map name="Al bahal_04" wedName="wo025_04.wed" tokName="067"/>
+		<Map name="Al bahal_05" wedName="wo025_05.wed" tokName="068"/>
+		<Map name="dummy" wedName="wo_dummy_225.wed" tokName="069"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="070"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="071"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="072"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="073"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="074"/>
+		<!--6줄 -->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="075"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="076"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_239.wed" tokName="077"/>
+		<Map name="Al Sarvana_06" wedName="wo024_alsarvana06.wed" tokName="078"/>
+		<Map name="Al Sarvana_07" wedName="wo024_alsarvana07.wed" tokName="079"/>
+		<Map name="Al Sarvana_08" wedName="wo024_alsarvana08.wed" tokName="080"/>
+		<Map name="Al bahal_06" wedName="wo025_06.wed" tokName="081"/>
+		<Map name="Al bahal_07" wedName="wo025_07.wed" tokName="082"/>
+		<Map name="Al bahal_08" wedName="wo025_08.wed" tokName="083"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_246.wed" tokName="084"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="085"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="086"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="087"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="088"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="089"/>
+		<!--7줄 -->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="090"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="091"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_260.wed" tokName="092"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_261.wed" tokName="093"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_262.wed" tokName="094"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_263.wed" tokName="095"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_264.wed" tokName="096"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_265.wed" tokName="097"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_266.wed" tokName="098"/>
+		<Map name="wOrta_dummy" wedName="wo_dummy_267.wed" tokName="099"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="100"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="101"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="102"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="103"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="104"/>
+		<!--8줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="105"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="106"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="107"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="108"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="109"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="110"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="111"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="112"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="113"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="114"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="115"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="116"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="117"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="118"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="119"/>
+		<!--9줄-->
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="120"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="121"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="122"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="123"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="124"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="125"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="126"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="127"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="128"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="129"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="130"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="131"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="132"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="133"/>
+		<Map name="wOrta_dummy" wedName="dummy.wed" tokName="134"/>
+	</Area>
+	<!-- 서버에없음 -->
+</WorldLayout>

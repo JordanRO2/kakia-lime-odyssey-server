@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="euc-kr" ?>
+<SoundPropertyRoot>
+    <SoundProperty pos="869.691345 -28.952454 0.000000" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+    <SoundProperty pos="891.237793 -1568.946777 592.544434" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+    <SoundProperty pos="-1320.296143 795.646851 793.738770" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="1.500000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+    <SoundProperty pos="-973.338501 -793.749878 892.054565" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+    <SoundProperty pos="-315.425415 1112.453613 659.843872" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="1.500000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+    <SoundProperty pos="-1304.647705 677.483459 803.130493" rot="0.000000 1.000000 0.000000 0.000000" extent="0.000000 0.000000 0.000000" minDist="10.000000" radius="2000.000000" boundRadius="0.000000" delay="0.000000" fade="0.000000" volume="1.000000" loop="0" third="1" bgm="0" soundID="9648" />
+</SoundPropertyRoot>

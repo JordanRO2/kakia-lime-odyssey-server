@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Administrator (SIRIUS) -->
+<GlobalBgmData>
+	<Noon bgm="39"/>
+	<Dusk bgm="39"/>
+	<MidNight bgm="39"/>
+	<Dawn bgm="39"/>
+</GlobalBgmData>
