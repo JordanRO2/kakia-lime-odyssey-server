@@ -19,6 +19,8 @@ using kakia_lime_odyssey_server.Services.Post;
 using kakia_lime_odyssey_server.Services.Exchange;
 using kakia_lime_odyssey_server.Services.Quest;
 using kakia_lime_odyssey_server.Services.Chatroom;
+using kakia_lime_odyssey_server.Services.Skill;
+using kakia_lime_odyssey_server.Services.Item;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -57,6 +59,12 @@ public class LimeServer : SocketServer
 
 	/// <summary>Service for managing private chatrooms</summary>
 	public static ChatroomService ChatroomService { get; } = new();
+
+	/// <summary>Service for managing skill learning and progression</summary>
+	public static SkillService SkillService { get; } = new();
+
+	/// <summary>Service for managing item usage and consumption</summary>
+	public static ItemService ItemService { get; } = new();
 
 	public Config Config { get; set; }
 
