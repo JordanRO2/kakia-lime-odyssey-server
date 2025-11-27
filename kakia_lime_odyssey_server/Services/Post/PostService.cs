@@ -238,7 +238,7 @@ public class PostService
 		var mailbox = GetMailbox(player);
 
 		using PacketWriter pw = new();
-		pw.Write(new PACKET_SC_POST_LIST
+		pw.Write(new SC_POST_LIST
 		{
 			count = (byte)Math.Min(mailbox.Count, 255)
 		});
@@ -311,7 +311,7 @@ public class PostService
 	public void SendDeletedPost(PlayerClient player, int indexNumber)
 	{
 		using PacketWriter pw = new();
-		pw.Write(new PACKET_SC_DELETED_POST
+		pw.Write(new SC_DELETED_POST
 		{
 			indexNumber = indexNumber
 		});
@@ -324,7 +324,7 @@ public class PostService
 	public void SendPostItem(PlayerClient player, int indexNumber)
 	{
 		using PacketWriter pw = new();
-		pw.Write(new PACKET_SC_POST_ITEM
+		pw.Write(new SC_POST_ITEM
 		{
 			indexNumber = indexNumber
 		});
@@ -389,7 +389,7 @@ public class PostService
 	private void SendPostResult(PlayerClient player, bool success)
 	{
 		using PacketWriter pw = new();
-		pw.Write(new PACKET_SC_SEND_POST_RESULT
+		pw.Write(new SC_SEND_POST_RESULT
 		{
 			isSuccess = success
 		});
@@ -399,7 +399,7 @@ public class PostService
 	private void SendNewPostAlarm(PlayerClient player, int count)
 	{
 		using PacketWriter pw = new();
-		pw.Write(new PACKET_SC_NEW_POST_ALARM
+		pw.Write(new SC_NEW_POST_ALARM
 		{
 			count = count
 		});

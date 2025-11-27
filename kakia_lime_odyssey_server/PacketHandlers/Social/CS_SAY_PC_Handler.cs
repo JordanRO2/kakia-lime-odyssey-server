@@ -51,6 +51,18 @@ class CS_SAY_PC_Handler : PacketHandler
 			case "#stopaction":
 				StopAction(parts, client);
 				break;
+
+			case "#cooldown":
+				HandleCooldownCommand(parts, client);
+				break;
+
+			case "#heal":
+				HealSelf(client);
+				break;
+
+			case "#stats":
+				ShowStats(client);
+				break;
 		}
 	}
 
@@ -237,6 +249,143 @@ class CS_SAY_PC_Handler : PacketHandler
 		}
 	}
 
+	/// <summary>
+	/// Handle cooldown admin commands.
+	/// Usage: #cooldown [clear|clearall|list|info skillId]
+	/// </summary>
+	private void HandleCooldownCommand(string[] parts, IPlayerClient client)
+	{
+		var playerClient = client as PlayerClient;
+		if (playerClient == null)
+		{
+			Logger.Log("[ADMIN] Cooldown command failed - invalid client", LogLevel.Warning);
+			return;
+		}
+
+		var tracker = playerClient.GetSkillCooldownTracker();
+		if (tracker == null)
+		{
+			Logger.Log("[ADMIN] Cooldown command failed - no tracker", LogLevel.Warning);
+			SendSystemMessage(client, "Cooldown tracker not initialized");
+			return;
+		}
+
+		if (parts.Length < 2)
+		{
+			SendSystemMessage(client, "Usage: #cooldown [clear|clearall|list|info <skillId>]");
+			return;
+		}
+
+		switch (parts[1].ToLower())
+		{
+			case "clearall":
+				tracker.ClearAllCooldowns();
+				SendSystemMessage(client, "All skill cooldowns cleared");
+				Logger.Log($"[ADMIN] {client.GetCurrentCharacter()?.appearance.name} cleared all cooldowns", LogLevel.Debug);
+				break;
+
+			case "clear":
+				if (parts.Length < 3 || !int.TryParse(parts[2], out int skillId))
+				{
+					SendSystemMessage(client, "Usage: #cooldown clear <skillId>");
+					return;
+				}
+				tracker.ClearCooldown(skillId);
+				SendSystemMessage(client, $"Cooldown cleared for skill {skillId}");
+				break;
+
+			case "list":
+				var cooldowns = tracker.GetActiveCooldowns();
+				if (cooldowns.Count == 0)
+				{
+					SendSystemMessage(client, "No active cooldowns");
+				}
+				else
+				{
+					SendSystemMessage(client, $"Active cooldowns ({cooldowns.Count}):");
+					foreach (var cd in cooldowns)
+					{
+						SendSystemMessage(client, $"  Skill {cd.Key}: {cd.Value / 1000.0:F1}s remaining");
+					}
+				}
+				break;
+
+			case "info":
+				if (parts.Length < 3 || !int.TryParse(parts[2], out int infoSkillId))
+				{
+					SendSystemMessage(client, "Usage: #cooldown info <skillId>");
+					return;
+				}
+				var info = tracker.GetCooldownInfo(infoSkillId);
+				SendSystemMessage(client, info ?? $"No cooldown info for skill {infoSkillId}");
+				break;
+
+			default:
+				SendSystemMessage(client, "Unknown subcommand. Use: clear, clearall, list, info");
+				break;
+		}
+	}
+
+	/// <summary>
+	/// Heal self to full HP/MP.
+	/// Usage: #heal
+	/// </summary>
+	private void HealSelf(IPlayerClient client)
+	{
+		var playerClient = client as PlayerClient;
+		if (playerClient == null) return;
+
+		var character = client.GetCurrentCharacter();
+		if (character == null) return;
+
+		var status = character.savedStatusPc;
+		playerClient.UpdateHP(status.mhp, true);
+		playerClient.UpdateMP(status.mmp, true);
+
+		SendSystemMessage(client, $"Healed to full HP ({status.mhp}) and MP ({status.mmp})");
+		Logger.Log($"[ADMIN] {character.appearance.name} healed to full", LogLevel.Debug);
+	}
+
+	/// <summary>
+	/// Show player stats.
+	/// Usage: #stats
+	/// </summary>
+	private void ShowStats(IPlayerClient client)
+	{
+		var playerClient = client as PlayerClient;
+		if (playerClient == null) return;
+
+		var status = playerClient.GetEntityStatus();
+		if (status == null)
+		{
+			SendSystemMessage(client, "Could not retrieve stats");
+			return;
+		}
+
+		SendSystemMessage(client, "=== Combat Stats ===");
+		SendSystemMessage(client, $"HP: {status.Hp}/{status.MaxHp} | MP: {status.Mp}/{status.MaxMp}");
+		SendSystemMessage(client, $"ATK: {status.Attack} | DEF: {status.Defense}");
+		SendSystemMessage(client, $"HIT: {status.Hit} | DODGE: {status.Dodge}");
+		SendSystemMessage(client, $"CRIT: {status.CriticalRate:F1}% | PARRY: {status.Parry:F1}% | BLOCK: {status.Block:F1}%");
+		SendSystemMessage(client, $"Speed: {status.HitSpeedRatio:F2}x");
+	}
+
+	/// <summary>
+	/// Send a system message to the player via whisper packet.
+	/// </summary>
+	private static void SendSystemMessage(IPlayerClient client, string message)
+	{
+		SC_WHISPER whisper = new()
+		{
+			fromName = "[System]",
+			message = message
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(whisper);
+		client.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
 	private void UpdateVelocity(string[] parts, IPlayerClient client)
 	{
 		var vel = client.GetVelocities();
@@ -245,7 +394,7 @@ class CS_SAY_PC_Handler : PacketHandler
 		switch (parts[2])
 		{
 			case "ratio":
-				vel.ratio = val;				
+				vel.ratio = val;
 				break;
 
 			case "run":

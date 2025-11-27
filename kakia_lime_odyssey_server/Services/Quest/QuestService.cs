@@ -1,9 +1,9 @@
 /// <summary>
-/// Service for managing player quests with database persistence.
+/// Service for managing player quests with database persistence and XML quest definitions.
 /// </summary>
 /// <remarks>
-/// Uses: MongoDBService for quest persistence
-/// Handles: Accept, abandon, complete quests, state updates
+/// Uses: MongoDBService for quest persistence, LimeServer.QuestDB for quest definitions
+/// Handles: Accept, abandon, complete quests, state updates, quest validation
 /// </remarks>
 using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
@@ -11,6 +11,7 @@ using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Models.Persistence;
+using kakia_lime_odyssey_server.Models.QuestXML;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Quest;
@@ -25,8 +26,51 @@ public class QuestService
 	private const int MaxActiveQuests = 30;
 
 	/// <summary>
+	/// Gets a quest definition from the QuestDB by type ID.
+	/// </summary>
+	/// <param name="questTypeID">Quest type ID.</param>
+	/// <returns>Quest definition or null if not found.</returns>
+	public static XmlQuest? GetQuestDefinition(uint questTypeID)
+	{
+		return LimeServer.QuestDB.FirstOrDefault(q => q.TypeID == questTypeID);
+	}
+
+	/// <summary>
+	/// Checks if a quest exists in the database.
+	/// </summary>
+	/// <param name="questTypeID">Quest type ID.</param>
+	/// <returns>True if quest exists.</returns>
+	public static bool QuestExists(uint questTypeID)
+	{
+		return LimeServer.QuestDB.Any(q => q.TypeID == questTypeID);
+	}
+
+	/// <summary>
+	/// Gets all quests available from a specific NPC.
+	/// </summary>
+	/// <param name="npcName">NPC name.</param>
+	/// <returns>List of quests the NPC can give.</returns>
+	public static List<XmlQuest> GetQuestsForNPC(string npcName)
+	{
+		return LimeServer.QuestDB.Where(q => q.NPC == npcName).ToList();
+	}
+
+	/// <summary>
+	/// Gets quests available for a player's level.
+	/// </summary>
+	/// <param name="playerLevel">Player's current level.</param>
+	/// <returns>List of available quests.</returns>
+	public static List<XmlQuest> GetQuestsForLevel(int playerLevel)
+	{
+		return LimeServer.QuestDB.Where(q => q.Level <= playerLevel).ToList();
+	}
+
+	/// <summary>
 	/// Accepts a quest for a player.
 	/// </summary>
+	/// <param name="player">The player accepting the quest.</param>
+	/// <param name="questTypeID">Quest type ID to accept.</param>
+	/// <returns>True if quest was accepted successfully.</returns>
 	public bool AcceptQuest(PlayerClient player, uint questTypeID)
 	{
 		var character = player.GetCurrentCharacter();
@@ -34,6 +78,23 @@ public class QuestService
 
 		string accountId = player.GetAccountId();
 		string charName = character.appearance.name;
+
+		// Validate quest exists in QuestDB
+		var questDef = GetQuestDefinition(questTypeID);
+		if (questDef == null)
+		{
+			Logger.Log($"[QUEST] Quest {questTypeID} not found in QuestDB", LogLevel.Warning);
+			return false;
+		}
+
+		// Check level requirement
+		var entityStatus = (player as Interfaces.IEntity)?.GetEntityStatus();
+		if (entityStatus != null && entityStatus.Lv < questDef.Level)
+		{
+			Logger.Log($"[QUEST] {charName} level {entityStatus.Lv} too low for quest {questTypeID} (requires {questDef.Level})", LogLevel.Debug);
+			return false;
+		}
+
 		var quests = GetOrLoadQuests(accountId, charName);
 
 		if (quests.ActiveQuests.Count >= MaxActiveQuests)
@@ -49,9 +110,9 @@ public class QuestService
 		}
 
 		// Check if already completed (for non-repeatable quests)
-		if (quests.CompletedQuests.Contains((int)questTypeID))
+		if (quests.CompletedQuests.Contains((int)questTypeID) && questDef.Repeatable != 1)
 		{
-			Logger.Log($"[QUEST] {charName} already completed quest {questTypeID}", LogLevel.Debug);
+			Logger.Log($"[QUEST] {charName} already completed non-repeatable quest {questTypeID}", LogLevel.Debug);
 			return false;
 		}
 
@@ -67,13 +128,16 @@ public class QuestService
 
 		SendQuestAdd(player, questTypeID);
 
-		Logger.Log($"[QUEST] {charName} accepted quest {questTypeID}", LogLevel.Debug);
+		Logger.Log($"[QUEST] {charName} accepted quest {questTypeID} ({questDef.TypeName})", LogLevel.Debug);
 		return true;
 	}
 
 	/// <summary>
 	/// Abandons a quest for a player.
 	/// </summary>
+	/// <param name="player">The player abandoning the quest.</param>
+	/// <param name="questTypeID">Quest type ID to abandon.</param>
+	/// <returns>True if quest was abandoned successfully.</returns>
 	public bool AbandonQuest(PlayerClient player, uint questTypeID)
 	{
 		var character = player.GetCurrentCharacter();
@@ -81,6 +145,15 @@ public class QuestService
 
 		string accountId = player.GetAccountId();
 		string charName = character.appearance.name;
+
+		// Check if quest is cancelable
+		var questDef = GetQuestDefinition(questTypeID);
+		if (questDef != null && questDef.Cancelable != 1)
+		{
+			Logger.Log($"[QUEST] Quest {questTypeID} cannot be abandoned (not cancelable)", LogLevel.Debug);
+			return false;
+		}
+
 		var quests = GetOrLoadQuests(accountId, charName);
 
 		var quest = quests.ActiveQuests.FirstOrDefault(q => q.QuestId == (int)questTypeID);
@@ -103,6 +176,10 @@ public class QuestService
 	/// <summary>
 	/// Completes a quest for a player.
 	/// </summary>
+	/// <param name="player">The player completing the quest.</param>
+	/// <param name="questTypeID">Quest type ID to complete.</param>
+	/// <param name="rewardChoices">Indices of selected choice rewards.</param>
+	/// <returns>True if quest was completed successfully.</returns>
 	public bool CompleteQuest(PlayerClient player, uint questTypeID, int[] rewardChoices)
 	{
 		var character = player.GetCurrentCharacter();
@@ -119,19 +196,104 @@ public class QuestService
 			return false;
 		}
 
+		// Get quest definition for rewards and categorization
+		var questDef = GetQuestDefinition(questTypeID);
+
 		quests.ActiveQuests.Remove(quest);
 		quests.CompletedQuests.Add((int)questTypeID);
 		SaveQuests(accountId, charName, quests);
 
-		// Count completed quests by type (simplified - would need quest XML data for proper categorization)
-		int completedMain = quests.CompletedQuests.Count(id => id < 1000);
-		int completedSub = quests.CompletedQuests.Count(id => id >= 1000 && id < 10000);
-		int completedNormal = quests.CompletedQuests.Count(id => id >= 10000);
+		// Count completed quests by type using QuestDB for proper categorization
+		int completedMain = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsMainQuest == true);
+		int completedSub = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsSideQuest == true);
+		int completedNormal = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsNormalQuest == true);
 
 		SendQuestComplete(player, questTypeID, completedMain, completedSub, completedNormal);
 
-		Logger.Log($"[QUEST] {charName} completed quest {questTypeID}", LogLevel.Info);
+		// Grant experience rewards if available
+		if (questDef != null && player is Interfaces.IEntity entity)
+		{
+			GrantQuestRewards(entity, player, questDef, rewardChoices);
+		}
+
+		string questName = questDef?.TypeName ?? "Unknown";
+		Logger.Log($"[QUEST] {charName} completed quest {questTypeID} ({questName})", LogLevel.Info);
 		return true;
+	}
+
+	/// <summary>
+	/// Counts completed quests matching a category predicate.
+	/// </summary>
+	private static int CountCompletedByCategory(List<int> completedIds, Func<XmlQuest?, bool> predicate)
+	{
+		return completedIds.Count(id => predicate(GetQuestDefinition((uint)id)));
+	}
+
+	/// <summary>
+	/// Grants rewards from a completed quest.
+	/// </summary>
+	private static void GrantQuestRewards(Interfaces.IEntity entity, PlayerClient player, XmlQuest questDef, int[] rewardChoices)
+	{
+		// Grant experience rewards
+		if (questDef.RewardEXP > 0 || questDef.RewardCombatJobEXP > 0)
+		{
+			ulong totalExp = questDef.RewardEXP + questDef.RewardCombatJobEXP;
+			if (totalExp > 0)
+			{
+				bool levelUp = entity.AddExp(totalExp);
+				var status = entity.GetEntityStatus();
+
+				using PacketWriter pw = new();
+				pw.Write(new SC_GOT_COMBAT_JOB_EXP
+				{
+					exp = (uint)status.Exp,
+					addExp = (uint)totalExp
+				});
+				player.Send(pw.ToPacket(), default).Wait();
+
+				if (levelUp)
+				{
+					using PacketWriter lvPw = new();
+					lvPw.Write(new SC_PC_COMBAT_JOB_LEVEL_UP
+					{
+						objInstID = entity.GetId(),
+						lv = status.Lv,
+						exp = (uint)status.Exp,
+						newStr = 5,
+						newInl = 5,
+						newAgi = 5,
+						newDex = 5,
+						newSpi = 5,
+						newVit = 5
+					});
+					player.Send(lvPw.ToPacket(), default).Wait();
+					player.SendGlobalPacket(lvPw.ToPacket(), default).Wait();
+				}
+
+				Logger.Log($"[QUEST] Granted {totalExp} exp from quest {questDef.TypeID}", LogLevel.Debug);
+			}
+		}
+
+		// Grant basic reward items
+		if (questDef.BasicReward != null && questDef.BasicReward.TypeID > 0)
+		{
+			// TODO: Add items to player inventory via InventoryService
+			Logger.Log($"[QUEST] Basic reward: {questDef.BasicReward.Count}x item {questDef.BasicReward.TypeID}", LogLevel.Debug);
+		}
+
+		// Grant selected choice rewards
+		if (rewardChoices != null && questDef.ChoiceRewards.Count > 0)
+		{
+			foreach (int choice in rewardChoices)
+			{
+				if (choice >= 0 && choice < questDef.ChoiceRewards.Count)
+				{
+					var reward = questDef.ChoiceRewards[choice];
+					// TODO: Add items to player inventory via InventoryService
+					Logger.Log($"[QUEST] Choice reward {choice}: {reward.Count}x item {reward.TypeID}", LogLevel.Debug);
+				}
+			}
+		}
 	}
 
 	/// <summary>

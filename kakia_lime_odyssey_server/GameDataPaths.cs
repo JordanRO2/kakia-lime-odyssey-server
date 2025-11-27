@@ -41,6 +41,12 @@ public static class GameDataPaths
             public const string Skills = "GameData/Definitions/Skills/Skills.xml";
         }
 
+        public static class Quests
+        {
+            public const string Folder = "GameData/Definitions/Quests";
+            public const string QuestList = "GameData/Definitions/Quests/questList.xml";
+        }
+
         public const string QuestsFolder = "GameData/Definitions/Quests";
     }
 

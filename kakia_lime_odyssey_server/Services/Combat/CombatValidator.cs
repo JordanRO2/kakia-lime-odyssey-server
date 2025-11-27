@@ -348,6 +348,91 @@ public static class CombatValidator
 	}
 
 	/// <summary>
+	/// Maximum reasonable damage value (anti-cheat threshold).
+	/// </summary>
+	private const uint MaxReasonableDamage = 999999;
+
+	/// <summary>
+	/// Validates that a calculated damage value is reasonable.
+	/// </summary>
+	/// <remarks>
+	/// From COMBAT_MECHANICS_ANALYSIS.md Section 5.1:
+	/// - Maximum damage: Should be capped based on attacker level/stats
+	/// - Variance should not produce impossible values
+	/// </remarks>
+	/// <param name="damage">The calculated damage.</param>
+	/// <param name="attackerAtk">Attacker's attack stat.</param>
+	/// <param name="isCritical">Whether this was a critical hit.</param>
+	/// <returns>Validation result.</returns>
+	public static ValidationResult ValidateDamage(uint damage, ushort attackerAtk, bool isCritical)
+	{
+		// Damage should never exceed maximum threshold
+		if (damage > MaxReasonableDamage)
+		{
+			Logger.Log($"[COMBAT] Suspicious damage detected: {damage} exceeds max {MaxReasonableDamage}", LogLevel.Warning);
+			return ValidationResult.Failure(
+				CombatValidationError.InvalidStats,
+				$"Damage {damage} exceeds maximum reasonable value");
+		}
+
+		// Damage should be reasonable relative to attack stat
+		// Critical can do up to 4x attack, normal up to 2x attack
+		uint maxExpectedDamage = isCritical ? (uint)(attackerAtk * 4) : (uint)(attackerAtk * 2);
+
+		// Allow 50% margin for variance and bonuses
+		if (damage > maxExpectedDamage * 1.5)
+		{
+			Logger.Log($"[COMBAT] High damage warning: {damage} (ATK: {attackerAtk}, expected max: {maxExpectedDamage})", LogLevel.Debug);
+		}
+
+		return ValidationResult.Success();
+	}
+
+	/// <summary>
+	/// Validates animation speed ratio is within acceptable bounds.
+	/// </summary>
+	/// <remarks>
+	/// From COMBAT_MECHANICS_ANALYSIS.md Section 5.2:
+	/// aniSpeedRatio should be > 0 and &lt;= 5.0f
+	/// </remarks>
+	public static ValidationResult ValidateAniSpeedRatio(float aniSpeedRatio)
+	{
+		if (aniSpeedRatio <= 0 || aniSpeedRatio > 5.0f)
+		{
+			return ValidationResult.Failure(
+				CombatValidationError.InvalidStats,
+				$"Invalid animation speed ratio: {aniSpeedRatio}");
+		}
+
+		return ValidationResult.Success();
+	}
+
+	/// <summary>
+	/// Validates HIT_DESC packet data before sending.
+	/// </summary>
+	/// <remarks>
+	/// From COMBAT_MECHANICS_ANALYSIS.md Section 5.2:
+	/// - damage >= 0
+	/// - weaponTypeID > 0 (unless unarmed)
+	/// - result is valid HIT_FAIL_TYPE
+	/// </remarks>
+	public static ValidationResult ValidateHitDesc(byte result, int weaponTypeID, uint damage)
+	{
+		// Validate result is a valid HIT_FAIL_TYPE (0-6)
+		if (result > 6)
+		{
+			return ValidationResult.Failure(
+				CombatValidationError.InvalidStats,
+				$"Invalid hit result type: {result}");
+		}
+
+		// WeaponTypeID can be 0 for unarmed combat
+		// No additional validation needed
+
+		return ValidationResult.Success();
+	}
+
+	/// <summary>
 	/// Logs a combat validation failure.
 	/// </summary>
 	public static void LogValidationFailure(IEntity attacker, IEntity target, ValidationResult result)
@@ -357,6 +442,27 @@ public static class CombatValidator
 
 		Logger.Log(
 			$"[COMBAT VALIDATION] {attackerName} -> {targetName}: {result.ErrorType} - {result.FailReason}",
+			LogLevel.Debug);
+	}
+
+	/// <summary>
+	/// Logs a combat event for debugging/auditing.
+	/// </summary>
+	public static void LogCombatEvent(
+		IEntity attacker,
+		IEntity target,
+		uint damage,
+		bool isCritical,
+		bool isMiss,
+		string hitResultType)
+	{
+		string attackerName = GetEntityName(attacker);
+		string targetName = GetEntityName(target);
+
+		string resultStr = isMiss ? "MISS" : (isCritical ? "CRIT" : hitResultType);
+
+		Logger.Log(
+			$"[COMBAT] {attackerName} -> {targetName}: {damage} dmg ({resultStr})",
 			LogLevel.Debug);
 	}
 

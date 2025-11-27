@@ -20,6 +20,7 @@ using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
 using kakia_lime_odyssey_server.Network;
 using kakia_lime_odyssey_server.Services.Combat;
+using kakia_lime_odyssey_server.Services.Notification;
 
 namespace kakia_lime_odyssey_server.PacketHandlers.Combat;
 
@@ -34,6 +35,7 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 		if (skill is null)
 		{
 			Logger.Log($"Skill not found with ID: {useSkill.typeID}!", LogLevel.Error);
+			SystemNotificationService.SendSkillError(client, SystemErrorCode.SkillNotFound, useSkill.typeID);
 			return;
 		}
 
@@ -49,17 +51,21 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 					$"attempted to use skill {useSkill.typeID} on object {useSkill.objInstID} while on cooldown",
 					LogLevel.Warning
 				);
+				SystemNotificationService.SendSkillError(client, SystemErrorCode.SkillOnCooldown, useSkill.typeID);
 				return;
 			}
 		}
 
 		// Get target from packet (not from selected target)
-		if (!LimeServer.TryGetEntity(useSkill.objInstID, out IEntity? target)) return;
-		if (target is null) return;
+		if (!LimeServer.TryGetEntity(useSkill.objInstID, out IEntity? target) || target is null)
+		{
+			SystemNotificationService.SendCombatError(client, SystemErrorCode.TargetInvalid);
+			return;
+		}
 
 		if (target.GetEntityStatus().BasicStatus.Hp == 0)
 		{
-			// Target dead
+			SystemNotificationService.SendCombatError(client, SystemErrorCode.TargetDead);
 			return;
 		}
 
@@ -114,7 +120,11 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 
 		// Calculate and apply damage
 		var damage = DamageHandler.DealWeaponHitDamage((client as IEntity)!, target);
-		if (damage.Packet is null) return;
+		if (damage.Packet is null)
+		{
+			SystemNotificationService.SendError(client, SystemErrorCode.InternalError, "Damage calculation failed");
+			return;
+		}
 
 		// Send bullet packet first for ranged attacks
 		if (damage.IsRanged && damage.BulletPacket != null)

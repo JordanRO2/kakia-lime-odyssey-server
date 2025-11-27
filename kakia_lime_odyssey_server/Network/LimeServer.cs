@@ -10,6 +10,7 @@ using kakia_lime_odyssey_server.Entities.Npcs;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
 using kakia_lime_odyssey_server.Models.MonsterXML;
+using kakia_lime_odyssey_server.Models.QuestXML;
 using kakia_lime_odyssey_server.Models.SkillXML;
 using kakia_lime_odyssey_server.Services.Ban;
 using kakia_lime_odyssey_server.Services.Combat;
@@ -35,6 +36,7 @@ public class LimeServer : SocketServer
 	public static List<XmlMonster> MonsterDB = new List<XmlMonster>();
 	public static List<Item> ItemDB = ItemInfo.GetItems();
 	public static List<XmlSkill> SkillDB = SkillInfo.GetSkills();
+	public static List<XmlQuest> QuestDB = new List<XmlQuest>();
 
 	public static List<PlayerClient> PlayerClients = new();
 	public static Dictionary<uint, List<Npc>> Npcs = new();
@@ -97,6 +99,9 @@ public class LimeServer : SocketServer
 
 		MonsterDB.AddRange(MonsterInfo.GetEntries());
 		Logger.Log("Monster DB loaded.", LogLevel.Information);
+
+		QuestDB.AddRange(QuestInfo.GetQuests());
+		Logger.Log($"Quest DB loaded: {QuestDB.Count} quests.", LogLevel.Information);
 
 		var mapMobs = WorldDataLoader.LoadMobSpawns();
 		foreach (var mob in  mapMobs)

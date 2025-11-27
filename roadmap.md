@@ -225,6 +225,156 @@ Data/
 
 ---
 
+## Combat System Implementation (2025-11-27)
+
+### Stat Scaling Formulas (COMPLETED)
+
+Implemented comprehensive stat calculation system based on IDA reverse engineering.
+
+**Files Created/Modified:**
+- `Services/Combat/StatCalculator.cs` - New stat calculation service
+- `Services/Combat/CombatService.cs` - Enhanced with parry/block mechanics
+- `Services/Combat/ICombatService.cs` - Updated interface with HIT_FAIL_TYPE
+- `Models/EntityStatus.cs` - Added dodge, parry, block, hitSpeedRatio fields
+- `Packets/Enums/HIT_FAIL_TYPE.cs` - Updated with IDA documentation
+
+**IDA-Verified Structures Used:**
+| Structure | Size | Purpose |
+|-----------|------|---------|
+| STATUS_PC | 176 bytes | All player derived stats |
+| COMBAT_JOB_STATUS_ | 24 bytes | Base stats (STR, INT, DEX, AGI, VIT, SPI, LUK) |
+| COMMON_STATUS | 20 bytes | HP/MP values |
+| HIT_DESC | 16 bytes | Hit result per weapon |
+| AttackInfo | 40 bytes | Attack damage/type info |
+| DamageInfo | 32 bytes | Client-side damage tracking |
+
+**Stat Conversion Formulas:**
+```
+MeleeAtk = STR * 2.0 + DEX * 0.5 + WeaponAtk
+SpellAtk = INT * 2.0 + SPI * 0.5 + WeaponSpellAtk
+MeleeDef = VIT * 1.5 + AGI * 0.3 + ArmorDef
+SpellDef = SPI * 1.5 + INT * 0.3 + ArmorSpellDef
+HitRate = DEX * 2.0 + LUK * 0.5 + Level
+Dodge = AGI * 1.5 + LUK * 0.5
+CritRate = DEX * 0.15 + LUK * 0.25 (capped at 100%)
+Parry = DEX * 0.1 + STR * 0.05 (requires weapon)
+Block = VIT * 0.15 + STR * 0.05 (requires shield)
+HitSpeedRatio = 1.0 + AGI * 0.002 + DEX * 0.001 (capped at 2.0)
+MaxHP = 100 + VIT * 15 + Level * 10
+MaxMP = 50 + SPI * 10 + INT * 5 + Level * 5
+MaxLP = 50 + VIT * 8 + Level * 5
+```
+
+**Combat Chain Implementation:**
+Hit determination follows this order:
+1. Miss check (HIT vs DODGE)
+2. Dodge check (active evasion)
+3. Block check (shield, 75% damage reduction)
+4. Parry check (weapon, 50% damage reduction)
+5. Critical check
+6. Normal hit
+
+**HIT_FAIL_TYPE Values (IDA Verified):**
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | HIT_FAIL_NONE | Invalid/default |
+| 1 | HIT_FAIL_HIT | Normal hit |
+| 2 | HIT_FAIL_CRITICAL_HIT | Critical hit (2x damage) |
+| 3 | HIT_FAIL_MISS | Miss (no damage) |
+| 4 | HIT_FAIL_AVOID | Dodge (active evasion) |
+| 5 | HIT_FAIL_SHIELD | Block (75% reduction) |
+| 6 | HIT_FAIL_GUARD | Parry (50% reduction) |
+
+**Damage Formula:**
+```
+Defense Reduction = DEF / (DEF + 100) [diminishing returns]
+Normal Damage = ATK * (1 - DefReduction) * Variance(0.8-1.2)
+Critical Damage = ATK * (1 - DefReduction*0.5) * Variance(1.5-2.0) * 2.0
+Blocked Damage = NormalDamage * 0.25
+Parried Damage = NormalDamage * 0.50
+Off-hand Damage = MainDamage * 0.50
+```
+
+---
+
+## Admin Commands System (2025-11-27)
+
+### New Commands Added
+
+Chat-based admin commands (prefix: `#`) for server management and testing.
+
+**Cooldown Management:**
+- `#cooldown clearall` - Clear all skill cooldowns for yourself
+- `#cooldown clear <skillId>` - Clear cooldown for specific skill
+- `#cooldown list` - Show all active cooldowns with remaining time
+- `#cooldown info <skillId>` - Show detailed cooldown info for a skill
+
+**Player Utilities:**
+- `#heal` - Restore HP and MP to full
+- `#stats` - Display current combat stats (HP, MP, ATK, DEF, HIT, DODGE, CRIT, etc.)
+
+**Existing Commands:**
+- `#warp <x> <y> <z>` - Teleport to coordinates
+- `#spawn npc <modelId>` - Spawn NPC
+- `#spawn mob <modelId> <aggro>` - Spawn monster
+- `#item <itemId>` - Add item to inventory
+- `#doaction <actionId>` - Perform animation
+- `#stopaction` - Stop current animation
+- `#update velocity <param> <value>` - Modify movement speed
+
+### IDA Verification: Elemental Damage System
+
+**Status: NOT FOUND**
+
+Comprehensive search of the Lime Odyssey client confirmed that NO elemental damage system exists:
+- No "fire", "ice", "wind", "earth", etc. damage types in packets or structures
+- No ELEMENT-related game structures (only UI/rendering NiScreenElements)
+- "water" strings only relate to swimming/terrain, not damage
+- RESIST structures are for skill resist (buff/debuff immunity), not elemental
+
+**Conclusion:** Combat is purely Physical (melee) vs Magical (spell) damage, with no elemental subtypes.
+
+---
+
+## Mail System Verification (2025-11-27)
+
+### IDA Structure Verification (COMPLETED)
+
+Verified all Mail/Post system packet structures against IDA Pro client analysis.
+
+**Packets Verified:**
+| Packet | Size | Header | Status |
+|--------|------|--------|--------|
+| SC_POST_LIST | 5 bytes | PACKET_VAR (4 bytes) | Verified |
+| SC_POST | 3649 bytes | PACKET_VAR (4 bytes) | Verified |
+| SC_NEW_POST_ALARM | 6 bytes | PACKET_FIX (2 bytes) | Verified |
+| SC_DELETED_POST | 6 bytes | PACKET_FIX (2 bytes) | Verified |
+| SC_POST_ITEM | 6 bytes | PACKET_FIX (2 bytes) | Verified |
+| SC_SEND_POST_RESULT | 3 bytes | PACKET_FIX (2 bytes) | Verified |
+
+**Models Verified:**
+| Model | Size | Fields |
+|-------|------|--------|
+| POST_LIST | 88 bytes | fromName[26], title[51], indexNumber(4), isNew(1) |
+| POST_ATTACHED | 324 bytes | typeID, count, remainExpiryTime, durability, mdurability, grade, inherits(300) |
+| POST_ATTACHING | 16 bytes | slot(4), _padding(4), count(8) |
+
+**Fixes Applied:**
+- POST_ATTACHING.cs: Added 4-byte padding between slot and count to match IDA layout
+- All SC packets: Added proper IPacketFixed/IPacketVar interfaces
+- All SC packets: Renamed from PACKET_SC_* to SC_* for consistency
+- PostService.cs: Updated to use new struct names
+
+**Existing Implementation:**
+Mail system was already implemented with:
+- PostService.cs - Complete mail service with send/receive/delete/attachment handling
+- PostMessage.cs - Mail message model with attachments
+- PlayerMail.cs - Player mailbox persistence model
+- MongoDBService integration for mail persistence
+- 6 CS packet handlers for mail operations
+
+---
+
 ## Recent Updates (2025-11-19)
 
 ### Trading & Economy Systems Analysis (COMPLETED)

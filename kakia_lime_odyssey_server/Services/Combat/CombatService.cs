@@ -20,9 +20,31 @@ public enum SkillDamageType
 /// <summary>
 /// Service for handling combat calculations including damage, hit rolls, and critical strikes.
 /// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// Uses structures: STATUS_PC, HIT_DESC, AttackInfo
+/// Hit result types from AttackInfo::HIT_FAIL_TYPE:
+/// - HIT_FAIL_NONE (0): Invalid
+/// - HIT_FAIL_HIT (1): Normal hit
+/// - HIT_FAIL_CRITICAL_HIT (2): Critical hit
+/// - HIT_FAIL_MISS (3): Miss
+/// - HIT_FAIL_AVOID (4): Dodge
+/// - HIT_FAIL_SHIELD (5): Block
+/// - HIT_FAIL_GUARD (6): Parry
+/// </remarks>
 public class CombatService : ICombatService
 {
 	private static readonly ThreadLocal<Random> _random = new(() => new Random());
+
+	/// <summary>
+	/// Parry damage reduction percentage.
+	/// </summary>
+	private const float ParryDamageReduction = 0.5f;
+
+	/// <summary>
+	/// Block damage reduction percentage.
+	/// </summary>
+	private const float BlockDamageReduction = 0.75f;
 
 	// Skill type to damage type mapping based on skill class/type
 	private static readonly Dictionary<string, SkillDamageType> SkillTypeMapping = new(StringComparer.OrdinalIgnoreCase)
@@ -51,50 +73,24 @@ public class CombatService : ICombatService
 		var targetStatus = target.GetEntityStatus();
 		var rnd = _random.Value!;
 
-		// Calculate main hand hit chance with bounds (5% min, 95% max)
-		double hitChance = 95.0;
-		if (targetStatus.MeleeAttack.FleeRate > 0)
-		{
-			hitChance = (sourceStatus.MeleeAttack.Hit / (double)targetStatus.MeleeAttack.FleeRate) * 100;
-			hitChance = Math.Clamp(hitChance, 5.0, 95.0);
-		}
+		// Determine hit result using full combat chain
+		var hitResult = DetermineHitResult(sourceStatus, targetStatus, rnd);
 
-		bool isMiss = rnd.Next(0, 100) >= hitChance;
-
-		// Critical hit check (capped at 100%)
-		int critChance = Math.Clamp(sourceStatus.MeleeAttack.CritRate, 0, 100);
-		bool isCrit = !isMiss && rnd.Next(0, 100) < critChance;
-
-		uint damage = CalculateDamage(sourceStatus, targetStatus, isMiss, isCrit, rnd);
+		// Calculate damage based on hit result
+		uint damage = CalculateDamageWithResult(sourceStatus, targetStatus, hitResult, rnd);
 
 		// Check for dual-wielding (off-hand weapon equipped)
 		uint subDamage = 0;
-		bool subIsMiss = true;
-		bool subIsCrit = false;
+		HIT_FAIL_TYPE subHitResult = HIT_FAIL_TYPE.HIT_FAIL_MISS;
 
 		if (sourceStatus.SubAttack != null)
 		{
-			// Off-hand hit chance (slightly reduced accuracy)
-			double subHitChance = 95.0;
-			if (targetStatus.MeleeAttack.FleeRate > 0)
-			{
-				// Off-hand has 10% reduced accuracy
-				subHitChance = (sourceStatus.SubAttack.Hit * 0.9 / targetStatus.MeleeAttack.FleeRate) * 100;
-				subHitChance = Math.Clamp(subHitChance, 5.0, 95.0);
-			}
-
-			subIsMiss = rnd.Next(0, 100) >= subHitChance;
-
-			// Off-hand critical (same rate as main)
-			int subCritChance = Math.Clamp(sourceStatus.SubAttack.CritRate, 0, 100);
-			subIsCrit = !subIsMiss && rnd.Next(0, 100) < subCritChance;
-
-			// Off-hand damage (reduced to 50% of calculated damage)
-			subDamage = CalculateSubWeaponDamage(sourceStatus.SubAttack, targetStatus, subIsMiss, subIsCrit, rnd);
+			subHitResult = DetermineSubHandHitResult(sourceStatus.SubAttack, targetStatus, rnd);
+			subDamage = CalculateSubWeaponDamageWithResult(sourceStatus.SubAttack, targetStatus, subHitResult, rnd);
 		}
 
 		uint totalDamage = damage + subDamage;
-		var packet = BuildWeaponHitPacket(source, target, damage, isMiss, isCrit, subDamage, subIsMiss, subIsCrit, sourceStatus);
+		var packet = BuildWeaponHitPacketWithResult(source, target, damage, hitResult, subDamage, subHitResult, sourceStatus);
 
 		// Build bullet packet and calculate delay for ranged attacks
 		byte[]? bulletPacket = null;
@@ -108,17 +104,199 @@ public class CombatService : ICombatService
 		return new DamageResult
 		{
 			Damage = damage,
-			IsMiss = isMiss,
-			IsCritical = isCrit,
+			IsMiss = hitResult == HIT_FAIL_TYPE.HIT_FAIL_MISS || hitResult == HIT_FAIL_TYPE.HIT_FAIL_AVOID,
+			IsCritical = hitResult == HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT,
+			HitResultType = hitResult,
 			SubDamage = subDamage,
-			SubIsMiss = subIsMiss,
-			SubIsCritical = subIsCrit,
+			SubIsMiss = subHitResult == HIT_FAIL_TYPE.HIT_FAIL_MISS || subHitResult == HIT_FAIL_TYPE.HIT_FAIL_AVOID,
+			SubIsCritical = subHitResult == HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT,
+			SubHitResultType = subHitResult,
 			TargetKilled = targetStatus.BasicStatus.Hp <= totalDamage,
 			Packet = packet,
 			IsRanged = sourceStatus.IsRanged,
 			BulletPacket = bulletPacket,
 			HitDelay = hitDelay
 		};
+	}
+
+	/// <summary>
+	/// Determines the hit result using the full combat chain:
+	/// Miss -> Dodge -> Block -> Parry -> Critical -> Normal Hit
+	/// </summary>
+	private static HIT_FAIL_TYPE DetermineHitResult(EntityStatus source, EntityStatus target, Random rnd)
+	{
+		// Step 1: Check for miss (based on hit rate vs dodge)
+		double hitChance = StatCalculator.CalculateHitChance(source.MeleeAttack.Hit, target.Dodge);
+		if (rnd.Next(0, 100) >= hitChance)
+		{
+			// Determine if it was a miss or a dodge
+			// If target has high dodge, it's more likely an active dodge
+			if (target.Dodge > 0 && rnd.Next(0, 100) < 50)
+				return HIT_FAIL_TYPE.HIT_FAIL_AVOID; // Active dodge
+			return HIT_FAIL_TYPE.HIT_FAIL_MISS; // Miss
+		}
+
+		// Step 2: Check for block (requires shield)
+		if (target.Block > 0)
+		{
+			float blockChance = Math.Min(target.Block, 50.0f); // Cap at 50%
+			if (rnd.Next(0, 100) < blockChance)
+				return HIT_FAIL_TYPE.HIT_FAIL_SHIELD;
+		}
+
+		// Step 3: Check for parry (requires weapon)
+		if (target.Parry > 0)
+		{
+			float parryChance = Math.Min(target.Parry, 40.0f); // Cap at 40%
+			if (rnd.Next(0, 100) < parryChance)
+				return HIT_FAIL_TYPE.HIT_FAIL_GUARD;
+		}
+
+		// Step 4: Check for critical hit
+		int critChance = Math.Clamp(source.MeleeAttack.CritRate, 0, 100);
+		if (rnd.Next(0, 100) < critChance)
+			return HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT;
+
+		// Step 5: Normal hit
+		return HIT_FAIL_TYPE.HIT_FAIL_HIT;
+	}
+
+	/// <summary>
+	/// Determines hit result for off-hand weapon (reduced accuracy).
+	/// </summary>
+	private static HIT_FAIL_TYPE DetermineSubHandHitResult(AttackStatus subAttack, EntityStatus target, Random rnd)
+	{
+		// Off-hand has 10% reduced accuracy
+		double hitChance = StatCalculator.CalculateHitChance((ushort)(subAttack.Hit * 0.9), target.Dodge);
+		if (rnd.Next(0, 100) >= hitChance)
+		{
+			if (target.Dodge > 0 && rnd.Next(0, 100) < 50)
+				return HIT_FAIL_TYPE.HIT_FAIL_AVOID;
+			return HIT_FAIL_TYPE.HIT_FAIL_MISS;
+		}
+
+		// Block check
+		if (target.Block > 0)
+		{
+			float blockChance = Math.Min(target.Block, 50.0f);
+			if (rnd.Next(0, 100) < blockChance)
+				return HIT_FAIL_TYPE.HIT_FAIL_SHIELD;
+		}
+
+		// Parry check
+		if (target.Parry > 0)
+		{
+			float parryChance = Math.Min(target.Parry, 40.0f);
+			if (rnd.Next(0, 100) < parryChance)
+				return HIT_FAIL_TYPE.HIT_FAIL_GUARD;
+		}
+
+		// Critical check
+		int critChance = Math.Clamp(subAttack.CritRate, 0, 100);
+		if (rnd.Next(0, 100) < critChance)
+			return HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT;
+
+		return HIT_FAIL_TYPE.HIT_FAIL_HIT;
+	}
+
+	/// <summary>
+	/// Calculates damage based on hit result type.
+	/// </summary>
+	private static uint CalculateDamageWithResult(EntityStatus source, EntityStatus target, HIT_FAIL_TYPE hitResult, Random rnd)
+	{
+		return hitResult switch
+		{
+			HIT_FAIL_TYPE.HIT_FAIL_MISS => 0,
+			HIT_FAIL_TYPE.HIT_FAIL_AVOID => 0,
+			HIT_FAIL_TYPE.HIT_FAIL_SHIELD => CalculateBlockedDamage(source, target, rnd),
+			HIT_FAIL_TYPE.HIT_FAIL_GUARD => CalculateParriedDamage(source, target, rnd),
+			HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT => CalculateCriticalDamage(source, target, rnd),
+			_ => CalculateNormalDamage(source, target, rnd)
+		};
+	}
+
+	/// <summary>
+	/// Calculates normal hit damage.
+	/// </summary>
+	private static uint CalculateNormalDamage(EntityStatus source, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		return StatCalculator.CalculateDamage(source.MeleeAttack.Atk, target.MeleeAttack.Def, false, variance);
+	}
+
+	/// <summary>
+	/// Calculates critical hit damage.
+	/// </summary>
+	private static uint CalculateCriticalDamage(EntityStatus source, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		return StatCalculator.CalculateDamage(source.MeleeAttack.Atk, target.MeleeAttack.Def, true, variance);
+	}
+
+	/// <summary>
+	/// Calculates blocked damage (reduced by shield).
+	/// </summary>
+	private static uint CalculateBlockedDamage(EntityStatus source, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		uint baseDamage = StatCalculator.CalculateDamage(source.MeleeAttack.Atk, target.MeleeAttack.Def, false, variance);
+		return (uint)(baseDamage * (1.0 - BlockDamageReduction));
+	}
+
+	/// <summary>
+	/// Calculates parried damage (reduced by weapon).
+	/// </summary>
+	private static uint CalculateParriedDamage(EntityStatus source, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		uint baseDamage = StatCalculator.CalculateDamage(source.MeleeAttack.Atk, target.MeleeAttack.Def, false, variance);
+		return (uint)(baseDamage * (1.0 - ParryDamageReduction));
+	}
+
+	/// <summary>
+	/// Calculates sub-weapon damage based on hit result.
+	/// </summary>
+	private static uint CalculateSubWeaponDamageWithResult(AttackStatus subAttack, EntityStatus target, HIT_FAIL_TYPE hitResult, Random rnd)
+	{
+		const double offHandPenalty = 0.5;
+
+		uint baseDamage = hitResult switch
+		{
+			HIT_FAIL_TYPE.HIT_FAIL_MISS => 0,
+			HIT_FAIL_TYPE.HIT_FAIL_AVOID => 0,
+			HIT_FAIL_TYPE.HIT_FAIL_SHIELD => CalculateSubBlockedDamage(subAttack, target, rnd),
+			HIT_FAIL_TYPE.HIT_FAIL_GUARD => CalculateSubParriedDamage(subAttack, target, rnd),
+			HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT => CalculateSubCriticalDamage(subAttack, target, rnd),
+			_ => CalculateSubNormalDamage(subAttack, target, rnd)
+		};
+
+		return (uint)(baseDamage * offHandPenalty);
+	}
+
+	private static uint CalculateSubNormalDamage(AttackStatus subAttack, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		return StatCalculator.CalculateDamage(subAttack.Atk, target.MeleeAttack.Def, false, variance);
+	}
+
+	private static uint CalculateSubCriticalDamage(AttackStatus subAttack, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		return StatCalculator.CalculateDamage(subAttack.Atk, target.MeleeAttack.Def, true, variance);
+	}
+
+	private static uint CalculateSubBlockedDamage(AttackStatus subAttack, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		uint baseDamage = StatCalculator.CalculateDamage(subAttack.Atk, target.MeleeAttack.Def, false, variance);
+		return (uint)(baseDamage * (1.0 - BlockDamageReduction));
+	}
+
+	private static uint CalculateSubParriedDamage(AttackStatus subAttack, EntityStatus target, Random rnd)
+	{
+		double variance = rnd.NextDouble();
+		uint baseDamage = StatCalculator.CalculateDamage(subAttack.Atk, target.MeleeAttack.Def, false, variance);
+		return (uint)(baseDamage * (1.0 - ParryDamageReduction));
 	}
 
 	/// <summary>
@@ -469,6 +647,58 @@ public class CombatService : ICombatService
 				result = sourceStatus.SubAttack != null
 					? (byte)(subIsMiss ? HIT_FAIL_TYPE.HIT_FAIL_MISS : HIT_FAIL_TYPE.HIT_FAIL_HIT)
 					: (byte)0,
+				weaponTypeID = sourceStatus.SubAttack != null ? (int)sourceStatus.SubAttack.WeaponTypeId : 0,
+				damage = subDamage,
+				bonusDamage = 0
+			},
+			ranged = sourceStatus.IsRanged,
+			rangeHitDelay = sourceStatus.IsRanged ? CalculateRangeHitDelay(source, target) : 0,
+			rangedVelocity = sourceStatus.IsRanged ? GetProjectileVelocity(sourceStatus) : 0
+		};
+
+		pw.Write(hit);
+		return pw.ToPacket();
+	}
+
+	/// <summary>
+	/// Builds weapon hit packet with detailed hit result types.
+	/// </summary>
+	/// <remarks>
+	/// IDA Verified: Yes (2025-11-27)
+	/// Uses HIT_DESC structure for main and sub weapon results.
+	/// Maps to: PACKET_SC_WEAPON_HIT_RESULT (64 bytes)
+	/// </remarks>
+	private static byte[] BuildWeaponHitPacketWithResult(
+		IEntity source,
+		IEntity target,
+		uint damage,
+		HIT_FAIL_TYPE hitResult,
+		uint subDamage,
+		HIT_FAIL_TYPE subHitResult,
+		EntityStatus sourceStatus)
+	{
+		using PacketWriter pw = new();
+
+		// Determine if either hit was a crit (glared shows crit animation)
+		bool anyCrit = hitResult == HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT ||
+					   subHitResult == HIT_FAIL_TYPE.HIT_FAIL_CRITICAL_HIT;
+
+		SC_WEAPON_HIT_RESULT hit = new()
+		{
+			fromInstID = source.GetId(),
+			targetInstID = target.GetId(),
+			glared = anyCrit,
+			aniSpeedRatio = sourceStatus.HitSpeedRatio,
+			main = new()
+			{
+				result = (byte)hitResult,
+				weaponTypeID = (int)sourceStatus.MeleeAttack.WeaponTypeId,
+				damage = damage,
+				bonusDamage = 0
+			},
+			sub = new()
+			{
+				result = sourceStatus.SubAttack != null ? (byte)subHitResult : (byte)0,
 				weaponTypeID = sourceStatus.SubAttack != null ? (int)sourceStatus.SubAttack.WeaponTypeId : 0,
 				damage = subDamage,
 				bonusDamage = 0
