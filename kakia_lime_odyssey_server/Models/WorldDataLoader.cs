@@ -114,7 +114,7 @@ public class NpcSpawnXml
         return new Npc
         {
             Id = Id,
-            ZoneId = ZoneId,
+            ZoneId = (uint)ZoneId,
             Pos = new FPOS { x = Pos.X, y = Pos.Y, z = Pos.Z },
             Dir = new FPOS { x = Dir.X, y = Dir.Y, z = Dir.Z },
             Status = new COMMON_STATUS

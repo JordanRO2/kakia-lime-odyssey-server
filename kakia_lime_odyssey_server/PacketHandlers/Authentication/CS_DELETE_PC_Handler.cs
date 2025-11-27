@@ -40,7 +40,7 @@ class CS_DELETE_PC_Handler : PacketHandler
 
 		// Get the character to delete
 		var characterToDelete = characters[(int)packet.charNum];
-		string characterName = characterToDelete.appearance.name;
+		string characterName = global::System.Text.Encoding.ASCII.GetString(characterToDelete.appearance.name).TrimEnd('\0');
 
 		Logger.Log($"[AUTH] Deleting character {characterName} (slot {packet.charNum}) for account {accountId}", LogLevel.Information);
 

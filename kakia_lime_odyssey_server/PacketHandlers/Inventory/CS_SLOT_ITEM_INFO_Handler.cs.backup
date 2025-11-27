@@ -25,8 +25,8 @@ class CS_SLOT_ITEM_INFO_Handler : PacketHandler
 		var packet = PacketConverter.Extract<CS_SLOT_ITEM_INFO>(p.Payload);
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
-		Logger.Log($"[ITEM] {playerName} requesting info for slot type {packet.slot.type} index {packet.slot.slot}", LogLevel.Debug);
+		Logger.Log($"[ITEM] {playerName} requesting info for slot type {packet.slot.slotType} index {packet.slot.slotIdx}", LogLevel.Debug);
 
-		LimeServer.ItemService.GetSlotItemInfo(pc, packet.slot.type, packet.slot.slot);
+		LimeServer.ItemService.GetSlotItemInfo(pc, packet.slot.slotType, packet.slot.slotIdx);
 	}
 }

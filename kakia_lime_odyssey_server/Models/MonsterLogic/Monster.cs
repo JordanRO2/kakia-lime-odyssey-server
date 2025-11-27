@@ -477,7 +477,7 @@ public partial class Monster : INPC, IEntity
 		return new DamageResult()
 		{
 			TargetKilled = HP == 0,
-			ExpReward = (ulong)(_mobInfo.CombatJobEXP + _mobInfo.EXP)
+			ExpReward = (int)(_mobInfo.CombatJobEXP + _mobInfo.EXP)
 		};
 	}
 

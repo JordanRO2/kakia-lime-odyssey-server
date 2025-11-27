@@ -45,8 +45,8 @@ public interface IPlayerClient
 	public void UpdatePosition(FPOS pos);
 	public void UpdateDirection(FPOS dir);
 
-	public VELOCITIES GetVELOCITIES();
-	public void UpdateVELOCITIES(VELOCITIES vel);
+	public VELOCITIES GetVelocities();
+	public void UpdateVelocities(VELOCITIES vel);
 
 	public void SetInMotion(bool inMotion);
 	public bool IsInMotion();

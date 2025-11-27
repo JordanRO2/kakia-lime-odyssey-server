@@ -271,18 +271,18 @@ public class PartyMember
 			instID = InstId,
 			state = new PARTY_MEMBER_STATE
 			{
-				combatJobTypeID = (sbyte)(character?.savedStatus.combatJob.jobTypeID ?? 0),
-				lifeJobTypeID = (sbyte)(character?.savedStatus.lifeJob.jobTypeID ?? 0),
-				playingJob = (byte)(character?.savedStatus.playingJob ?? 0),
-				combatJobLv = character?.savedStatus.combatJob.lv ?? 1,
-				lifeJobLv = character?.savedStatus.lifeJob.lv ?? 1,
+				combatJobTypeID = (sbyte)(character?.status.combatJob.typeID ?? 0),
+				lifeJobTypeID = (sbyte)(character?.status.lifeJob.typeID ?? 0),
+				playingJob = character?.appearance.playingJobClass ?? 0,
+				combatJobLv = character?.status.combatJob.lv ?? 1,
+				lifeJobLv = character?.status.lifeJob.lv ?? 1,
 				hp = (int)(status?.BasicStatus.Hp ?? 0),
 				mhp = (int)(status?.BasicStatus.MaxHp ?? 0),
 				mp = (int)(status?.BasicStatus.Mp ?? 0),
 				mmp = (int)(status?.BasicStatus.MaxMp ?? 0),
 				lp = (int)(status?.Lp ?? 0),
 				mlp = (int)(status?.MaxLp ?? 0),
-				pos = new POS { x = PosX, y = PosY, z = PosZ },
+				pos = new POS { x = (int)PosX, y = (int)PosY, z = PosZ },
 				zoneID = ZoneId
 			}
 		};

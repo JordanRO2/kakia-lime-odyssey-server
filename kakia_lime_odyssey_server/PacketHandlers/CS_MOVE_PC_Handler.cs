@@ -18,7 +18,7 @@ class CS_MOVE_PC_Handler : PacketHandler
 	public override void HandlePacket(IPlayerClient client, RawPacket p)
 	{
 		var move_pc = PacketConverter.Extract<CS_MOVE_PC>(p.Payload);
-		var vel = client.GetVELOCITIES();
+		var vel = client.GetVelocities();
 
 		SC_MOVE sc_move = new()
 		{

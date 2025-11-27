@@ -22,6 +22,7 @@ class CS_KNIGHTS_SAY_PC_Handler : PacketHandler
 	{
 		if (client is not PlayerClient pc) return;
 
+		using PacketReader pr = new PacketReader(p.Payload);
 		var chat = PacketConverter.Extract<CS_KNIGHTS_SAY_PC>(p.Payload);
 		string message = pr.ReadRemaining();
 

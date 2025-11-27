@@ -33,7 +33,7 @@ public class MailMessage
 	public string Body { get; set; } = string.Empty;
 
 	/// <summary>Attached items (up to 11)</summary>
-	public List<Item> Attachments { get; set; } = new();
+	public List<MailItem> Attachments { get; set; } = new();
 
 	/// <summary>Attached Peder currency</summary>
 	public long AttachedPeder { get; set; }
@@ -55,6 +55,30 @@ public class MailMessage
 
 	/// <summary>Mail type (normal, system, COD, etc.)</summary>
 	public MailType Type { get; set; } = MailType.Normal;
+}
+
+/// <summary>
+/// Item attached to mail (simplified for persistence)
+/// </summary>
+public class MailItem
+{
+	/// <summary>Item type ID</summary>
+	public int TypeID { get; set; }
+
+	/// <summary>Stack count</summary>
+	public int Count { get; set; }
+
+	/// <summary>Durability</summary>
+	public int Durability { get; set; }
+
+	/// <summary>Max durability</summary>
+	public int MaxDurability { get; set; }
+
+	/// <summary>Item grade/quality</summary>
+	public int Grade { get; set; }
+
+	/// <summary>Expiry time remaining (-1 for no expiry)</summary>
+	public int RemainExpiryTime { get; set; }
 }
 
 public enum MailType

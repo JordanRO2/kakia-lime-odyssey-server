@@ -391,7 +391,7 @@ public class LimeServer : SocketServer
 	{
 		foreach (var (entity, buff) in expiredBuffs)
 		{
-			var removePacket = BuffService.BuildRemoveDefPacket(buff.InstanceId);
+			var removePacket = BuffService.BuildRemoveDefPacket(buff.InstId);
 
 			if (entity is PlayerClient pc && pc.IsConnected())
 			{

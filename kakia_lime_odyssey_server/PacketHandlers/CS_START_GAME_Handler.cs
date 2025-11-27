@@ -90,22 +90,22 @@ class CS_START_GAME_Handler : PacketHandler
 			completedNormal = 0,
 			details = new()
 			{
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101190,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				},
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101300,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				},
-				new QuestDetails()
+				new QuestDetail()
 				{
 					questId = 203101360,
-					questState = QUEST_STATE.QUEST_STATE_PROGRESSING,
+					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
 					questDescription = "Try to play the game."
 				}
 			}
@@ -119,7 +119,7 @@ class CS_START_GAME_Handler : PacketHandler
 
 		SC_SKILL_LIST skillList = new()
 		{
-			skills = new()
+			skills = new SKILL[]
 			{
 				new()
 				{
@@ -144,7 +144,7 @@ class CS_START_GAME_Handler : PacketHandler
 					typeID = 4,
 					level = 1,
 					remainCoolTime = 0
-				},
+				}
 			}
 		};
 

@@ -234,7 +234,7 @@ public class PlayerClient : IPlayerClient, IEntity
 		};
 
 		// Initialize skill cooldown tracker
-		_skillCooldownTracker = new SkillCooldownTracker(_objInstID, pc.appearance.name);
+		_skillCooldownTracker = new SkillCooldownTracker(_objInstID, global::System.Text.Encoding.ASCII.GetString(pc.appearance.name).TrimEnd('\0'));
 
 		Load();
 		SetEquipToCurrentJob();
@@ -625,6 +625,14 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	public SC_ENTER_SIGHT_PC GetEnterSight()
 	{
+		var guildNameBytes = new byte[51];
+		var guildNameStr = GetRegionPC().guildName;
+		if (!string.IsNullOrEmpty(guildNameStr))
+		{
+			var guildNameData = global::System.Text.Encoding.ASCII.GetBytes(guildNameStr);
+			Array.Copy(guildNameData, guildNameBytes, Math.Min(guildNameData.Length, 50));
+		}
+
 		return new()
 		{
 			enter_zone = new()
@@ -635,7 +643,7 @@ public class PlayerClient : IPlayerClient, IEntity
 			},
 			deltaLookAtRadian = 2,
 			appearance = GetCurrentCharacter().appearance.AsStruct(),
-			guildName = GetRegionPC().guildName,
+			guildName = guildNameBytes,
 			raceRelationState = 1,
 			stopType = (byte)STOP_TYPE.STOP_TYPE_GROUND
 		};

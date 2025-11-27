@@ -324,7 +324,7 @@ public static class CombatValidator
 			status.MeleeAttack.Def = 0;
 
 		// Clamp crit rate
-		status.MeleeAttack.CritRate = Math.Clamp((int)status.MeleeAttack.CritRate, 0, MaxCritRate);
+		status.MeleeAttack.CritRate = (ushort)Math.Clamp((int)status.MeleeAttack.CritRate, 0, MaxCritRate);
 
 		// Clamp hit rate
 		status.MeleeAttack.Hit = (ushort)Math.Max((int)status.MeleeAttack.Hit, 1);

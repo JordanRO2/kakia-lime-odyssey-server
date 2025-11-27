@@ -1,4 +1,4 @@
-﻿using kakia_lime_odyssey_logging;
+using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
 using kakia_lime_odyssey_contracts.Interfaces;
@@ -24,12 +24,13 @@ class CS_LOGIN_Handler : PacketHandler
 		Logger.Log($"Account login [{login.id}:{login.pw}][REV: {login.revision}]");
 
 		var characters = JsonDB.LoadPC(login.id);
-		
+
 		var updated = new List<CLIENT_PC>();
 
 		foreach (var character in characters)
 		{
-			var equip = JsonDB.GetPlayerEquipment(login.id, character.appearance.name);
+			var characterName = global::System.Text.Encoding.ASCII.GetString(character.appearance.name).TrimEnd('\0');
+			var equip = JsonDB.GetPlayerEquipment(login.id, characterName);
 			var equipped = equip.Combat.GetEquipped();
 			var modApp = new ModAppearance(character.appearance);
 			modApp.equiped = new ModEquipped(equipped);
@@ -41,7 +42,7 @@ class CS_LOGIN_Handler : PacketHandler
 				appearance = modApp.AsStruct()
 			});
 		}
-		
+
 
 		SC_PC_LIST char_list = new()
 		{
@@ -80,7 +81,7 @@ class CS_LOGIN_Handler : PacketHandler
 		pw2.Write((byte)108);
 
 		// Combat job
-		pw2.Write((byte)2); 
+		pw2.Write((byte)2);
 
 		// Gender
 		pw2.Write((byte)1);

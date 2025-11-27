@@ -155,17 +155,13 @@ public class SkillService
 	{
 		var packet = new PACKET_SC_SKILL_ADD
 		{
-			header = new kakia_lime_odyssey_packets.Packets.Common.PACKET_FIX
-			{
-				packetType = (ushort)PacketType.SC_SKILL_ADD
-			},
 			typeID = skillTypeId,
 			level = level
 		};
 
 		using PacketWriter pw = new();
 		pw.Write(packet);
-		pc.Send(pw.ToSizedPacket(), default).Wait();
+		pc.Send(pw.ToPacket(), default).Wait();
 	}
 
 	/// <summary>

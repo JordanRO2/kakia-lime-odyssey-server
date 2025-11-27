@@ -13,17 +13,13 @@
 /// Sent to the other player to update their view of the trade.
 /// </remarks>
 using System.Runtime.InteropServices;
-using kakia_lime_odyssey_packets.Packets.Common;
-using kakia_lime_odyssey_packets.Packets.Models;
+using kakia_lime_odyssey_packets.Packets.Interface;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PACKET_SC_SUBTRACTED_ITEM_FROM_EXCHANGE_LIST
+public struct PACKET_SC_SUBTRACTED_ITEM_FROM_EXCHANGE_LIST : IPacketFixed
 {
-	/// <summary>Packet header</summary>
-	public PACKET_FIX header;
-
 	/// <summary>Item type identifier</summary>
 	public int itemTypeID;
 

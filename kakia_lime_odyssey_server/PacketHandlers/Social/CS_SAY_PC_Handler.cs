@@ -186,7 +186,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			{
 				appearance = new()
 				{
-					name = System.Text.Encoding.ASCII.GetBytes("Test Villager"),
+					name = global::System.Text.Encoding.ASCII.GetBytes("Test Villager"),
 					action = 0,
 					actionStartTick = 4,
 					scale = 1,
@@ -338,9 +338,9 @@ class CS_SAY_PC_Handler : PacketHandler
 		var character = client.GetCurrentCharacter();
 		if (character == null) return;
 
-		var status = character.savedStatusPc;
-		playerClient.UpdateHP(status.mhp, true);
-		playerClient.UpdateMP(status.mmp, true);
+		var status = playerClient.GetStatus();
+		playerClient.UpdateHP((int)status.mhp, true);
+		playerClient.UpdateMP((int)status.mmp, true);
 
 		SendSystemMessage(client, $"Healed to full HP ({status.mhp}) and MP ({status.mmp})");
 		Logger.Log($"[ADMIN] {character.appearance.name} healed to full", LogLevel.Debug);
@@ -363,10 +363,10 @@ class CS_SAY_PC_Handler : PacketHandler
 		}
 
 		SendSystemMessage(client, "=== Combat Stats ===");
-		SendSystemMessage(client, $"HP: {status.Hp}/{status.MaxHp} | MP: {status.Mp}/{status.MaxMp}");
-		SendSystemMessage(client, $"ATK: {status.Attack} | DEF: {status.Defense}");
-		SendSystemMessage(client, $"HIT: {status.Hit} | DODGE: {status.Dodge}");
-		SendSystemMessage(client, $"CRIT: {status.CriticalRate:F1}% | PARRY: {status.Parry:F1}% | BLOCK: {status.Block:F1}%");
+		SendSystemMessage(client, $"HP: {status.BasicStatus.Hp}/{status.BasicStatus.MaxHp} | MP: {status.BasicStatus.Mp}/{status.BasicStatus.MaxMp}");
+		SendSystemMessage(client, $"ATK: {status.MeleeAttack.Atk} | DEF: {status.MeleeAttack.Def}");
+		SendSystemMessage(client, $"HIT: {status.MeleeAttack.Hit} | DODGE: {status.Dodge:F1}");
+		SendSystemMessage(client, $"CRIT: {status.MeleeAttack.CritRate}% | PARRY: {status.Parry:F1}% | BLOCK: {status.Block:F1}%");
 		SendSystemMessage(client, $"Speed: {status.HitSpeedRatio:F2}x");
 	}
 

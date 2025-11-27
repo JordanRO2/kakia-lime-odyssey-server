@@ -51,10 +51,14 @@ public class PostService
 		}
 
 		// Convert attachments to persistence format
-		var mailAttachments = attachments.Select(a => new Models.Item
+		var mailAttachments = attachments.Select(a => new MailItem
 		{
 			TypeID = a.TypeID,
-			Slot = a.Slot
+			Count = a.Count,
+			Durability = a.Durability,
+			MaxDurability = a.MaxDurability,
+			Grade = a.Grade,
+			RemainExpiryTime = a.RemainExpiryTime
 		}).ToList();
 
 		// Create mail message
@@ -270,7 +274,7 @@ public class PostService
 			SaveMail(accountId, charName, mail);
 		}
 
-		var packet = new PACKET_SC_POST
+		var packet = new SC_POST
 		{
 			indexNumber = indexNumber,
 			fromName = new byte[26],
@@ -290,8 +294,13 @@ public class PostService
 			{
 				packet.attached[i] = new POST_ATTACHED
 				{
-					typeID = (uint)(post.Attachments[i].TypeID),
-					count = 1
+					typeID = (int)post.Attachments[i].TypeID,
+					count = post.Attachments[i].Count,
+					remainExpiryTime = post.Attachments[i].RemainExpiryTime,
+					durability = post.Attachments[i].Durability,
+					mdurability = post.Attachments[i].MaxDurability,
+					grade = post.Attachments[i].Grade,
+					inherits = new ITEM_INHERITS()
 				};
 			}
 			else

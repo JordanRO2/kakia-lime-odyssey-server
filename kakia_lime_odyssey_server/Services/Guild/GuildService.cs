@@ -199,10 +199,10 @@ public class GuildService : IGuildService
 			Player = leader,
 			InstId = playerId,
 			IsConnected = true,
-			CombatJobTypeId = (byte)(character.combatJob?.jobTypeID ?? 0),
-			LifeJobTypeId = (byte)(character.lifeJob?.jobTypeID ?? 0),
-			CombatJobLevel = character.combatJob?.level ?? 1,
-			LifeJobLevel = character.lifeJob?.level ?? 1,
+			CombatJobTypeId = character.status.combatJob.typeID,
+			LifeJobTypeId = character.status.lifeJob.typeID,
+			CombatJobLevel = character.status.combatJob.lv,
+			LifeJobLevel = character.status.lifeJob.lv,
 			ContributionPoints = 0,
 			MemberType = GuildMemberType.Leader
 		};
@@ -355,10 +355,10 @@ public class GuildService : IGuildService
 			Player = player,
 			InstId = playerId,
 			IsConnected = true,
-			CombatJobTypeId = (byte)(character.combatJob?.jobTypeID ?? 0),
-			LifeJobTypeId = (byte)(character.lifeJob?.jobTypeID ?? 0),
-			CombatJobLevel = character.combatJob?.level ?? 1,
-			LifeJobLevel = character.lifeJob?.level ?? 1,
+			CombatJobTypeId = character.status.combatJob.typeID,
+			LifeJobTypeId = character.status.lifeJob.typeID,
+			CombatJobLevel = character.status.combatJob.lv,
+			LifeJobLevel = character.status.lifeJob.lv,
 			ContributionPoints = 0,
 			MemberType = GuildMemberType.Member
 		};
@@ -456,10 +456,10 @@ public class GuildService : IGuildService
 			Player = player,
 			InstId = playerId,
 			IsConnected = true,
-			CombatJobTypeId = (byte)(character.combatJob?.jobTypeID ?? 0),
-			LifeJobTypeId = (byte)(character.lifeJob?.jobTypeID ?? 0),
-			CombatJobLevel = character.combatJob?.level ?? 1,
-			LifeJobLevel = character.lifeJob?.level ?? 1,
+			CombatJobTypeId = character.status.combatJob.typeID,
+			LifeJobTypeId = character.status.lifeJob.typeID,
+			CombatJobLevel = character.status.combatJob.lv,
+			LifeJobLevel = character.status.lifeJob.lv,
 			ContributionPoints = 0,
 			MemberType = GuildMemberType.Member
 		};
@@ -824,10 +824,10 @@ public class GuildService : IGuildService
 		var character = player.GetCurrentCharacter();
 		if (character != null)
 		{
-			member.CombatJobTypeId = (byte)(character.combatJob?.jobTypeID ?? 0);
-			member.LifeJobTypeId = (byte)(character.lifeJob?.jobTypeID ?? 0);
-			member.CombatJobLevel = character.combatJob?.level ?? 1;
-			member.LifeJobLevel = character.lifeJob?.level ?? 1;
+			member.CombatJobTypeId = character.status.combatJob.typeID;
+			member.LifeJobTypeId = character.status.lifeJob.typeID;
+			member.CombatJobLevel = character.status.combatJob.lv;
+			member.LifeJobLevel = character.status.lifeJob.lv;
 		}
 
 		// Send guild info to reconnecting player
@@ -891,7 +891,7 @@ public class GuildService : IGuildService
 		pw.Write((byte)guild.Members.Count);
 		foreach (var member in guild.Members)
 		{
-			pw.Write(member.ToPacketStruct());
+			pw.Write(PacketConverter.AsBytes(member.ToPacketStruct()));
 		}
 
 		player.Send(pw.ToSizedPacket(), default).Wait();

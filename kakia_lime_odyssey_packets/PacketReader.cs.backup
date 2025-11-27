@@ -78,19 +78,5 @@ namespace kakia_lime_odyssey_packets
 			}
 			return whisper;
 		}
-
-		/// <summary>
-		/// Reads all remaining bytes in the stream and returns as ASCII string.
-		/// </summary>
-		/// <returns>ASCII string representation of remaining bytes, trimmed of null terminators</returns>
-		public string ReadRemaining()
-		{
-			var remaining = (int)(BaseStream.Length - BaseStream.Position);
-			if (remaining <= 0)
-				return string.Empty;
-
-			var bytes = ReadBytes(remaining);
-			return Encoding.ASCII.GetString(bytes).TrimEnd('\0');
-		}
 	}
 }

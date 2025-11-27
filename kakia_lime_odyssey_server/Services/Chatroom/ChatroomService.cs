@@ -3,6 +3,7 @@ using System.Text;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Chatroom;
@@ -344,8 +345,8 @@ public class ChatroomService
 		if (sender != null)
 		{
 			// Check GM permission (account level > 0)
-			var account = sender.GetAccount();
-			if (account == null || account.AccessLevel <= 0)
+			var account = DatabaseFactory.Instance.GetAccount(sender.GetAccountId());
+			if (account == null || account.PermissionLevel <= 0)
 			{
 				Logger.Log($"[NOTICE] Non-GM player attempted to send notice", LogLevel.Warning);
 				return false;

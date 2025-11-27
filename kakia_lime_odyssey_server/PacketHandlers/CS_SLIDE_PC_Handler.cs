@@ -21,7 +21,7 @@ class CS_SLIDE_PC_Handler : PacketHandler
 		client.UpdateDirection(cs_slide.dir);
 		client.SetInMotion(true);
 
-		var vel = client.GetVELOCITIES();
+		var vel = client.GetVelocities();
 
 		SC_SLIDE_PC sc_slide = new()
 		{

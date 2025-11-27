@@ -270,7 +270,7 @@ public class PartyService : IPartyService
 		// Check if target has a party
 		var party = GetParty(target);
 		if (party == null)
-			return PartyResult.Fail(PartyError.PartyNotFound, $"Player '{targetName}' is not in a party");
+			return PartyResult.Fail(PartyError.NotInParty, $"Player '{targetName}' is not in a party");
 
 		// Check if party is full
 		if (party.IsFull)
@@ -702,7 +702,7 @@ public class PartyService : IPartyService
 		pw.Write((byte)party.Members.Count);
 		foreach (var member in party.Members)
 		{
-			pw.Write(member.ToPacketStruct());
+			pw.Write(PacketConverter.AsBytes(member.ToPacketStruct()));
 		}
 
 		player.Send(pw.ToSizedPacket(), default).Wait();
@@ -848,7 +848,7 @@ public class PartyService : IPartyService
 		pw.Write(new SC_PARTY_MEMBER_LOOTED_ITEM
 		{
 			idx = memberIdx,
-			typeID = itemTypeId,
+			itemTypeID = itemTypeId,
 			count = count
 		});
 		player.Send(pw.ToPacket(), default).Wait();
@@ -871,7 +871,7 @@ public class PartyService : IPartyService
 		pw.Write(new SC_PARTY_MEMBER_DEL_DEF
 		{
 			idx = memberIdx,
-			defInstID = defInstId
+			instID = defInstId
 		});
 		player.Send(pw.ToPacket(), default).Wait();
 	}

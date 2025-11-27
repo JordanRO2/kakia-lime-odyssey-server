@@ -1,7 +1,7 @@
 using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
-using kakia_lime_odyssey_server.Models;
+using ItemModel = kakia_lime_odyssey_server.Models.Item;
 
 namespace kakia_lime_odyssey_server.Services.Inventory;
 
@@ -30,7 +30,7 @@ public static class InventoryService
 	{
 		var totalAmount = source.GetAmount() + target.GetAmount();
 
-		if (totalAmount <= Item.MaxStackSize)
+		if (totalAmount <= ItemModel.MaxStackSize)
 		{
 			source.UpdateAmount(0);
 			target.UpdateAmount(totalAmount);
@@ -44,13 +44,13 @@ public static class InventoryService
 		}
 		else
 		{
-			source.UpdateAmount(totalAmount - Item.MaxStackSize);
-			target.UpdateAmount(Item.MaxStackSize);
+			source.UpdateAmount(totalAmount - ItemModel.MaxStackSize);
+			target.UpdateAmount(ItemModel.MaxStackSize);
 
 			return new StackResult
 			{
-				SourceAmount = totalAmount - Item.MaxStackSize,
-				TargetAmount = Item.MaxStackSize,
+				SourceAmount = totalAmount - ItemModel.MaxStackSize,
+				TargetAmount = ItemModel.MaxStackSize,
 				SourceDepleted = false
 			};
 		}
@@ -73,7 +73,7 @@ public static class InventoryService
 			};
 		}
 
-		var moves = new List<SLOT_MOVE>();
+		var moves = new List<MOVE_SLOT>();
 
 		// Moving to empty slot
 		if (targetItem == null)
@@ -81,12 +81,12 @@ public static class InventoryService
 			inventory.AddItem(sourceItem, toSlot);
 			inventory.RemoveItem(fromSlot);
 
-			moves.Add(new SLOT_MOVE
+			moves.Add(new MOVE_SLOT
 			{
 				fromCount = 0,
 				toCount = (ulong)count,
-				fromSlot = new SLOT { slot = fromSlot },
-				toSlot = new SLOT { slot = toSlot }
+				fromSlot = new ITEM_SLOT { type = 0, slot = fromSlot },
+				toSlot = new ITEM_SLOT { type = 0, slot = toSlot }
 			});
 
 			return new MoveItemResult
@@ -108,12 +108,12 @@ public static class InventoryService
 
 			inventory.UpdateItemAtSlot(toSlot, targetItem);
 
-			moves.Add(new SLOT_MOVE
+			moves.Add(new MOVE_SLOT
 			{
 				fromCount = stackResult.SourceAmount,
 				toCount = stackResult.TargetAmount,
-				fromSlot = new SLOT { slot = fromSlot },
-				toSlot = new SLOT { slot = toSlot }
+				fromSlot = new ITEM_SLOT { type = 0, slot = fromSlot },
+				toSlot = new ITEM_SLOT { type = 0, slot = toSlot }
 			});
 
 			return new MoveItemResult
@@ -129,20 +129,20 @@ public static class InventoryService
 		inventory.AddItem(sourceItem, toSlot);
 		inventory.AddItem(targetItem, fromSlot);
 
-		moves.Add(new SLOT_MOVE
+		moves.Add(new MOVE_SLOT
 		{
 			fromCount = (ulong)count,
 			toCount = (ulong)count,
-			fromSlot = new SLOT { slot = fromSlot },
-			toSlot = new SLOT { slot = toSlot }
+			fromSlot = new ITEM_SLOT { type = 0, slot = fromSlot },
+			toSlot = new ITEM_SLOT { type = 0, slot = toSlot }
 		});
 
-		moves.Add(new SLOT_MOVE
+		moves.Add(new MOVE_SLOT
 		{
 			fromCount = (ulong)count,
 			toCount = (ulong)count,
-			fromSlot = new SLOT { slot = toSlot },
-			toSlot = new SLOT { slot = fromSlot }
+			fromSlot = new ITEM_SLOT { type = 0, slot = toSlot },
+			toSlot = new ITEM_SLOT { type = 0, slot = fromSlot }
 		});
 
 		return new MoveItemResult
@@ -195,7 +195,7 @@ public static class InventoryService
 		if (previousItem != null)
 		{
 			previousItemNewSlot = inventory.AddItem(previousItem, inventorySlot);
-			var prevItemCast = previousItem as Item;
+			var prevItemCast = previousItem as ItemModel;
 			if (prevItemCast != null)
 			{
 				equipActions.Add(prevItemCast.EquipChangePart(EQUIPMENT_TYPE.TYPE_UNEQUIP, previousItemNewSlot));
@@ -204,7 +204,7 @@ public static class InventoryService
 
 		// Equip new item
 		equipment.Equip(equipSlot, item);
-		var itemCast = item as Item;
+		var itemCast = item as ItemModel;
 		if (itemCast != null)
 		{
 			equipActions.Add(itemCast.EquipChangePart(EQUIPMENT_TYPE.TYPE_EQUIP, inventorySlot));
@@ -259,7 +259,7 @@ public static class InventoryService
 		}
 
 		var equipActions = new List<EQUIPMENT>();
-		var itemCast = item as Item;
+		var itemCast = item as ItemModel;
 		if (itemCast != null)
 		{
 			equipActions.Add(itemCast.EquipChangePart(EQUIPMENT_TYPE.TYPE_UNEQUIP, inventorySlot));

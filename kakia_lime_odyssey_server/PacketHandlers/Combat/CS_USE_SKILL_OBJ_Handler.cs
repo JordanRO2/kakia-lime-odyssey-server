@@ -98,10 +98,10 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 			fromInstID = client.GetObjInstID(),
 			toInstID = useSkill.objInstID,
 			typeID = useSkill.typeID,
-			useHP = (short)(skillLv1 != null ? skillLv1.UseHP : 0),
-			useMP = (short)(skillLv1 != null ? skillLv1.UseMP : 0),
-			useLP = (short)(skillLv1 != null ? skillLv1.UseLP : 0),
-			useSP = (short)(skillLv1 != null ? skillLv1.UseSP : 0),
+			useHP = (ushort)(skillLv1 != null ? skillLv1.UseHP : 0),
+			useMP = (ushort)(skillLv1 != null ? skillLv1.UseMP : 0),
+			useLP = (ushort)(skillLv1 != null ? skillLv1.UseLP : 0),
+			useSP = (ushort)(skillLv1 != null ? skillLv1.UseSP : 0),
 			coolTime = (uint)(skillLv1 != null ? skillLv1.CoolTime : skill.CoolTime)
 		};
 
@@ -119,7 +119,7 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 		}
 
 		// Calculate and apply damage
-		var damage = DamageHandler.DealWeaponHitDamage((client as IEntity)!, target);
+		var damage = kakia_lime_odyssey_server.Combat.DamageHandler.DealWeaponHitDamage((client as IEntity)!, target);
 		if (damage.Packet is null)
 		{
 			SystemNotificationService.SendError(client, SystemErrorCode.InternalError, "Damage calculation failed");

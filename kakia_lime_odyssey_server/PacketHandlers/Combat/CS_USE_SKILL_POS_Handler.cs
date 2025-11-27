@@ -62,7 +62,7 @@ class CS_USE_SKILL_POS_Handler : PacketHandler
 			SC_START_CASTING_SKILL_POS castSkill = new()
 			{
 				fromInstID = client.GetObjInstID(),
-				toPos = useSkill.pos,
+				pos = useSkill.pos,
 				typeID = useSkill.typeID,
 				castTime = castTime
 			};

@@ -79,9 +79,9 @@ class CS_START_GAME_Handler : PacketHandler
 		}
 
 
+		// TODO: FIX THESE
 		client.SendInventory();
 		client.SendEquipment();
-		client.SendBuffList();
 
 		// POC quests (added just to have something in the quest list)
 		SC_QUEST_LIST questList = new()

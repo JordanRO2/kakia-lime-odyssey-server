@@ -41,7 +41,7 @@ class CS_ITEM_REPAIR_PRICE_Handler : PacketHandler
 			// Get from equipment
 			var equipment = pc.GetEquipment(true);
 			var slot = (EQUIP_SLOT)request.slot;
-			item = equipment.GetItemInSlot(slot) as Item;
+			item = equipment.GetEquipped(slot) as Item;
 		}
 		else
 		{

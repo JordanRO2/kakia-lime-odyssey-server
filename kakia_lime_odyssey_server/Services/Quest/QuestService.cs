@@ -204,9 +204,9 @@ public class QuestService
 		SaveQuests(accountId, charName, quests);
 
 		// Count completed quests by type using QuestDB for proper categorization
-		int completedMain = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsMainQuest == true);
-		int completedSub = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsSideQuest == true);
-		int completedNormal = CountCompletedByCategory(quests.CompletedQuests, q => q?.IsNormalQuest == true);
+		int completedMain = CountCompletedByCategory(quests.CompletedQuests.ToList(), q => q?.IsMainQuest == true);
+		int completedSub = CountCompletedByCategory(quests.CompletedQuests.ToList(), q => q?.IsSideQuest == true);
+		int completedNormal = CountCompletedByCategory(quests.CompletedQuests.ToList(), q => q?.IsNormalQuest == true);
 
 		SendQuestComplete(player, questTypeID, completedMain, completedSub, completedNormal);
 

@@ -50,10 +50,10 @@ class CS_USE_SKILL_SELF_Handler : PacketHandler
 			fromInstID = client.GetObjInstID(),
 			toInstID = client.GetObjInstID(),
 			typeID = useSkill.typeID,
-			useHP = (short)(skillLv1  != null ? skillLv1.UseHP : 0),
-			useMP = (short)(skillLv1 != null ? skillLv1.UseMP : 0),
-			useLP = (short)(skillLv1 != null ? skillLv1.UseLP : 0),
-			useSP = (short)(skillLv1 != null ? skillLv1.UseSP : 0),
+			useHP = (ushort)(skillLv1  != null ? skillLv1.UseHP : 0),
+			useMP = (ushort)(skillLv1 != null ? skillLv1.UseMP : 0),
+			useLP = (ushort)(skillLv1 != null ? skillLv1.UseLP : 0),
+			useSP = (ushort)(skillLv1 != null ? skillLv1.UseSP : 0),
 			coolTime = (uint)(skillLv1 != null ? skillLv1.CoolTime : skill.CoolTime)
 		};
 

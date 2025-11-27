@@ -10,11 +10,11 @@ public class ItemSubjectInfo
     public List<ItemSeries> Series { get; set; } = new();
 
     [XmlElement(ElementName = "ItemType")]
-    public List<ItemType> ItemTypes { get; set; } = new();
+    public List<ItemSubjectXML.ItemType> ItemTypes { get; set; } = new();
 
     private static ItemSubjectInfo? _instance;
     private static Dictionary<int, ItemSeries>? _seriesCache;
-    private static Dictionary<int, ItemType>? _itemTypeCache;
+    private static Dictionary<int, ItemSubjectXML.ItemType>? _itemTypeCache;
 
     public static ItemSubjectInfo GetInstance()
     {
@@ -31,7 +31,7 @@ public class ItemSubjectInfo
                 _seriesCache.Add(series.TypeId, series);
         }
 
-        _itemTypeCache = new Dictionary<int, ItemType>();
+        _itemTypeCache = new Dictionary<int, ItemSubjectXML.ItemType>();
         foreach (var itemType in _instance.ItemTypes)
         {
             if (!_itemTypeCache.ContainsKey(itemType.TypeId))
@@ -47,7 +47,7 @@ public class ItemSubjectInfo
         return _seriesCache!.TryGetValue(typeId, out var series) ? series : null;
     }
 
-    public static ItemType? GetItemType(int typeId)
+    public static ItemSubjectXML.ItemType? GetItemType(int typeId)
     {
         GetInstance();
         return _itemTypeCache!.TryGetValue(typeId, out var itemType) ? itemType : null;

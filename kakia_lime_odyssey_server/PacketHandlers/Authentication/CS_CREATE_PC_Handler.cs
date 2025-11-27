@@ -18,18 +18,22 @@ class CS_CREATE_PC_Handler : PacketHandler
 		Logger.LogPck(p.Payload);
 		var character = PacketConverter.Extract<CS_CREATE_PC>(p.Payload);
 
+		var nameBytes = new byte[26];
+		var nameData = global::System.Text.Encoding.ASCII.GetBytes(character.name);
+		global::System.Array.Copy(nameData, nameBytes, global::System.Math.Min(nameData.Length, 25));
+
 		CLIENT_PC newCharacter = new()
 		{
 			status = new SAVED_STATUS_PC_KR()
 			{
-			
+
 				hp = 120,
 				mp = 120,
 				lp = 120,
 				streamPoint = 1,
 				breath = 1,
 				fatigue = 1,
-				
+
 				lifeJob = new SAVED_LIFE_JOB_STATUS()
 				{
 					lv = 1,
@@ -57,7 +61,7 @@ class CS_CREATE_PC_Handler : PacketHandler
 
 			appearance = new()
 			{
-				name = character.name,
+				name = nameBytes,
 				raceTypeID = character.raceTypeID,
 				genderType = character.genderType,
 				lifeJobTypeID = character.lifeJobTypeID,

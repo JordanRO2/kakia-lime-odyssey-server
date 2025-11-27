@@ -50,7 +50,8 @@ class CS_LOGIN_Handler : PacketHandler
 
 		foreach (var character in characters)
 		{
-			var equip = db.GetPlayerEquipment(login.id, character.appearance.name);
+			var characterName = global::System.Text.Encoding.ASCII.GetString(character.appearance.name).TrimEnd('\0');
+			var equip = db.GetPlayerEquipment(login.id, characterName);
 			var equipped = equip.Combat.GetEquipped();
 			var modApp = new ModAppearance(character.appearance);
 			modApp.equiped = new ModEquipped(equipped);

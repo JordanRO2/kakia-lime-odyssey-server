@@ -20,8 +20,7 @@ class CS_REQUEST_DELETE_POST_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[POST] {playerName} requesting to delete mail index {packet.indexNumber}", LogLevel.Debug);
 
-		long playerId = pc.GetId();
-		if (LimeServer.PostService.DeletePost(playerId, packet.indexNumber))
+		if (LimeServer.PostService.DeletePost(pc, packet.indexNumber))
 		{
 			LimeServer.PostService.SendDeletedPost(pc, packet.indexNumber);
 			Logger.Log($"[POST] {playerName} deleted mail index {packet.indexNumber}", LogLevel.Debug);

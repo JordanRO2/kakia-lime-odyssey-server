@@ -8,9 +8,10 @@ using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Models;
-using kakia_lime_odyssey_server.Models.MonsterLogic;
+using kakia_lime_odyssey_server.Entities.Monsters;
 using kakia_lime_odyssey_server.Network;
 using System;
+using System.Text;
 
 namespace kakia_lime_odyssey_server.PacketHandlers;
 
@@ -164,7 +165,7 @@ class CS_SAY_PC_Handler : PacketHandler
 	{
 		int objId = Random.Shared.Next(210000, 250000);
 
-		NPC npc = new()
+		kakia_lime_odyssey_server.Entities.Npcs.Npc npc = new()
 		{
 			Id = objId,
 			Pos = client.GetPosition(),
@@ -173,7 +174,7 @@ class CS_SAY_PC_Handler : PacketHandler
 			{
 				appearance = new()
 				{
-					name = System.Text.Encoding.ASCII.GetBytes("Test Villager"),
+					name = Encoding.ASCII.GetBytes("Test Villager"),
 					action = 0,
 					actionStartTick = 4,
 					scale = 1,
@@ -238,7 +239,7 @@ class CS_SAY_PC_Handler : PacketHandler
 
 	private void UpdateVelocity(string[] parts, IPlayerClient client)
 	{
-		var vel = client.GetVELOCITIES();
+		var vel = client.GetVelocities();
 		float val = float.Parse(parts[3]);
 
 		switch (parts[2])
@@ -293,7 +294,7 @@ class CS_SAY_PC_Handler : PacketHandler
 		}
 
 		Logger.Log($"Updated velocity param {parts[2]} to {parts[3]}", LogLevel.Debug);
-		client.UpdateVELOCITIES(vel);
+		client.UpdateVelocities(vel);
 
 		SC_CHANGED_VELOCITIES updateVel = new()
 		{

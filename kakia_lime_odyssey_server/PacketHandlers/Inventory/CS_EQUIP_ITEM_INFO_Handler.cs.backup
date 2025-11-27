@@ -37,7 +37,7 @@ class CS_EQUIP_ITEM_INFO_Handler : PacketHandler
 		var slot = (EQUIP_SLOT)request.equipSlot;
 
 		// Get the item at the specified slot
-		var item = equipment.GetItemInSlot(slot) as Item;
+		var item = equipment.GetEquipped(slot) as Item;
 		if (item is null)
 		{
 			Logger.Log($"[INVENTORY] No item equipped at slot {request.equipSlot} for {playerName}", LogLevel.Debug);

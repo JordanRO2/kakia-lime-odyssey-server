@@ -1,9 +1,9 @@
 /// <summary>
-/// Handles CS_REALM_SAY_PC packet - player sends a realm-wide chat message.
+/// Handles CS_KNIGHTS_SAY_PC packet - player sends a guild (knights) chat message.
 /// </summary>
 /// <remarks>
-/// Triggered by: Player using realm/faction chat channel
-/// Response packets: SC_REALM_SAY (broadcast to all realm/faction members)
+/// Triggered by: Player using guild/knights chat channel
+/// Response packets: SC_KNIGHTS_SAY (broadcast to all guild members)
 /// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
@@ -15,20 +15,19 @@ using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.PacketHandlers.Social;
 
-[PacketHandlerAttr(PacketType.CS_REALM_SAY_PC)]
-class CS_REALM_SAY_PC_Handler : PacketHandler
+[PacketHandlerAttr(PacketType.CS_KNIGHTS_SAY_PC)]
+class CS_KNIGHTS_SAY_PC_Handler : PacketHandler
 {
 	public override void HandlePacket(IPlayerClient client, RawPacket p)
 	{
 		if (client is not PlayerClient pc) return;
 
-		using PacketReader pr = new PacketReader(p.Payload);
-		var chat = PacketConverter.Extract<CS_REALM_SAY_PC>(p.Payload);
+		var chat = PacketConverter.Extract<CS_KNIGHTS_SAY_PC>(p.Payload);
 		string message = pr.ReadRemaining();
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
-		Logger.Log($"[CHAT:REALM] {playerName}: {message}", LogLevel.Debug);
+		Logger.Log($"[CHAT:KNIGHTS] {playerName}: {message}", LogLevel.Debug);
 
-		LimeServer.ChatroomService.SendRealmChat(pc, message, chat.maintainTime, chat.type);
+		LimeServer.GuildService.SendGuildChat(pc, message, chat.maintainTime, chat.type);
 	}
 }

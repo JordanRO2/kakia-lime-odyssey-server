@@ -29,10 +29,12 @@ class CS_RETURN_LOBBY_Handler : PacketHandler
 		pc.Save();
 
 		// Notify other players that this character is leaving
-		pc.SendGlobalPacket(new PacketWriter().Write(new SC_LEAVE_SIGHT_PC
+		PacketWriter leaveWriter = new();
+		leaveWriter.Write(new SC_LEAVE_SIGHT_PC
 		{
 			leave_zone = new SC_LEAVE_ZONEOBJ { objInstID = pc.GetObjInstID() }
-		}).ToPacket(), default).Wait();
+		});
+		pc.SendGlobalPacket(leaveWriter.ToPacket(), default).Wait();
 
 		// Clean up services state
 		LimeServer.PartyService.OnPlayerDisconnect(pc);

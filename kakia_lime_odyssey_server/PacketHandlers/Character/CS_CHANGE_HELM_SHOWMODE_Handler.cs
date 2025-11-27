@@ -33,7 +33,7 @@ class CS_CHANGE_HELM_SHOWMODE_Handler : PacketHandler
 		var character = pc.GetCurrentCharacter();
 		if (character != null)
 		{
-			character.appearance.helmShowMode = packet.show;
+			character.appearance.showHelm = packet.show;
 		}
 
 		// Send confirmation and broadcast to others

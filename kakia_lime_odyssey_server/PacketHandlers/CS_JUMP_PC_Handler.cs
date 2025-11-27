@@ -18,7 +18,7 @@ class CS_JUMP_PC_Handler : PacketHandler
 		client.UpdatePosition(cs_jump.pos);
 		client.UpdateDirection(cs_jump.dir);
 
-		var vel = client.GetVELOCITIES();		
+		var vel = client.GetVelocities();		
 
 		SC_JUMP_PC sc_jump = new()
 		{

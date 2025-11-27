@@ -316,7 +316,7 @@ public class BuffService : IBuffService
 				lv = (ushort)buff.Level,
 				durTime = buff.RemainingDurationMs
 			};
-			pw.Write(def);
+			pw.Write(PacketConverter.AsBytes(def));
 		}
 
 		return pw.ToSizedPacket();
