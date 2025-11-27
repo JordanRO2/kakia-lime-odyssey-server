@@ -12,7 +12,7 @@ namespace kakia_lime_odyssey_network
 		private byte[] _buffer { get; set; }
 		private int _position = 0;
 		public bool IsAlive { get; set; }
-		public bool UseCrypto { get; set; }
+		public bool UseCrypto { get; set; } = true;
 
 		public int Id { get; set; }		
 
