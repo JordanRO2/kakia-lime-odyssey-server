@@ -15,6 +15,7 @@ using kakia_lime_odyssey_server.Services.Ban;
 using kakia_lime_odyssey_server.Services.Combat;
 using kakia_lime_odyssey_server.Services.Guild;
 using kakia_lime_odyssey_server.Services.Party;
+using kakia_lime_odyssey_server.Services.Post;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -41,6 +42,9 @@ public class LimeServer : SocketServer
 
 	/// <summary>Service for managing guilds</summary>
 	public static GuildService GuildService { get; } = new();
+
+	/// <summary>Service for managing mail/post messages</summary>
+	public static PostService PostService { get; } = new();
 
 	public Config Config { get; set; }
 

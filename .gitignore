@@ -22,11 +22,12 @@
 /kakia_lime_odyssey_contracts/obj
 
 # Documentation (except README)
+*.md
+!README.md
 *.txt
 *.toon
 /docs/
 /.claude/
-!README.md
 
 # Data files
 *.xml
