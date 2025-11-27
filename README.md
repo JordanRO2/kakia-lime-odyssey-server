@@ -14,11 +14,6 @@ A server emulator for the Korean CBT3 client (rev 211) of Lime Odyssey Online, b
 3. Run the server: `dotnet run --project kakia_lime_odyssey_server`
 4. On first run, a `config.json` file will be generated
 
-### Configuration
-
-The default config listens on localhost. Key settings:
-- `Crypto: true` - Required for Korean CBT3 client compatibility
-
 ## Getting the Client
 
 This emulator works with the Korean CBT3 client (rev 211). Download from kaitodomoto:
