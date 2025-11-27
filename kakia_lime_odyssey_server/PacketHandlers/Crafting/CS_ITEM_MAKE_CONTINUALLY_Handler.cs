@@ -28,10 +28,6 @@ class CS_ITEM_MAKE_CONTINUALLY_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} starting continuous crafting x{packet.count}", LogLevel.Debug);
 
-		// TODO: Validate can craft requested count
-		// TODO: Start continuous crafting loop
-		// TODO: Send SC_ITEM_MAKE_START_CASTING
-
-		Logger.Log($"[CRAFT] {playerName} continuous crafting started for {packet.count} items", LogLevel.Debug);
+		LimeServer.CraftingService.StartContinuousCrafting(pc, packet.count);
 	}
 }

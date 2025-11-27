@@ -24,8 +24,6 @@ class CS_ITEM_MAKE_REQUEST_REPORT_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} requesting crafting report", LogLevel.Debug);
 
-		// TODO: Send SC_ITEM_MAKE_UPDATE_REPORT with current crafting status
-
-		Logger.Log($"[CRAFT] {playerName} crafting report sent", LogLevel.Debug);
+		LimeServer.CraftingService.RequestReport(pc);
 	}
 }

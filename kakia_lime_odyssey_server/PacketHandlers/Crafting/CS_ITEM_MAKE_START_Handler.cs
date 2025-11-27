@@ -24,10 +24,6 @@ class CS_ITEM_MAKE_START_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} starting crafting", LogLevel.Debug);
 
-		// TODO: Consume materials
-		// TODO: Start crafting timer
-		// TODO: Send SC_ITEM_MAKE_START_CASTING
-
-		Logger.Log($"[CRAFT] {playerName} crafting started", LogLevel.Debug);
+		LimeServer.CraftingService.StartItemMake(pc);
 	}
 }

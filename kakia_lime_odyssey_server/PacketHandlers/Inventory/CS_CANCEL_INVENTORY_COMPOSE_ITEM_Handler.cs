@@ -24,6 +24,6 @@ class CS_CANCEL_INVENTORY_COMPOSE_ITEM_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMPOSE] {playerName} canceling composition", LogLevel.Debug);
 
-		// TODO: Clear composition state
+		LimeServer.ItemService.CancelComposition(pc);
 	}
 }

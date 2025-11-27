@@ -29,10 +29,6 @@ class CS_USE_INVENTORY_COMPOSE_ITEM_SLOTS_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMPOSE] {playerName} executing composition on slot {packet.slot}", LogLevel.Debug);
 
-		// TODO: Validate base item and materials
-		// TODO: Calculate composition result (success/fail)
-		// TODO: Consume materials
-		// TODO: Update item stats on success
-		// TODO: Send SC_INVENTORY_COMPOSE_ITEM_FINISH
+		LimeServer.ItemService.ExecuteComposition(pc, packet.slot, packet.targetSlots.slots);
 	}
 }

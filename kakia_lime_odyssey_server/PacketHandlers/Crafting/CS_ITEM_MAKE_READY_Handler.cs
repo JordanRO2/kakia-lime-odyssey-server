@@ -28,10 +28,6 @@ class CS_ITEM_MAKE_READY_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} preparing to craft item type {packet.typeID}", LogLevel.Debug);
 
-		// TODO: Validate recipe exists and player can craft it
-		// TODO: Check materials are available
-		// TODO: Send SC_ITEM_MAKE_UPDATE_REPORT with crafting info
-
-		Logger.Log($"[CRAFT] {playerName} ready to craft item {packet.typeID}", LogLevel.Debug);
+		LimeServer.CraftingService.ReadyItemMake(pc, packet.typeID);
 	}
 }

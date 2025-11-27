@@ -28,8 +28,6 @@ class CS_REQUEST_TRADE_PRICE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} requesting price for slot {packet.slot}", LogLevel.Debug);
 
-		// TODO: Get item from inventory slot
-		// TODO: Calculate sell price
-		// TODO: Send SC_TRADE_PRICE
+		LimeServer.TradeService.GetItemSellPrice(pc, packet.slot);
 	}
 }

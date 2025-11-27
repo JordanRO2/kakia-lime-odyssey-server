@@ -28,7 +28,6 @@ class CS_STUFF_MAKE_DELETE_LIST_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} removing item from stuff make list", LogLevel.Debug);
 
-		// TODO: Remove from processing queue
-		// TODO: Send SC_STUFF_MAKE_DELETE_LIST_SUCCESS
+		LimeServer.CraftingService.RemoveFromStuffMakeList(pc, packet.deleteItem.slot);
 	}
 }

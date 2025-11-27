@@ -24,7 +24,6 @@ class CS_STUFF_MAKE_CANCEL_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} canceling stuff make", LogLevel.Debug);
 
-		// TODO: Cancel gathering/processing timer
-		// TODO: Send SC_STUFF_MAKE_FINISH
+		LimeServer.CraftingService.CancelStuffMake(pc);
 	}
 }

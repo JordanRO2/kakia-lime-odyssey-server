@@ -5,10 +5,12 @@
 /// Handles using consumable items on self, objects, positions, and other inventory slots.
 /// Uses: PlayerInventory for item access, ItemDB for item definitions
 /// </remarks>
+using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Common;
+using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Network;
 
@@ -311,5 +313,160 @@ public class ItemService
 	public Models.Item? GetItemDefinition(int typeId)
 	{
 		return LimeServer.ItemDB.FirstOrDefault(i => i.Id == typeId);
+	}
+
+	// ============ ITEM REPAIR ============
+
+	/// <summary>
+	/// Base repair cost multiplier.
+	/// </summary>
+	private const float RepairCostMultiplier = 0.1f;
+
+	/// <summary>
+	/// Gets the repair price for all equipped items.
+	/// </summary>
+	public uint GetEquippedItemsRepairPrice(PlayerClient pc)
+	{
+		var equipment = pc.GetEquipment(true);
+		uint totalPrice = 0;
+
+		// Calculate repair cost for all equipped items by iterating through all slots
+		for (int i = 1; i <= 20; i++)
+		{
+			var slot = (EQUIP_SLOT)i;
+			var item = equipment.GetItemInSlot(slot);
+			if (item is Models.Item equippedItem)
+			{
+				totalPrice += CalculateRepairPrice(equippedItem);
+			}
+		}
+
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+		Logger.Log($"[REPAIR] {playerName} equipped items repair price: {totalPrice}", LogLevel.Debug);
+
+		return totalPrice;
+	}
+
+	/// <summary>
+	/// Repairs all equipped items.
+	/// </summary>
+	public bool RepairAllEquippedItems(PlayerClient pc)
+	{
+		var character = pc.GetCurrentCharacter();
+		if (character == null)
+		{
+			Logger.Log("[REPAIR] RepairAllEquippedItems failed: No character loaded", LogLevel.Warning);
+			return false;
+		}
+
+		uint totalCost = GetEquippedItemsRepairPrice(pc);
+
+		// TODO: Check player has enough gold
+		// TODO: Deduct gold from player
+
+		// For now, assume repair is always successful
+		string playerName = character.appearance.name;
+		Logger.Log($"[REPAIR] {playerName} repaired all equipped items for {totalCost} gold", LogLevel.Information);
+
+		return true;
+	}
+
+	/// <summary>
+	/// Calculates the repair price for an item based on its properties.
+	/// </summary>
+	public static uint CalculateRepairPrice(Models.Item item)
+	{
+		// Base price on item value and durability loss
+		// For now, use a simple formula: base_price * grade * (1 - durability_ratio)
+		int basePrice = item.Price > 0 ? item.Price : 100;
+		int grade = item.Grade > 0 ? item.Grade : 1;
+
+		// TODO: Calculate actual durability loss when durability tracking is implemented
+		// For now, assume 50% durability loss
+		float durabilityLoss = 0.5f;
+
+		uint repairCost = (uint)(basePrice * grade * durabilityLoss * RepairCostMultiplier);
+		return Math.Max(1, repairCost); // Minimum 1 currency
+	}
+
+	// ============ ITEM COMPOSITION (Upgrading/Enchanting) ============
+
+	private readonly ConcurrentDictionary<long, int> _activeCompositions = new();
+
+	/// <summary>
+	/// Prepares an item for composition (upgrading/enchanting).
+	/// </summary>
+	public bool ReadyComposition(PlayerClient pc, int slot)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		var inventory = pc.GetInventory();
+		var item = inventory.AtSlot(slot) as Models.Item;
+
+		if (item == null)
+		{
+			Logger.Log($"[COMPOSE] {playerName} failed: No item at slot {slot}", LogLevel.Warning);
+			return false;
+		}
+
+		// TODO: Validate item can be composed (equipment only, max upgrade level, etc.)
+
+		_activeCompositions[playerId] = slot;
+
+		Logger.Log($"[COMPOSE] {playerName} ready to compose item {item.Name}", LogLevel.Debug);
+		return true;
+	}
+
+	/// <summary>
+	/// Cancels the current composition.
+	/// </summary>
+	public void CancelComposition(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		if (_activeCompositions.TryRemove(playerId, out _))
+		{
+			Logger.Log($"[COMPOSE] {playerName} canceled composition", LogLevel.Debug);
+		}
+	}
+
+	/// <summary>
+	/// Executes item composition with materials.
+	/// </summary>
+	public bool ExecuteComposition(PlayerClient pc, int baseSlot, int[] materialSlots)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		var inventory = pc.GetInventory();
+		var baseItem = inventory.AtSlot(baseSlot) as Models.Item;
+
+		if (baseItem == null)
+		{
+			Logger.Log($"[COMPOSE] {playerName} failed: No base item at slot {baseSlot}", LogLevel.Warning);
+			return false;
+		}
+
+		// TODO: Validate materials exist
+		// TODO: Calculate success rate based on materials
+		// TODO: Consume materials
+		// TODO: Apply composition result (success: upgrade item, fail: potentially destroy)
+
+		Logger.Log($"[COMPOSE] {playerName} executed composition on {baseItem.Name} with {materialSlots.Length} materials", LogLevel.Debug);
+
+		// Clean up active composition
+		_activeCompositions.TryRemove(playerId, out _);
+
+		return true;
+	}
+
+	/// <summary>
+	/// Cleans up composition state for a player (on disconnect).
+	/// </summary>
+	public void CleanupPlayerComposition(long playerId)
+	{
+		_activeCompositions.TryRemove(playerId, out _);
 	}
 }

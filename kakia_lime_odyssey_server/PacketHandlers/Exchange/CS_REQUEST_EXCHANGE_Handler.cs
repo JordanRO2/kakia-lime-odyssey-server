@@ -25,8 +25,21 @@ class CS_REQUEST_EXCHANGE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[EXCHANGE] {playerName} requesting P2P exchange", LogLevel.Debug);
 
-		// TODO: Get current target player
-		// TODO: Send exchange request to target
-		// TODO: Wait for accept/reject
+		// Get current target player
+		long targetId = pc.GetCurrentTarget();
+		if (targetId == 0)
+		{
+			Logger.Log($"[EXCHANGE] {playerName} has no target selected", LogLevel.Debug);
+			return;
+		}
+
+		var target = LimeServer.PlayerClients.FirstOrDefault(x => x.GetId() == targetId);
+		if (target == null)
+		{
+			Logger.Log($"[EXCHANGE] Target player not found: {targetId}", LogLevel.Debug);
+			return;
+		}
+
+		LimeServer.ExchangeService.RequestExchange(pc, target);
 	}
 }

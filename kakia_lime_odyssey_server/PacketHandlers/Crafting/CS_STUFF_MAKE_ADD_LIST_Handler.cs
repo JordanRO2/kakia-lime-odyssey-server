@@ -28,8 +28,6 @@ class CS_STUFF_MAKE_ADD_LIST_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} adding item to stuff make list", LogLevel.Debug);
 
-		// TODO: Validate item exists in inventory
-		// TODO: Add to processing queue
-		// TODO: Send SC_STUFF_MAKE_ADD_LIST_SUCCESS
+		LimeServer.CraftingService.AddToStuffMakeList(pc, packet.addItem.slot, packet.addItem.count);
 	}
 }

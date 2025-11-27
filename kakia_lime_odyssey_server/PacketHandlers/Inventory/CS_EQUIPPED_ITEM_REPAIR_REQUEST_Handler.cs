@@ -25,9 +25,12 @@ class CS_EQUIPPED_ITEM_REPAIR_REQUEST_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[REPAIR] {playerName} requesting equipped item repair", LogLevel.Debug);
 
-		// TODO: Calculate repair cost
-		// TODO: Check player has enough gold
-		// TODO: Deduct gold and repair all equipped items
-		// TODO: Send SC_EQUIPPED_ITEM_REPAIR_RESULT
+		bool success = LimeServer.ItemService.RepairAllEquippedItems(pc);
+
+		// Send SC_EQUIPPED_ITEM_REPAIR_RESULT
+		using PacketWriter pw = new();
+		pw.Writer.Write((ushort)PacketType.SC_EQUIPPED_ITEM_REPAIR_RESULT);
+		pw.Writer.Write(success);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 }

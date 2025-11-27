@@ -28,7 +28,6 @@ class CS_READY_INVENTORY_COMPOSE_ITEM_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMPOSE] {playerName} preparing composition for slot {packet.slot}", LogLevel.Debug);
 
-		// TODO: Validate item in slot can be composed
-		// TODO: Send SC_READY_INVENTORY_COMPOSE_ITEM with composition info
+		LimeServer.ItemService.ReadyComposition(pc, packet.slot);
 	}
 }

@@ -28,7 +28,6 @@ class CS_STUFF_MAKE_READY_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} preparing stuff make type {packet.typeID}", LogLevel.Debug);
 
-		// TODO: Validate stuff make type
-		// TODO: Send SC_STUFF_MAKE_READY_SUCCESS
+		LimeServer.CraftingService.ReadyStuffMake(pc, packet.typeID);
 	}
 }

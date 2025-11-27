@@ -24,9 +24,6 @@ class CS_ITEM_MAKE_CONTINUALLY_STOP_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} stopping continuous crafting", LogLevel.Debug);
 
-		// TODO: Stop crafting loop
-		// TODO: Send SC_ITEM_MAKE_FINISH with current progress
-
-		Logger.Log($"[CRAFT] {playerName} continuous crafting stopped", LogLevel.Debug);
+		LimeServer.CraftingService.StopContinuousCrafting(pc);
 	}
 }
