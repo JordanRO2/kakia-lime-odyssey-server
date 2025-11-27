@@ -4,21 +4,20 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_QUEST_ADD - Quest accepted
-/// IDA Structure: PACKET_SC_QUEST_ADD (8 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this when a quest is accepted/added to player's quest log.
-/// Variable-length packet with quest data appended after the base structure.
-///
-/// Structure layout:
-/// 0x00: PACKET_VAR (4 bytes) - base packet header with variable data
-/// 0x04: unsigned int typeID - quest type ID
-/// Variable: quest data follows
-/// Total: 8 bytes + quest data
+/// Notifies client that a quest was added to their quest log.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_QUEST_ADD
+/// Size: 8 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: unsigned int typeID (4 bytes) - Quest type identifier
+/// Triggered by: CS_QUEST_ADD, NPC dialog quest accept
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_QUEST_ADD : IPacketVar
 {
-    public uint typeID;
+	/// <summary>Quest type identifier (offset 0x04)</summary>
+	public uint typeID;
 }

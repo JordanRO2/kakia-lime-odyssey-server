@@ -1,17 +1,27 @@
-﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_SIT_DOWN - Server notifies that an entity has sat down
-/// IDA Verification: PACKET_SC_SIT_DOWN
-/// Size: 14 bytes (2 byte header + 8 byte objInstID + 4 byte tick)
-/// Verified: 2025-11-26
+/// Notifies client that an entity has sat down.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_SIT_DOWN
+/// Size: 14 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes) - Entity instance ID
+/// - 0x0A: unsigned int tick (4 bytes) - Server tick timestamp
+/// Triggered by: CS_SIT_DOWN_PC
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_SIT_DOWN : IPacketFixed
 {
+	/// <summary>Entity instance ID (offset 0x02)</summary>
 	public long objInstID;
+
+	/// <summary>Server tick timestamp (offset 0x0A)</summary>
 	public uint tick;
 }
