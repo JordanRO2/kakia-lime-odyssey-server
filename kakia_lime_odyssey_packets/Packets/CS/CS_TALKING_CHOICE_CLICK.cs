@@ -1,21 +1,22 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_TALKING_CHOICE_CLICK - Select dialog choice
-/// IDA Structure: PACKET_CS_TALKING_CHOICE_CLICK (4 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Client sends this when player selects a choice in NPC dialog menu.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// 0x02: unsigned __int16 choiceNum - selected choice index
-/// Total: 4 bytes
+/// Client->Server packet to select dialog choice.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_TALKING_CHOICE_CLICK
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_TALKING_CHOICE_CLICK
+/// Size: 4 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned __int16 choiceNum (2 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_TALKING_CHOICE_CLICK : IPacketFixed
 {
-    public ushort choiceNum;
+	/// <summary>Selected choice index (offset 0x02)</summary>
+	public ushort choiceNum;
 }

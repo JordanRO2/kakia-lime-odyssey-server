@@ -1,20 +1,20 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_BOARD_CANCEL - Close quest board
-/// IDA Structure: PACKET_CS_BOARD_CANCEL (2 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Client sends this when player closes the quest board UI.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// Total: 2 bytes
+/// Client->Server packet to close quest board UI.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_BOARD_CANCEL
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_BOARD_CANCEL
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_BOARD_CANCEL : IPacketFixed
 {
-    // Header only packet - no additional fields
+	// Header only - no payload
 }

@@ -1,24 +1,23 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_QUEST_COMPLETE - Complete quest and claim reward
-/// IDA Structure: PACKET_CS_QUEST_COMPLETE (42 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Client sends this when player turns in a completed quest.
-/// Includes reward choice items if quest offers multiple reward options.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// 0x02: REWARD_CHOICE_ITEMS (40 bytes) - selected reward items
-///   - int[10] choiceItems - array of 10 item IDs for reward choices
-/// Total: 42 bytes
+/// Client->Server packet to complete quest and claim reward.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_QUEST_COMPLETE
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_QUEST_COMPLETE
+/// Size: 42 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: int[10] choiceItems (40 bytes) - selected reward items
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_QUEST_COMPLETE : IPacketFixed
 {
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-    public int[] choiceItems;
+	/// <summary>Selected reward item IDs (offset 0x02)</summary>
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
+	public int[] choiceItems;
 }

@@ -4,24 +4,27 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_CHANGE_QUEST_SUBJECT - Quest subject/objective changed
-/// IDA Structure: PACKET_SC_CHANGE_QUEST_SUBJECT (8 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this when a quest objective/subject changes state.
-/// Used to track progress through multi-stage quests.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// 0x02: unsigned int typeID - quest type ID
-/// 0x06: unsigned __int8 subjectNum - subject/objective number
-/// 0x07: bool isSuccessed - whether the subject was completed successfully
-/// Total: 8 bytes
+/// Server->Client packet indicating a quest subject/objective has changed.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_CHANGE_QUEST_SUBJECT
+/// Size: 8 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned int typeID (4 bytes)
+/// - 0x06: unsigned __int8 subjectNum (1 byte)
+/// - 0x07: bool isSuccessed (1 byte)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_CHANGE_QUEST_SUBJECT : IPacketFixed
 {
-    public uint typeID;
-    public byte subjectNum;
-    public bool isSuccessed;
+	/// <summary>Quest type ID (offset 0x02)</summary>
+	public uint typeID;
+
+	/// <summary>Subject/objective number (offset 0x06)</summary>
+	public byte subjectNum;
+
+	/// <summary>Whether the subject was completed successfully (offset 0x07)</summary>
+	public bool isSuccessed;
 }

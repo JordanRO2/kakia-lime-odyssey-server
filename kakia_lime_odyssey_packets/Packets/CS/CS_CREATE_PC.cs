@@ -1,20 +1,26 @@
-﻿using System.Runtime.InteropServices;
+﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_CREATE_PC - Client to Server character creation packet
-/// Total size: 45 bytes (including 2-byte PACKET_FIX header)
-/// IDA verified: 2025-11-26
-/// Structure name in client: PACKET_CS_CREATE_PC
+/// Client->Server character creation packet.
 /// </summary>
 /// <remarks>
-/// This packet is sent when a player creates a new character.
-/// Contains character name and all appearance/customization data.
-/// Server responds with SC_CREATED_PC on success.
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_CREATE_PC
+/// Size: 45 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: char[26] name (26 bytes)
+/// - 0x1C: unsigned int raceTypeID (4 bytes)
+/// - 0x20: bool genderType (1 byte)
+/// - 0x21: unsigned char lifeJobTypeID (1 byte)
+/// - 0x22-0x2C: appearance fields (11 bytes)
+/// Response: SC_CREATED_PC
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct CS_CREATE_PC
+public struct CS_CREATE_PC : IPacketFixed
 {
 	/// <summary>
 	/// Character name - null-terminated string, max 26 bytes including null terminator

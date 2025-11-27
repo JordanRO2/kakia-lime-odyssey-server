@@ -1,28 +1,22 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_PRIVATE_CHATROOM_MEMBER_ADDED - Member joined chatroom notification
-///
-/// IDA Verification Status: VERIFIED (2025-11-26)
-/// IDA Structure Name: PACKET_SC_PRIVATE_CHATROOM_MEMBER_ADDED
-/// IDA Structure Size: 10 bytes
-///
-/// IDA Structure Layout:
-/// +0x00: PACKET_FIX (header: ushort) - 2 bytes [handled by framework]
-/// +0x02: instID (__int64) - 8 bytes
-///
-/// C# Implementation Notes:
-/// - PACKET_FIX header (2 bytes) is stripped by RawPacket.ParsePackets
-/// - instID is the instance ID of the player who joined the chatroom
-/// - Sent to all existing chatroom members when a new member joins
-///
-/// Type Mappings (IDA -> C#):
-/// - __int64 -> long (instID)
+/// Server->Client packet when a member joins a private chatroom.
 /// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_PRIVATE_CHATROOM_MEMBER_ADDED
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 instID (8 bytes)
+/// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SC_PRIVATE_CHATROOM_MEMBER_ADDED
+public struct SC_PRIVATE_CHATROOM_MEMBER_ADDED : IPacketFixed
 {
+	/// <summary>Instance ID of the player who joined (offset 0x02)</summary>
 	public long instID;
 }

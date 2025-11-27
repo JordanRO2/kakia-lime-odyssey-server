@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
@@ -6,15 +7,15 @@ namespace kakia_lime_odyssey_packets.Packets.CS;
 /// Client->Server packet to resurrect at current location.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_CS_RESURRECT
-/// Size: 0 bytes (2 bytes with PACKET_FIX header only)
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
 /// Response: SC_RESURRECTED
-/// Sent when player chooses to resurrect in place (e.g., using resurrection stone/skill).
-/// Different from CS_ESCAPE which returns to town.
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_RESURRECT
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_RESURRECT : IPacketFixed
 {
-	// No fields - header-only packet
+	// Header only - no payload
 }

@@ -1,22 +1,31 @@
-﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using kakia_lime_odyssey_packets.Packets.Models;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// IDA Verified: 2025-11-26
-/// Structure: PACKET_SC_INVENTORY_ITEM_LIST @ 9 bytes (header only)
-/// Sends inventory metadata. Actual inventory items are sent in separate packets.
-/// This is a variable-length packet (PACKET_VAR header).
+/// Server->Client packet containing player inventory items.
 /// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_INVENTORY_ITEM_LIST
+/// Size: 9 bytes total (header + fixed fields)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: unsigned __int8 bagNum (1 byte)
+/// - 0x05: int maxCount (4 bytes)
+/// Note: Variable-length array of INVENTORY_ITEM follows
+/// Triggered by: CS_START_GAME, bag open
+/// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SC_INVENTORY_ITEM_LIST
+public struct SC_INVENTORY_ITEM_LIST : IPacketVar
 {
-	public int maxCount;
-	public byte inventoryGrade;
+	/// <summary>Bag number (offset 0x04)</summary>
+	public byte bagNum;
 
-	// Note: Inventory items are sent separately as individual INVENTORY_ITEM packets
-	// The array below is for convenience in the C# implementation
-	public INVENTORY_ITEM[] inventory;
+	/// <summary>Maximum inventory slot count (offset 0x05)</summary>
+	public int maxCount;
+
+	// Note: Variable-length array of INVENTORY_ITEM follows, handled separately
 }

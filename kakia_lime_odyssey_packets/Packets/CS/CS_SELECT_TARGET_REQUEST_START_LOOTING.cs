@@ -1,22 +1,23 @@
-﻿/// <summary>
-/// Client->Server request to select a target and start looting it.
-/// </summary>
-/// <remarks>
-/// IDA Verified: 2025-11-26
-/// IDA Struct: PACKET_CS_SELECT_TARGET_REQUEST_START_LOOTING
-/// Size: 10 bytes (8 bytes + 2 byte PACKET_FIX header)
-/// Fields:
-///   - objInstID: Instance ID of the object to loot (8 bytes at offset 0x02)
-/// Response: SC_LOOTABLE_ITEM_LIST
-/// </remarks>
 using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <summary>
+/// Client->Server request to select a target and start looting it.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_SELECT_TARGET_REQUEST_START_LOOTING
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// Response: SC_LOOTABLE_ITEM_LIST
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct CS_SELECT_TARGET_REQUEST_START_LOOTING : IPacketFixed
 {
-	/// <summary>Instance ID of the object to loot</summary>
+	/// <summary>Instance ID of the object to loot (offset 0x02)</summary>
 	public long objInstID;
 }

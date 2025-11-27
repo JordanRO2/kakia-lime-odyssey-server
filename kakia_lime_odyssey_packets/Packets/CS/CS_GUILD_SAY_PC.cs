@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
@@ -6,19 +7,23 @@ namespace kakia_lime_odyssey_packets.Packets.CS;
 /// Client->Server packet for guild chat message.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_CS_GUILD_SAY_PC
-/// Size: 12 bytes total (4 byte PACKET_VAR header + 4 byte maintainTime + 4 byte type)
-/// Note: Variable length - actual message follows these fixed fields
+/// Size: Variable (12+ bytes with PACKET_VAR header)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: unsigned int maintainTime (4 bytes)
+/// - 0x08: int type (4 bytes)
+/// - 0x0C: variable-length message text
 /// Response: SC_GUILD_SAY (broadcast to guild members)
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct CS_GUILD_SAY_PC
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_GUILD_SAY_PC : IPacketVar
 {
-	/// <summary>Message maintain time (TTL)</summary>
+	/// <summary>Message maintain time (TTL) (offset 0x04)</summary>
 	public uint maintainTime;
 
-	/// <summary>Chat message type</summary>
+	/// <summary>Chat message type (offset 0x08)</summary>
 	public int type;
 
 	// Variable length message data follows (not included in struct)

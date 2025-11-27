@@ -1,17 +1,26 @@
-﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_START_CONTINUOUS_ACTION - Server notifies start of a continuous action (gathering, crafting, etc)
-/// IDA Verification: PACKET_SC_START_CONTINUOUS_ACTION
-/// Size: 14 bytes (2 byte header + 8 byte instID + 4 byte action)
-/// Verified: 2025-11-26
+/// Server->Client notification of continuous action start (gathering, crafting, etc).
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_START_CONTINUOUS_ACTION
+/// Size: 14 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 instID (8 bytes)
+/// - 0x0A: unsigned int action (4 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_START_CONTINUOUS_ACTION : IPacketFixed
 {
+	/// <summary>Object instance ID performing the action (offset 0x02)</summary>
 	public long instID;
+
+	/// <summary>Action type ID (offset 0x0A)</summary>
 	public uint action;
 }

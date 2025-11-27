@@ -1,40 +1,33 @@
-﻿using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_SAY - Local chat message broadcast
-///
-/// IDA Verification Status: VERIFIED (2025-11-26)
-/// IDA Structure Name: PACKET_SC_SAY
-/// IDA Structure Size: 20 bytes (base size, variable message)
-///
-/// IDA Structure Layout:
-/// +0x00: PACKET_VAR (header: ushort, size: ushort) - 4 bytes [handled by framework]
-/// +0x04: objInstID (__int64) - 8 bytes
-/// +0x0C: maintainTime (unsigned int) - 4 bytes
-/// +0x10: type (int) - 4 bytes
-/// +0x14: message (variable length string)
-///
-/// C# Implementation Notes:
-/// - PACKET_VAR header (4 bytes) is stripped by RawPacket.ParsePackets
-/// - objInstID is the sender's object instance ID
-/// - maintainTime specifies message display duration
-/// - type contains message flags/type
-/// - message is a variable-length ASCII string
-/// - Broadcast to nearby players (local/say range)
-///
-/// Type Mappings (IDA -> C#):
-/// - __int64 -> long (objInstID)
-/// - unsigned int -> uint (maintainTime)
-/// - int -> int (type)
-/// - variable string -> string (message)
+/// Server->Client local chat message broadcast.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct SC_SAY
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_SAY
+/// Size: 20 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: __int64 objInstID (8 bytes)
+/// - 0x0C: unsigned int maintainTime (4 bytes)
+/// - 0x10: int type (4 bytes)
+/// Note: Variable-length message string follows
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_SAY : IPacketVar
 {
+	/// <summary>Sender's object instance ID (offset 0x04)</summary>
 	public long objInstID;
+
+	/// <summary>Message display duration (offset 0x0C)</summary>
 	public uint maintainTime;
+
+	/// <summary>Message type/flags (offset 0x10)</summary>
 	public int type;
-	public string message;
+
+	// Variable length message string follows (not included in struct)
 }

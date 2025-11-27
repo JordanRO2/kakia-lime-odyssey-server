@@ -1,23 +1,28 @@
+using kakia_lime_odyssey_packets.Packets.Enums;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
+
+namespace kakia_lime_odyssey_packets.Packets.SC;
+
 /// <summary>
 /// Server->Client login result packet.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_LOGIN_RESULT
-/// Size: 8 bytes (10 with PACKET_FIX header)
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: PACKET_SC_LOGIN_RESULT::RESULT result (4 bytes)
+/// - 0x06: int revision (4 bytes)
 /// Triggered by: CS_LOGIN
 /// </remarks>
-using System.Runtime.InteropServices;
-using kakia_lime_odyssey_packets.Packets.Enums;
-
-namespace kakia_lime_odyssey_packets.Packets.SC;
-
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_LOGIN_RESULT
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_LOGIN_RESULT : IPacketFixed
 {
-	/// <summary>Login result code</summary>
+	/// <summary>Login result code (offset 0x02)</summary>
 	public LOGIN_RESULT result;
 
-	/// <summary>Server revision number (should match client revision 211)</summary>
+	/// <summary>Server revision number, should match client revision 211 (offset 0x06)</summary>
 	public int revision;
 }

@@ -1,31 +1,28 @@
-﻿using kakia_lime_odyssey_packets.Packets.Models;
+﻿using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Models;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
 /// Client sends this packet when the player character jumps.
-/// Contains position, direction, and jump parameters for server-side validation and replication.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_CS_JUMP_PC
-/// Size: 34 bytes (36 bytes with PACKET_FIX header)
-/// IDA Address: Structure ordinal 2475
+/// Size: 36 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: FPOS pos (12 bytes)
+/// - 0x0E: float deltaLookAtRadian (4 bytes)
+/// - 0x12: FPOS dir (12 bytes)
+/// - 0x1E: unsigned int tick (4 bytes)
+/// - 0x22: bool isSwim (1 byte)
+/// - 0x23: char dirType (1 byte)
 /// Response: SC_JUMP_PC
-///
-/// Field Breakdown:
-/// - pos (FPOS, 12 bytes): Current position at jump start (x, y, z)
-/// - deltaLookAtRadian (float, 4 bytes): Change in look-at angle in radians
-/// - dir (FPOS, 12 bytes): Direction vector (x, y, z)
-/// - tick (uint, 4 bytes): Client timestamp for jump synchronization
-/// - isSwim (bool, 1 byte): Whether character is swimming when jumping
-/// - dirType (sbyte/char, 1 byte): Direction type flag
-///
-/// Verified against IDA: 2025-11-26
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct CS_JUMP_PC
+public struct CS_JUMP_PC : IPacketFixed
 {
 	public FPOS pos;
 	public float deltaLookAtRadian;

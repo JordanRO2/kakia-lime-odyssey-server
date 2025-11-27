@@ -1,24 +1,22 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_DELETE_PC - Client to Server character deletion packet
-/// Total size: 3 bytes (including 2-byte PACKET_FIX header)
-/// IDA verified: 2025-11-26
-/// Structure name in client: PACKET_CS_DELETE_PC
+/// Client->Server character deletion packet.
 /// </summary>
 /// <remarks>
-/// This packet is sent when a player deletes a character from their character list.
-/// The charNum field represents the slot number (0-based index) of the character to delete.
-/// Server responds with SC_DELETED_PC on success.
-/// IDA Details:
-/// - Total size: 3 bytes
-/// - Member count: 2 (PACKET_FIX header + charNum)
-/// - Field at offset 0x02: unsigned __int8 charNum
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_DELETE_PC
+/// Size: 3 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned char charNum (1 byte)
+/// Response: SC_DELETED_PC
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct CS_DELETE_PC
+public struct CS_DELETE_PC : IPacketFixed
 {
 	/// <summary>
 	/// Character slot number to delete (0-based index)

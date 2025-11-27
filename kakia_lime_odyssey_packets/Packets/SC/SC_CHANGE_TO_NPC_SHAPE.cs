@@ -4,22 +4,23 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_CHANGE_TO_NPC_SHAPE - Transform entity to NPC appearance
-/// IDA Structure: PACKET_SC_CHANGE_TO_NPC_SHAPE (14 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this when an entity (PC or other) transforms into an NPC appearance.
-/// Used for transformation/disguise mechanics.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// 0x02: __int64 objInstID - entity instance ID being transformed
-/// 0x0A: int modelTypeID - NPC model type ID to transform into
-/// Total: 14 bytes
+/// Server->Client packet to transform entity to NPC appearance.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_CHANGE_TO_NPC_SHAPE
+/// Size: 14 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// - 0x0A: int modelTypeID (4 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_CHANGE_TO_NPC_SHAPE : IPacketFixed
 {
-    public long objInstID;
-    public int modelTypeID;
+	/// <summary>Entity instance ID being transformed (offset 0x02)</summary>
+	public long objInstID;
+
+	/// <summary>NPC model type ID to transform into (offset 0x0A)</summary>
+	public int modelTypeID;
 }

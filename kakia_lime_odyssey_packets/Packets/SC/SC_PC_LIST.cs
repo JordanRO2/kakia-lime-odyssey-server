@@ -1,27 +1,28 @@
-﻿using kakia_lime_odyssey_packets.Packets.Models;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Models;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// Server sends the list of characters for the logged-in account.
-/// Sent immediately after SC_LOGIN_RESULT when login is successful.
-/// Contains count followed by variable-length array of CLIENT_PC structs.
+/// Server->Client packet containing the list of characters for the logged-in account.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_PC_LIST
-/// Size: 5 bytes (1 byte count) + (count * 220 bytes per CLIENT_PC)
-/// Total with header: 5 + (count * 220) bytes
+/// Size: 5 bytes total (header + count)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: unsigned __int8 count (1 byte)
+/// Note: Variable-length array of CLIENT_PC (220 bytes each) follows
 /// Triggered by: CS_LOGIN (after successful authentication)
 /// Handler: CSeparateHandler::sc_pc_list @ 0x5b304c
-/// Note: The packet header (PACKET_VAR) contains size and opcode (4 bytes).
-/// The count field is at offset 4, followed by CLIENT_PC array at offset 5.
-/// Each CLIENT_PC is 220 bytes (68 bytes SAVED_STATUS_PC + 152 bytes APPEARANCE_PC).
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SC_PC_LIST
+public struct SC_PC_LIST : IPacketVar
 {
-    public byte count;
-    public CLIENT_PC[] pc_list;
+	/// <summary>Number of characters in the list (offset 0x04)</summary>
+	public byte count;
+
+	// Note: Variable-length array of CLIENT_PC follows, handled separately
 }

@@ -1,16 +1,20 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// IDA Verification: PACKET_CS_READY
-/// Size: 2 bytes
-/// Structure verified: 2025-11-26
-/// Fields:
-///   +0x00 PACKET_FIX (2 bytes) - packet header (implicit)
-/// No additional fields - this is a header-only packet
+/// Client->Server packet indicating client is ready.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_READY
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_READY
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_READY : IPacketFixed
 {
+	// Header only - no payload
 }

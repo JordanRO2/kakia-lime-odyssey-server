@@ -1,18 +1,21 @@
-/// <summary>
-/// Client->Server request to disband the current party (leader only).
-/// </summary>
-/// <remarks>
-/// IDA Verified: 2025-11-26
-/// IDA Struct: PACKET_CS_PARTY_DISBAND
-/// Size: 0 bytes (2 with PACKET_FIX header)
-/// Response: SC_PARTY_DISBANDED
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_PARTY_DISBAND
+/// <summary>
+/// Client->Server request to disband the current party (leader only).
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_PARTY_DISBAND
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Response: SC_PARTY_DISBANDED
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_PARTY_DISBAND : IPacketFixed
 {
-	// Empty packet - header only
+	// Header only - no payload
 }

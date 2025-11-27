@@ -1,21 +1,21 @@
-﻿using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_REQUEST_TALKING - Continue NPC dialog
-/// IDA Structure: PACKET_CS_REQUEST_TALKING (2 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Client sends this to continue/request next dialog with already selected NPC.
-/// Used when NPC is already targeted (as opposed to CS_SELECT_AND_REQUEST_TALKING).
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// Total: 2 bytes
+/// Client->Server packet to continue NPC dialog.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_REQUEST_TALKING
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_REQUEST_TALKING
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Note: Used when NPC is already targeted
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_REQUEST_TALKING : IPacketFixed
 {
-    // Header only packet - no additional fields
+	// Header only - no payload
 }

@@ -1,26 +1,24 @@
-using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
 using kakia_lime_odyssey_packets.Packets.Models;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_PC_STATUS - Server to Client player character status packet
-/// Total size: 186 bytes (including 2-byte PACKET_FIX header)
-/// IDA verified: 2025-11-26
-/// Structure name in client: PACKET_SC_PC_STATUS
+/// Server->Client packet containing full player character status.
 /// </summary>
 /// <remarks>
-/// This packet is sent to update the client with complete player character status information.
-/// Contains all combat stats, job information, velocities, and other character attributes.
-/// Triggered by: CS_REQUEST_PC_STATUS or automatic status updates
-/// IDA Details:
-/// - Total size: 186 bytes
-/// - Member count: 3 (PACKET_FIX header + objInstID + status)
-/// - Offset 0x02: __int64 objInstID (8 bytes)
-/// - Offset 0x0A: STATUS_PC status (176 bytes)
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_PC_STATUS
+/// Size: 186 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// - 0x0A: STATUS_PC status (176 bytes)
+/// Triggered by: CS_REQUEST_PC_STATUS, status changes
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SC_PC_STATUS
+public struct SC_PC_STATUS : IPacketFixed
 {
 	/// <summary>
 	/// Object instance ID of the player character

@@ -1,15 +1,22 @@
-﻿using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_SELECT_ACTION_TARGET - Client selects a target for action
-/// IDA Verification: PACKET_CS_SELECT_ACTION_TARGET
-/// Size: 10 bytes (2 byte header + 8 byte targetInstID)
-/// Verified: 2025-11-26
+/// Client->Server packet to select a target for action.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_SELECT_ACTION_TARGET
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_SELECT_ACTION_TARGET
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 targetInstID (8 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_SELECT_ACTION_TARGET : IPacketFixed
 {
+	/// <summary>Target instance ID (offset 0x02)</summary>
 	public long targetInstID;
 }

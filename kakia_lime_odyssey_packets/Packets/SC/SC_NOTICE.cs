@@ -1,34 +1,26 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_NOTICE - System notice/announcement message
-///
-/// IDA Verification Status: VERIFIED (2025-11-26)
-/// IDA Structure Name: PACKET_SC_NOTICE
-/// IDA Structure Size: 30 bytes (base size, variable message)
-///
-/// IDA Structure Layout:
-/// +0x00: PACKET_VAR (header: ushort, size: ushort) - 4 bytes [handled by framework]
-/// +0x04: from (char[26]) - 26 bytes
-/// +0x1E: message (variable length string)
-///
-/// C# Implementation Notes:
-/// - PACKET_VAR header (4 bytes) is stripped by RawPacket.ParsePackets
-/// - from is a fixed 26-byte character array for the source/sender name
-/// - message is a variable-length ASCII string
-/// - Used for system announcements and important notices
-///
-/// Type Mappings (IDA -> C#):
-/// - char[26] -> string (from, max 25 chars + null terminator)
-/// - variable string -> string (message)
+/// Server->Client system notice/announcement message.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
-public struct SC_NOTICE
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_NOTICE
+/// Size: 30 bytes total (variable-length packet)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: char[26] from (26 bytes)
+/// Note: Variable-length message string follows
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_NOTICE : IPacketVar
 {
-	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 26)]
-	public string from;
+	/// <summary>Source/sender name (offset 0x04)</summary>
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 26)]
+	public byte[] from;
 
-	public string message;
+	// Variable length message string follows (not included in struct)
 }

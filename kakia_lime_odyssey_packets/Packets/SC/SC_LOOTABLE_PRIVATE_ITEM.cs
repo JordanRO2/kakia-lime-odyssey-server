@@ -1,22 +1,22 @@
-/// <summary>
-/// Server->Client notification that an object has private loot available (loot reserved for specific player).
-/// </summary>
-/// <remarks>
-/// IDA Verified: 2025-11-26
-/// IDA Struct: PACKET_SC_LOOTABLE_PRIVATE_ITEM
-/// Size: 10 bytes (8 bytes + 2 byte PACKET_FIX header)
-/// Fields:
-///   - objInstID: Instance ID of the lootable object with private loot (8 bytes at offset 0x02)
-/// Triggered by: Mob death with private/personal loot enabled
-/// </remarks>
 using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <summary>
+/// Server->Client notification that an object has private loot available.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_LOOTABLE_PRIVATE_ITEM
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_LOOTABLE_PRIVATE_ITEM : IPacketFixed
 {
-	/// <summary>Instance ID of the object with private loot</summary>
+	/// <summary>Instance ID of the object with private loot (offset 0x02)</summary>
 	public long objInstID;
 }

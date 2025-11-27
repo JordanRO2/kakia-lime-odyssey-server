@@ -1,35 +1,29 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_PRIVATE_CHATROOM_ENTERED - Successfully entered private chatroom
-///
-/// IDA Verification Status: VERIFIED (2025-11-26)
-/// IDA Structure Name: PACKET_SC_PRIVATE_CHATROOM_ENTERED
-/// IDA Structure Size: 13 bytes (base size, variable member list)
-///
-/// IDA Structure Layout:
-/// +0x00: PACKET_VAR (header: ushort, size: ushort) - 4 bytes [handled by framework]
-/// +0x04: masterID (__int64) - 8 bytes
-/// +0x0C: type (char) - 1 byte
-/// +0x0D: memberList (variable length data)
-///
-/// C# Implementation Notes:
-/// - PACKET_VAR header (4 bytes) is stripped by RawPacket.ParsePackets
-/// - masterID is the chatroom owner's instance ID
-/// - type is the chatroom type/category
-/// - memberList contains information about current chatroom members (variable length)
-///
-/// Type Mappings (IDA -> C#):
-/// - __int64 -> long (masterID)
-/// - char -> byte (type)
-/// - variable data -> byte[] (memberList)
+/// Server->Client packet when player enters a private chatroom.
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
-public struct SC_PRIVATE_CHATROOM_ENTERED
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_PRIVATE_CHATROOM_ENTERED
+/// Size: 13 bytes total (header + fixed fields)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// - 0x04: __int64 masterID (8 bytes)
+/// - 0x0C: char type (1 byte)
+/// Note: Variable-length member list follows
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_PRIVATE_CHATROOM_ENTERED : IPacketVar
 {
+	/// <summary>Chatroom owner's instance ID (offset 0x04)</summary>
 	public long masterID;
+
+	/// <summary>Chatroom type/category (offset 0x0C)</summary>
 	public byte type;
-	public byte[] memberList;
+
+	// Note: Variable-length member list follows, handled separately
 }

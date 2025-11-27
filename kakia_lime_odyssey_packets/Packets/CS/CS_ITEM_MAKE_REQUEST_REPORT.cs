@@ -1,18 +1,21 @@
-/// <summary>
-/// Client->Server packet to request crafting status report.
-/// </summary>
-/// <remarks>
-/// IDA Verified: Yes (2025-11-26)
-/// IDA Struct: PACKET_CS_ITEM_MAKE_REQUEST_REPORT
-/// Size: 0 bytes (2 with PACKET_FIX header)
-/// Response: SC_ITEM_MAKE_UPDATE_REPORT
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_ITEM_MAKE_REQUEST_REPORT
+/// <summary>
+/// Client->Server packet to request crafting status report.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_ITEM_MAKE_REQUEST_REPORT
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Response: SC_ITEM_MAKE_UPDATE_REPORT
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_ITEM_MAKE_REQUEST_REPORT : IPacketFixed
 {
-	// No fields - header only packet
+	// Header only - no payload
 }

@@ -1,31 +1,22 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_FINISH_USING_STREAM - Entity finishes using a stream
-/// IDA Structure: PACKET_SC_FINISH_USING_STREAM (10 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this when an entity (player, NPC, mob) finishes using a stream ability.
-/// The instID identifies which entity completed the stream action.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header (ushort header)
-/// 0x02: __int64 instID (8 bytes) - instance ID of entity finishing stream
-/// Total: 10 bytes
-///
-/// IDA Analysis:
-/// - Structure name: PACKET_SC_FINISH_USING_STREAM
-/// - Total size: 10 bytes
-/// - Member count: 2 (PACKET_FIX base + instID field)
-/// - Field layout verified:
-///   [0] offset 0x00, size 2, PACKET_FIX (base header)
-///   [1] offset 0x02, size 8, __int64 instID
+/// Server->Client packet indicating an entity finished using a stream.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_FINISH_USING_STREAM
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_FINISH_USING_STREAM
+/// Size: 10 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 instID (8 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_FINISH_USING_STREAM : IPacketFixed
 {
-    /// <summary>Instance ID of the entity finishing stream use</summary>
-    public long instID;
+	/// <summary>Instance ID of the entity finishing stream use (offset 0x02)</summary>
+	public long instID;
 }

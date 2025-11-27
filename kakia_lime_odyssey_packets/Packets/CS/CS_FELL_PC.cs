@@ -1,17 +1,22 @@
-﻿using System.Runtime.InteropServices;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// IDA Verification: PACKET_CS_FELL_PC
-/// Size: 6 bytes
-/// Structure verified: 2025-11-26
-/// Fields:
-///   +0x00 PACKET_FIX (2 bytes) - packet header (implicit)
-///   +0x02 float velocity (4 bytes) - falling velocity
+/// Client->Server packet when player falls/lands.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_FELL_PC
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_FELL_PC
+/// Size: 6 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: float velocity (4 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_FELL_PC : IPacketFixed
 {
+	/// <summary>Falling velocity (offset 0x02)</summary>
 	public float velocity;
 }

@@ -1,19 +1,23 @@
-/// <summary>
-/// Client->Server packet to select a life job.
-/// </summary>
-/// <remarks>
-/// IDA Verified: Yes (2025-11-26)
-/// IDA Struct: PACKET_CS_CHOICED_LIFE_JOB
-/// Size: 1 byte (3 with PACKET_FIX header)
-/// Response: SC_SELECTED_LIFE_JOB
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_CHOICED_LIFE_JOB
+/// <summary>
+/// Client->Server packet to select a life job.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_CHOICED_LIFE_JOB
+/// Size: 3 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: unsigned char index (1 byte)
+/// Response: SC_SELECTED_LIFE_JOB
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_CHOICED_LIFE_JOB : IPacketFixed
 {
-	/// <summary>Index of the life job being selected</summary>
+	/// <summary>Index of the life job being selected (offset 0x02)</summary>
 	public byte index;
 }

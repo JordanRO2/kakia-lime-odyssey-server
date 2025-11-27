@@ -1,17 +1,25 @@
-/// <summary>
-/// Life job status information structure.
-/// </summary>
-/// <remarks>
-/// IDA Verified: Yes (2025-11-26)
-/// IDA Struct: LIFE_JOB_STATUS_
-/// Size: 20 bytes
-/// Note: 3 byte padding between lv and exp fields
-/// </remarks>
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.Common;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <summary>
+/// Life job status information structure.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: LIFE_JOB_STATUS_
+/// Size: 20 bytes
+/// Memory Layout (IDA):
+/// - 0x00: unsigned __int8 lv (1 byte)
+/// - 0x01-0x03: padding (3 bytes)
+/// - 0x04: unsigned int exp (4 bytes)
+/// - 0x08: unsigned __int16 statusPoint (2 bytes)
+/// - 0x0A: unsigned __int16 idea (2 bytes)
+/// - 0x0C: unsigned __int16 mind (2 bytes)
+/// - 0x0E: unsigned __int16 craft (2 bytes)
+/// - 0x10: unsigned __int16 sense (2 bytes)
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct LIFE_JOB_STATUS
 {
 	/// <summary>Life job level</summary>

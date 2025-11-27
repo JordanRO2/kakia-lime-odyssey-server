@@ -4,33 +4,31 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// Server notifies client about mission zone creation progress.
-/// Provides queue position and zone creation statistics.
+/// Server->Client packet notifying mission zone creation progress.
 /// </summary>
 /// <remarks>
-/// IDA Verified: 2025-11-26
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_SC_CREATING_MISSION_ZONE
 /// Size: 18 bytes total
 /// Memory Layout (IDA):
-/// - 0x00: PACKET_FIX header (ushort header) - 2 bytes (handled by IPacketFixed)
-/// - 0x02: int order - 4 bytes (queue position)
-/// - 0x06: int waiting - 4 bytes (number waiting in queue)
-/// - 0x0A: int created - 4 bytes (number of zones created)
-/// - 0x0E: int createLimit - 4 bytes (max zones that can be created)
-/// Triggered by: Mission zone creation request
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: int order (4 bytes)
+/// - 0x06: int waiting (4 bytes)
+/// - 0x0A: int created (4 bytes)
+/// - 0x0E: int createLimit (4 bytes)
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_CREATING_MISSION_ZONE : IPacketFixed
 {
-	/// <summary>Player's position in queue</summary>
+	/// <summary>Player's position in queue (offset 0x02)</summary>
 	public int order;
 
-	/// <summary>Number of players waiting in queue</summary>
+	/// <summary>Number of players waiting in queue (offset 0x06)</summary>
 	public int waiting;
 
-	/// <summary>Number of zones currently created</summary>
+	/// <summary>Number of zones currently created (offset 0x0A)</summary>
 	public int created;
 
-	/// <summary>Maximum number of zones that can be created</summary>
+	/// <summary>Maximum number of zones that can be created (offset 0x0E)</summary>
 	public int createLimit;
 }

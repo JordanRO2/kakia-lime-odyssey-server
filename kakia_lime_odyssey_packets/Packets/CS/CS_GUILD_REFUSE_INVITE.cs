@@ -1,3 +1,4 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
@@ -6,13 +7,15 @@ namespace kakia_lime_odyssey_packets.Packets.CS;
 /// Client->Server packet to refuse a guild invitation.
 /// </summary>
 /// <remarks>
-/// IDA Verified: Yes (2025-11-26)
+/// IDA Verified: Yes (2025-11-27)
 /// IDA Struct: PACKET_CS_GUILD_REFUSE_INVITE
-/// Size: 2 bytes (header only, no payload)
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
 /// Response: None (silent decline)
 /// </remarks>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_GUILD_REFUSE_INVITE
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_GUILD_REFUSE_INVITE : IPacketFixed
 {
-	// Empty payload - header only packet
+	// Header only - no payload
 }

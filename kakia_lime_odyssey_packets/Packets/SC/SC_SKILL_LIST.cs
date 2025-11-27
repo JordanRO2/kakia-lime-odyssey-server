@@ -1,29 +1,24 @@
-﻿using kakia_lime_odyssey_packets.Packets.Models;
+using kakia_lime_odyssey_packets.Packets.Interface;
+using kakia_lime_odyssey_packets.Packets.Models;
+using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_SKILL_LIST - Server sends player's skill list
-/// IDA Verification: 2025-11-26
-/// Structure: PACKET_VAR (header + size) with variable-length SKILL array
-/// IDA Address: Ordinal 2718
-///
-/// IDA Structure (PACKET_SC_SKILL_LIST):
-/// - Size: 4 bytes (base)
-/// - Contains: PACKET_VAR (2 byte header + 2 byte size)
-/// - Variable data: Array of SKILL structs (12 bytes each)
-///
-/// PACKET_VAR fields:
-/// - header: unsigned short (2 bytes) at offset 0x00
-/// - size: unsigned short (2 bytes) at offset 0x02
-///
-/// SKILL struct (defined in Models/SKILL.cs):
-/// - typeID: unsigned int (4 bytes) at offset 0x00
-/// - level: unsigned short (2 bytes) at offset 0x04
-/// - remainCoolTime: unsigned int (4 bytes) at offset 0x08
-/// Total SKILL size: 12 bytes
+/// Server->Client packet containing the player's skill list.
 /// </summary>
-public struct SC_SKILL_LIST
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_SKILL_LIST
+/// Size: 4 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_VAR header (4 bytes) - handled by IPacketVar
+/// Note: Variable-length array of SKILL (12 bytes each) follows
+/// SKILL struct: typeID (4), level (2), padding (2), remainCoolTime (4)
+/// Triggered by: CS_START_GAME, skill changes
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_SKILL_LIST : IPacketVar
 {
-	public List<SKILL> skills;
+	// Note: Variable-length array of SKILL follows, handled separately
 }

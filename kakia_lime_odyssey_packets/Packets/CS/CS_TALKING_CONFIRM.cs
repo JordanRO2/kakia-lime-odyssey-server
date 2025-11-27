@@ -1,20 +1,20 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
 /// <summary>
-/// CS_TALKING_CONFIRM - Confirm NPC dialog
-/// IDA Structure: PACKET_CS_TALKING_CONFIRM (2 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Client sends this when player confirms/proceeds with NPC dialog.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// Total: 2 bytes
+/// Client->Server packet to confirm NPC dialog.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_TALKING_CONFIRM
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_TALKING_CONFIRM
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_TALKING_CONFIRM : IPacketFixed
 {
-    // Header only packet - no additional fields
+	// Header only - no payload
 }

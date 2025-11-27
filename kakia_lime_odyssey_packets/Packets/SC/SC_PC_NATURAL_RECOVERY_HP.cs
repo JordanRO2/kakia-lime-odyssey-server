@@ -1,26 +1,24 @@
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_PC_NATURAL_RECOVERY_HP - Server to Client HP natural recovery packet
-/// Total size: 14 bytes (including 2-byte PACKET_FIX header)
-/// IDA verified: 2025-11-26
-/// Structure name in client: PACKET_SC_PC_NATURAL_RECOVERY_HP
+/// Server->Client packet for natural HP recovery tick.
 /// </summary>
 /// <remarks>
-/// This packet is sent periodically to update the client with natural HP regeneration.
-/// Triggered by: Server-side periodic natural recovery tick
-/// The current field contains the new HP value, difference shows how much was recovered.
-/// IDA Details:
-/// - Total size: 14 bytes
-/// - Member count: 4 (PACKET_FIX header + objInstID + current + difference)
-/// - Offset 0x02: __int64 objInstID (8 bytes)
-/// - Offset 0x0A: unsigned __int16 current (2 bytes)
-/// - Offset 0x0C: unsigned __int16 difference (2 bytes)
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_PC_NATURAL_RECOVERY_HP
+/// Size: 14 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// - 0x0A: unsigned __int16 current (2 bytes)
+/// - 0x0C: unsigned __int16 difference (2 bytes)
+/// Triggered by: Server-side periodic recovery tick
 /// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SC_PC_NATURAL_RECOVERY_HP
+public struct SC_PC_NATURAL_RECOVERY_HP : IPacketFixed
 {
 	/// <summary>
 	/// Object instance ID of the player character

@@ -1,22 +1,27 @@
-/// <summary>
-/// Server->Client packet confirming life job selection.
-/// </summary>
-/// <remarks>
-/// IDA Verified: Yes (2025-11-26)
-/// IDA Struct: PACKET_SC_SELECTED_LIFE_JOB
-/// Size: 9 bytes (11 with PACKET_FIX header)
-/// Triggered by: CS_CHOICED_LIFE_JOB
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct SC_SELECTED_LIFE_JOB
+/// <summary>
+/// Server->Client packet confirming life job selection.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_SELECTED_LIFE_JOB
+/// Size: 11 bytes total
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// - 0x02: __int64 objInstID (8 bytes)
+/// - 0x0A: char jobTypeID (1 byte)
+/// Triggered by: CS_CHOICED_LIFE_JOB
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct SC_SELECTED_LIFE_JOB : IPacketFixed
 {
-	/// <summary>Instance ID of the character selecting the job</summary>
+	/// <summary>Instance ID of the character selecting the job (offset 0x02)</summary>
 	public long objInstID;
 
-	/// <summary>Selected life job type ID (signed byte in IDA but likely job enum)</summary>
+	/// <summary>Selected life job type ID (offset 0x0A)</summary>
 	public sbyte jobTypeID;
 }

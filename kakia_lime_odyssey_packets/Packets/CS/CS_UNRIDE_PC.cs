@@ -1,19 +1,21 @@
-/// <summary>
-/// Client->Server packet to dismount from a mount/pet.
-/// </summary>
-/// <remarks>
-/// IDA Verified: 2025-11-26
-/// IDA Struct: PACKET_CS_UNRIDE_PC
-/// Size: 2 bytes (PACKET_FIX header only)
-/// Response: SC_UNRIDE_PC
-/// This packet contains no additional fields beyond the header.
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
+/// <summary>
+/// Client->Server packet to dismount from a mount/pet.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_UNRIDE_PC
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// Response: SC_UNRIDE_PC
+/// </remarks>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct CS_UNRIDE_PC
+public struct CS_UNRIDE_PC : IPacketFixed
 {
-	// No additional fields - header only packet
+	// Header only - no payload
 }

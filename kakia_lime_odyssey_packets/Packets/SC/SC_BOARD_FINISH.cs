@@ -4,18 +4,17 @@ using System.Runtime.InteropServices;
 namespace kakia_lime_odyssey_packets.Packets.SC;
 
 /// <summary>
-/// SC_BOARD_FINISH - Quest board closed
-/// IDA Structure: PACKET_SC_BOARD_FINISH (2 bytes)
-/// Verified against IDA Pro: 2025-11-26
-///
-/// Server sends this to close the quest board UI on the client.
-///
-/// Structure layout:
-/// 0x00: PACKET_FIX (2 bytes) - base packet header
-/// Total: 2 bytes
+/// Server->Client packet indicating quest board UI should close.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_SC_BOARD_FINISH
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct SC_BOARD_FINISH : IPacketFixed
 {
-    // Header only packet - no additional fields
+	// Empty packet - header only
 }

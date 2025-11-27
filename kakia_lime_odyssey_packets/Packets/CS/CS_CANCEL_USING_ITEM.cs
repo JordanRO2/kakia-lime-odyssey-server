@@ -1,17 +1,20 @@
-/// <summary>
-/// Client->Server packet to cancel item usage.
-/// </summary>
-/// <remarks>
-/// IDA Verified: Yes (2025-11-26)
-/// IDA Struct: PACKET_CS_CANCEL_USING_ITEM
-/// Size: 0 bytes (2 with PACKET_FIX header)
-/// </remarks>
+using kakia_lime_odyssey_packets.Packets.Interface;
 using System.Runtime.InteropServices;
 
 namespace kakia_lime_odyssey_packets.Packets.CS;
 
-[StructLayout(LayoutKind.Sequential, Pack = 2)]
-public struct CS_CANCEL_USING_ITEM
+/// <summary>
+/// Client->Server packet to cancel item usage.
+/// </summary>
+/// <remarks>
+/// IDA Verified: Yes (2025-11-27)
+/// IDA Struct: PACKET_CS_CANCEL_USING_ITEM
+/// Size: 2 bytes total (header only)
+/// Memory Layout (IDA):
+/// - 0x00: PACKET_FIX header (2 bytes) - handled by IPacketFixed
+/// </remarks>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct CS_CANCEL_USING_ITEM : IPacketFixed
 {
 	// Header only - no payload
 }
