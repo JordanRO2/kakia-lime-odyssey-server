@@ -234,7 +234,7 @@ public class LimeServer : SocketServer
 
 	public override void OnConnect(SocketClient s)
 	{
-		s.UseCrypto = Config.Crypto;
+		s.UseCrypto = true;
 		var pc = new PlayerClient(s);
 		pc.SendGlobal += SendGlobal;
 		pc.RequestZonePresence += LoadOthersInZone;
