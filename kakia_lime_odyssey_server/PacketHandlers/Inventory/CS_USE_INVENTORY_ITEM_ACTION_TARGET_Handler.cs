@@ -28,9 +28,6 @@ class CS_USE_INVENTORY_ITEM_ACTION_TARGET_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ITEM] {playerName} using item at slot {packet.slot} on target", LogLevel.Debug);
 
-		// TODO: Get item from slot
-		// TODO: Get current target
-		// TODO: Apply item effect to target
-		// TODO: Consume item if applicable
+		LimeServer.ItemService.UseItemOnCurrentTarget(pc, packet.slot);
 	}
 }

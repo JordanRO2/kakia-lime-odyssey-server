@@ -5,6 +5,7 @@
 /// Handles skill learning from NPCs, skill point distribution, and skill level ups.
 /// Uses: MongoDBService for skill persistence, SkillDB for skill definitions
 /// </remarks>
+using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
@@ -17,10 +18,23 @@ using kakia_lime_odyssey_server.Network;
 namespace kakia_lime_odyssey_server.Services.Skill;
 
 /// <summary>
+/// Represents an active skill cast in progress.
+/// </summary>
+public class ActiveCast
+{
+	public uint SkillTypeId { get; set; }
+	public long TargetId { get; set; }
+	public DateTime StartTime { get; set; }
+	public int CastTimeMs { get; set; }
+}
+
+/// <summary>
 /// Service for managing player skill learning and progression.
 /// </summary>
 public class SkillService
 {
+	/// <summary>Tracks active skill casts per player</summary>
+	private readonly ConcurrentDictionary<long, ActiveCast> _activeCasts = new();
 	/// <summary>
 	/// Attempts to learn a new skill for a player.
 	/// </summary>
@@ -246,5 +260,83 @@ public class SkillService
 		MongoDBService.Instance.SavePlayerSkills(accountId, charName, playerSkills);
 
 		Logger.Log($"[SKILL] {charName} gained {points} skill points (total: {playerSkills.SkillPoints})", LogLevel.Debug);
+	}
+
+	// ============ SKILL CASTING ============
+
+	/// <summary>
+	/// Starts a skill cast for a player.
+	/// </summary>
+	public void StartCast(PlayerClient pc, uint skillTypeId, long targetId, int castTimeMs)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		var cast = new ActiveCast
+		{
+			SkillTypeId = skillTypeId,
+			TargetId = targetId,
+			StartTime = DateTime.Now,
+			CastTimeMs = castTimeMs
+		};
+
+		_activeCasts[playerId] = cast;
+
+		Logger.Log($"[SKILL] {playerName} started casting skill {skillTypeId}", LogLevel.Debug);
+	}
+
+	/// <summary>
+	/// Cancels any active skill cast for a player.
+	/// </summary>
+	public void CancelCast(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		if (_activeCasts.TryRemove(playerId, out var cast))
+		{
+			Logger.Log($"[SKILL] {playerName} canceled casting skill {cast.SkillTypeId}", LogLevel.Debug);
+		}
+	}
+
+	/// <summary>
+	/// Gets the active cast for a player if any.
+	/// </summary>
+	public ActiveCast? GetActiveCast(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		return _activeCasts.TryGetValue(playerId, out var cast) ? cast : null;
+	}
+
+	/// <summary>
+	/// Checks if a player is currently casting.
+	/// </summary>
+	public bool IsCasting(PlayerClient pc)
+	{
+		return _activeCasts.ContainsKey(pc.GetId());
+	}
+
+	/// <summary>
+	/// Completes a skill cast (called when cast time finishes).
+	/// </summary>
+	public void CompleteCast(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+
+		if (_activeCasts.TryRemove(playerId, out var cast))
+		{
+			string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+			Logger.Log($"[SKILL] {playerName} completed casting skill {cast.SkillTypeId}", LogLevel.Debug);
+
+			// The actual skill effect is applied by the combat system when the cast completes
+		}
+	}
+
+	/// <summary>
+	/// Cleans up casting state for a player (on disconnect).
+	/// </summary>
+	public void CleanupPlayer(long playerId)
+	{
+		_activeCasts.TryRemove(playerId, out _);
 	}
 }

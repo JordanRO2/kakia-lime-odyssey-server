@@ -27,7 +27,6 @@ class CS_NOTICE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[NOTICE] {playerName} sent notice: {message}", LogLevel.Information);
 
-		// TODO: Check if player has GM permissions
-		// TODO: Broadcast SC_NOTICE to all players
+		LimeServer.ChatroomService.SendServerNotice(pc, message);
 	}
 }

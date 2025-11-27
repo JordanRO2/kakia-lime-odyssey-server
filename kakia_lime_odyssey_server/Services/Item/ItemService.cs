@@ -468,5 +468,98 @@ public class ItemService
 	public void CleanupPlayerComposition(long playerId)
 	{
 		_activeCompositions.TryRemove(playerId, out _);
+		_activeItemUsage.TryRemove(playerId, out _);
+	}
+
+	// ============ ITEM INFO ============
+
+	/// <summary>
+	/// Gets detailed item information for a slot and sends to client.
+	/// </summary>
+	public void GetSlotItemInfo(PlayerClient pc, int slotType, int slotIndex)
+	{
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		Models.Item? item = null;
+
+		// slotType determines where to look
+		// 0 = inventory, 1 = equipment, 2 = bank, etc.
+		switch (slotType)
+		{
+			case 0: // Inventory
+				var inventory = pc.GetInventory();
+				item = inventory.AtSlot(slotIndex) as Models.Item;
+				break;
+			case 1: // Combat equipment
+				var combatEquip = pc.GetEquipment(true);
+				item = combatEquip.GetItemInSlot((EQUIP_SLOT)slotIndex) as Models.Item;
+				break;
+			case 2: // Life equipment
+				var lifeEquip = pc.GetEquipment(false);
+				item = lifeEquip.GetItemInSlot((EQUIP_SLOT)slotIndex) as Models.Item;
+				break;
+		}
+
+		if (item == null)
+		{
+			Logger.Log($"[ITEM] {playerName} slot info: no item at type {slotType} index {slotIndex}", LogLevel.Debug);
+			return;
+		}
+
+		Logger.Log($"[ITEM] {playerName} requesting info for {item.Name}", LogLevel.Debug);
+
+		// Send SC_SLOT_ITEM_INFO
+		using PacketWriter pw = new();
+		pw.Writer.Write((ushort)PacketType.SC_SLOT_ITEM_INFO);
+		pw.Writer.Write(item.Id);
+		pw.Writer.Write(item.Name ?? "Unknown");
+		pw.Writer.Write(item.Desc ?? "");
+		pw.Writer.Write(item.Grade);
+		pw.Writer.Write(item.Type);
+		pw.Writer.Write(item.Price);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	// ============ ITEM USAGE CANCELLATION ============
+
+	/// <summary>Tracks active item usage per player</summary>
+	private readonly ConcurrentDictionary<long, int> _activeItemUsage = new();
+
+	/// <summary>
+	/// Starts an item usage that can be canceled (e.g., consumables with cast time).
+	/// </summary>
+	public void StartItemUsage(PlayerClient pc, int slot)
+	{
+		long playerId = pc.GetId();
+		_activeItemUsage[playerId] = slot;
+	}
+
+	/// <summary>
+	/// Cancels any pending item usage.
+	/// </summary>
+	public void CancelItemUsage(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		if (_activeItemUsage.TryRemove(playerId, out int slot))
+		{
+			Logger.Log($"[ITEM] {playerName} canceled item usage from slot {slot}", LogLevel.Debug);
+		}
+	}
+
+	/// <summary>
+	/// Uses an item on the player's current target.
+	/// </summary>
+	public void UseItemOnCurrentTarget(PlayerClient pc, int slot)
+	{
+		long targetId = pc.GetCurrentTarget();
+		if (targetId == 0)
+		{
+			Logger.Log("[ITEM] UseItemOnCurrentTarget failed: No target selected", LogLevel.Debug);
+			return;
+		}
+
+		UseItemOnObject(pc, slot, targetId);
 	}
 }

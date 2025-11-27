@@ -25,18 +25,8 @@ class CS_REQUEST_BOARD_QUESTS_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[QUEST] {playerName} requesting quest board list", LogLevel.Debug);
 
-		// TODO: Get quest board quests from selected target
-		// For now send empty list
-		SendBoardQuests(pc);
-	}
-
-	private static void SendBoardQuests(PlayerClient pc)
-	{
-		// SC_BOARD_QUESTS is a variable packet - send empty list for now
-		SC_BOARD_QUESTS response = new();
-
-		using PacketWriter pw = new();
-		pw.Write(response);
-		pc.Send(pw.ToSizedPacket(), default).Wait();
+		// Get current target as quest board and request quests
+		long boardId = pc.GetCurrentTarget();
+		LimeServer.QuestService.GetBoardQuests(pc, boardId);
 	}
 }

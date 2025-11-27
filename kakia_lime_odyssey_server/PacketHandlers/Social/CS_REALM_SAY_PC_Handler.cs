@@ -29,7 +29,6 @@ class CS_REALM_SAY_PC_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CHAT:REALM] {playerName}: {message}", LogLevel.Debug);
 
-		// TODO: Get player's realm/faction
-		// TODO: Broadcast SC_REALM_SAY to all realm members
+		LimeServer.ChatroomService.SendRealmChat(pc, message, chat.maintainTime, chat.type);
 	}
 }

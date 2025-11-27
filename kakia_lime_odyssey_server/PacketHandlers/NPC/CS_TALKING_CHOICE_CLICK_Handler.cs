@@ -30,21 +30,8 @@ class CS_TALKING_CHOICE_CLICK_Handler : PacketHandler
 
 		Logger.Log($"[NPC] {playerName} selected dialog choice {choice.choiceNum} with NPC {targetId}", LogLevel.Debug);
 
-		// TODO: Process the choice - this would typically:
-		// - Advance quest state
-		// - Open shop window
-		// - Start crafting
-		// - Trigger other NPC actions
-
-		// For now, send a default response
-		SC_TALKING talking = new()
-		{
-			objInstID = targetId,
-			dialog = $"You selected option {choice.choiceNum}. This feature is not yet implemented."
-		};
-
-		using PacketWriter pw = new();
-		pw.Write(talking);
-		pc.Send(pw.ToSizedPacket(), default).Wait();
+		// Process the dialog choice through the NPC interaction system
+		// This can advance quests, open shops, start crafting, etc.
+		LimeServer.QuestService.ProcessDialogChoice(pc, targetId, choice.choiceNum);
 	}
 }

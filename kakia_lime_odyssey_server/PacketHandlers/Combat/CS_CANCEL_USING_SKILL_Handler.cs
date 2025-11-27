@@ -24,10 +24,6 @@ class CS_CANCEL_USING_SKILL_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMBAT] {playerName} canceling skill cast", LogLevel.Debug);
 
-		// TODO: Cancel any pending skill cast
-		// TODO: Clear casting state
-		// TODO: Notify nearby players if needed
-
-		Logger.Log($"[COMBAT] {playerName} skill cast canceled", LogLevel.Debug);
+		LimeServer.SkillService.CancelCast(pc);
 	}
 }

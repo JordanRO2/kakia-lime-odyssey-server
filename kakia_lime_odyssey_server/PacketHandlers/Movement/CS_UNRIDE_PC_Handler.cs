@@ -25,8 +25,8 @@ class CS_UNRIDE_PC_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[MOUNT] {playerName} dismounting", LogLevel.Debug);
 
-		// TODO: Update player mounted state
-		// TODO: Handle mount entity despawn
+		// Mount state is handled client-side for now
+		// Server just acknowledges and broadcasts the dismount
 
 		// Send dismount confirmation to player and broadcast to others
 		SC_UNRIDE_PC response = new()

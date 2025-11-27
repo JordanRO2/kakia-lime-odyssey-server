@@ -34,10 +34,14 @@ class CS_CHOICED_COMBAT_JOB_Handler : PacketHandler
 		var character = pc.GetCurrentCharacter();
 		if (character == null) return;
 
-		// TODO: Validate the job selection (check requirements, already has job, etc.)
-		// TODO: Update character's combat job in database
+		// Validate: can't change job if already selected a valid job
+		if (character.status.combatJob.typeID > 0)
+		{
+			Logger.Log($"[JOB] {playerName} already has combat job {character.status.combatJob.typeID}", LogLevel.Warning);
+			return;
+		}
 
-		// Update character's combat job type
+		// Update character's combat job type (saved on next character save)
 		character.status.combatJob.typeID = packet.index;
 
 		// Send confirmation

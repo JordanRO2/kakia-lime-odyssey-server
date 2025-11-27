@@ -1,3 +1,10 @@
+/// <summary>
+/// Handles CS_GUILD_REQUEST_JOIN packet - player requests to join a guild by name.
+/// </summary>
+/// <remarks>
+/// Triggered by: Player requesting to join a guild
+/// Response packets: SC_GUILD_INFO (if open recruitment), SC_GUILD_INVITED (to leader if requires approval)
+/// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
@@ -30,8 +37,11 @@ class CS_GUILD_REQUEST_JOIN_Handler : PacketHandler
 
 		Logger.Log($"[GUILD] {playerName} requesting to join guild '{guildName}'", LogLevel.Debug);
 
-		// Note: This requires guild request system implementation
-		// For now, log and ignore
-		Logger.Log($"[GUILD] Guild join requests not yet implemented", LogLevel.Warning);
+		var result = LimeServer.GuildService.RequestJoin(pc, guildName);
+
+		if (!result.Success)
+		{
+			Logger.Log($"[GUILD] Failed to request join: {result.Error} - {result.Message}", LogLevel.Debug);
+		}
 	}
 }

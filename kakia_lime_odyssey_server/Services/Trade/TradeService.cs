@@ -5,19 +5,38 @@
 /// Handles buying items from and selling items to NPC merchants.
 /// Uses: PlayerInventory for item access, ItemDB for item definitions and prices
 /// </remarks>
+using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Entities.Npcs;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Trade;
+
+/// <summary>
+/// Represents an item that was sold and can be bought back.
+/// </summary>
+public class SoldItem
+{
+	public int ItemTypeId { get; set; }
+	public string Name { get; set; } = "";
+	public long Count { get; set; }
+	public long SellPrice { get; set; }
+	public DateTime SoldAt { get; set; }
+}
 
 /// <summary>
 /// Service for managing NPC merchant buy/sell transactions.
 /// </summary>
 public class TradeService
 {
+	/// <summary>Tracks recently sold items per player for buyback</summary>
+	private readonly ConcurrentDictionary<long, List<SoldItem>> _soldItems = new();
+
+	/// <summary>Maximum items to keep in sold list per player</summary>
+	private const int MaxSoldItems = 20;
 	/// <summary>
 	/// Processes a buy request from NPC merchant.
 	/// </summary>
@@ -224,5 +243,215 @@ public class TradeService
 		using PacketWriter pw = new();
 		pw.Write(packet);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	// ============ NPC TRADE WINDOW ============
+
+	/// <summary>
+	/// Opens trade window with currently selected NPC.
+	/// </summary>
+	public void OpenTradeWithCurrentTarget(PlayerClient pc)
+	{
+		long targetId = pc.GetCurrentTarget();
+		if (targetId == 0)
+		{
+			Logger.Log("[TRADE] OpenTrade failed: No target selected", LogLevel.Debug);
+			return;
+		}
+
+		OpenTradeWithNpc(pc, targetId);
+	}
+
+	/// <summary>
+	/// Opens trade window with specific NPC.
+	/// </summary>
+	public void OpenTradeWithNpc(PlayerClient pc, long npcInstId)
+	{
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		// Find NPC in zone
+		Npc? npc = null;
+		uint zone = pc.GetZone();
+		if (LimeServer.Npcs.TryGetValue(zone, out var npcsInZone))
+		{
+			npc = npcsInZone.FirstOrDefault(n => n.Id == npcInstId);
+		}
+
+		if (npc == null)
+		{
+			Logger.Log($"[TRADE] {playerName} failed to open trade: NPC {npcInstId} not found", LogLevel.Debug);
+			return;
+		}
+
+		// Set as current target
+		pc.SetCurrentTarget(npcInstId);
+
+		Logger.Log($"[TRADE] {playerName} opened trade with NPC {npc.Appearance.typeID}", LogLevel.Debug);
+
+		// Send trade description packet with NPC shop items
+		// TODO: Load shop items from NPC definition when shop system is implemented
+		SendTradeDesc(pc, npc);
+	}
+
+	/// <summary>
+	/// Sends SC_TRADE_DESC packet with NPC shop information.
+	/// </summary>
+	private void SendTradeDesc(PlayerClient pc, Npc npc)
+	{
+		// For now, send a basic trade description
+		// TODO: Implement actual shop inventory lookup based on NPC type
+		using PacketWriter pw = new();
+		pw.Writer.Write((ushort)PacketType.SC_TRADE_DESC);
+		pw.Writer.Write((long)npc.Id); // NPC instance ID
+		pw.Writer.Write((int)npc.Appearance.typeID); // NPC type ID
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	// ============ SOLD ITEMS BUYBACK ============
+
+	/// <summary>
+	/// Adds an item to the sold items list for potential buyback.
+	/// </summary>
+	private void AddToSoldItems(PlayerClient pc, Models.Item item, long count, long sellPrice)
+	{
+		long playerId = pc.GetId();
+
+		var soldItem = new SoldItem
+		{
+			ItemTypeId = item.Id,
+			Name = item.Name,
+			Count = count,
+			SellPrice = sellPrice,
+			SoldAt = DateTime.Now
+		};
+
+		if (!_soldItems.ContainsKey(playerId))
+		{
+			_soldItems[playerId] = new List<SoldItem>();
+		}
+
+		var list = _soldItems[playerId];
+		list.Add(soldItem);
+
+		// Keep only the most recent items
+		while (list.Count > MaxSoldItems)
+		{
+			list.RemoveAt(0);
+		}
+	}
+
+	/// <summary>
+	/// Gets the list of recently sold items for buyback.
+	/// </summary>
+	public void GetSoldItems(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		var soldItems = _soldItems.TryGetValue(playerId, out var list) ? list : new List<SoldItem>();
+
+		Logger.Log($"[TRADE] {playerName} requesting sold items list ({soldItems.Count} items)", LogLevel.Debug);
+
+		// Send SC_SOLD_ITEM_LIST packet
+		using PacketWriter pw = new();
+		pw.Writer.Write((ushort)PacketType.SC_SOLD_ITEM_LIST);
+		pw.Writer.Write(soldItems.Count);
+
+		foreach (var item in soldItems)
+		{
+			pw.Writer.Write(item.ItemTypeId);
+			pw.Writer.Write(item.Count);
+			pw.Writer.Write(item.SellPrice);
+		}
+
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Buys back all recently sold items.
+	/// </summary>
+	public void BuyBackSoldItems(PlayerClient pc)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		if (!_soldItems.TryGetValue(playerId, out var soldItems) || soldItems.Count == 0)
+		{
+			Logger.Log($"[TRADE] {playerName} has no items to buy back", LogLevel.Debug);
+			return;
+		}
+
+		// Calculate total cost
+		long totalCost = soldItems.Sum(i => i.SellPrice);
+
+		// TODO: Check if player has enough gold when currency system is implemented
+
+		var inventory = pc.GetInventory();
+		int itemsReturned = 0;
+
+		foreach (var soldItem in soldItems.ToList())
+		{
+			// Find empty slot
+			int targetSlot = -1;
+			for (int i = 1; i <= 96; i++)
+			{
+				if (inventory.AtSlot(i) == null)
+				{
+					targetSlot = i;
+					break;
+				}
+			}
+
+			if (targetSlot < 0)
+			{
+				Logger.Log($"[TRADE] {playerName} ran out of inventory space during buyback", LogLevel.Debug);
+				break;
+			}
+
+			// Get item definition
+			var itemDef = LimeServer.ItemDB.FirstOrDefault(i => i.Id == soldItem.ItemTypeId);
+			if (itemDef == null) continue;
+
+			// Create item
+			var newItem = new Models.Item
+			{
+				Id = itemDef.Id,
+				ModelId = itemDef.ModelId,
+				Name = itemDef.Name,
+				Desc = itemDef.Desc,
+				Grade = itemDef.Grade,
+				Type = itemDef.Type,
+				SecondType = itemDef.SecondType,
+				Level = itemDef.Level,
+				Price = itemDef.Price,
+				Inherits = itemDef.Inherits ?? new List<Models.Inherit>()
+			};
+			newItem.UpdateAmount((ulong)soldItem.Count);
+
+			inventory.AddItem(newItem, targetSlot);
+			itemsReturned++;
+		}
+
+		// Clear sold items
+		soldItems.Clear();
+
+		Logger.Log($"[TRADE] {playerName} bought back {itemsReturned} items for {totalCost} Peder", LogLevel.Information);
+
+		// Send confirmation
+		using PacketWriter pw = new();
+		pw.Writer.Write((ushort)PacketType.SC_TRADE_BOUGHT_SOLD_ITEMS);
+		pw.Writer.Write(itemsReturned);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+
+		// Update inventory
+		pc.SendInventory();
+	}
+
+	/// <summary>
+	/// Cleans up sold items for a player (on disconnect or after time expires).
+	/// </summary>
+	public void CleanupPlayer(long playerId)
+	{
+		_soldItems.TryRemove(playerId, out _);
 	}
 }

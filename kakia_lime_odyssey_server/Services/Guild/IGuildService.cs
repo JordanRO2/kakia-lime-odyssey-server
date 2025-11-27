@@ -21,6 +21,9 @@ public interface IGuildService
 	GuildResult AcceptInvitation(PlayerClient player);
 	void DeclineInvitation(PlayerClient player);
 
+	// Join request system
+	GuildResult RequestJoin(PlayerClient requester, string guildName);
+
 	// Member management
 	bool LeaveGuild(PlayerClient player);
 	bool KickMember(PlayerClient leader, uint memberIdx);
@@ -217,6 +220,7 @@ public enum GuildError
 	None,
 	AlreadyInGuild,
 	GuildFull,
+	GuildNotFound,
 	NotInGuild,
 	NotGuildLeader,
 	NotEnoughPermission,

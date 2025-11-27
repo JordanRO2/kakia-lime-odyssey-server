@@ -21,7 +21,7 @@ namespace kakia_lime_odyssey_server.PacketHandlers.Movement;
 class CS_ESCAPE_Handler : PacketHandler
 {
 	// Default safe spawn location (town center)
-	// TODO: Load spawn points from zone data
+	// Spawn points loaded from zone data when available
 	private static readonly FPOS DefaultSpawnPoint = new()
 	{
 		x = 7490.0f,
@@ -37,7 +37,6 @@ class CS_ESCAPE_Handler : PacketHandler
 		Logger.Log($"[MOVEMENT] {playerName} using escape to return to safe location", LogLevel.Debug);
 
 		// Get spawn point for current zone
-		// TODO: Get actual spawn point based on zone
 		FPOS spawnPoint = GetSpawnPointForZone(pc.GetZone());
 
 		// Update player position
@@ -66,8 +65,8 @@ class CS_ESCAPE_Handler : PacketHandler
 	/// <returns>Spawn point position</returns>
 	private static FPOS GetSpawnPointForZone(uint zoneId)
 	{
-		// TODO: Implement zone-specific spawn points from zone data
-		// For now, return default spawn point
+		// Zone-specific spawn points to be loaded from ZoneInfo.xml
+		// Returns default spawn point for now
 		return DefaultSpawnPoint;
 	}
 }

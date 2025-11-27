@@ -24,7 +24,8 @@ class CS_TALKING_CANCEL_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[NPC] {playerName} cancelled dialog", LogLevel.Debug);
 
-		// TODO: Clean up any dialog state
-		// The client handles closing the dialog window
+		// Client handles closing the dialog window
+		// Server clears any active dialog state when needed
+		pc.SetCurrentTarget(0);
 	}
 }

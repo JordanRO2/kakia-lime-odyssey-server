@@ -288,4 +288,91 @@ public class ChatroomService
 
 		player.Send(pw.ToSizedPacket(PacketType.SC_PRIVATE_CHATROOM_SAY), default).Wait();
 	}
+
+	// ============ REALM-WIDE CHAT ============
+
+	/// <summary>
+	/// Sends a realm-wide chat message to all connected players.
+	/// </summary>
+	/// <param name="sender">The player sending the message</param>
+	/// <param name="message">The chat message text</param>
+	/// <param name="maintainTime">Display duration in milliseconds</param>
+	/// <param name="type">Message type flags</param>
+	public void SendRealmChat(PlayerClient sender, string message, uint maintainTime, int type)
+	{
+		long senderId = sender.GetId();
+		string senderName = sender.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		foreach (var player in LimeServer.PlayerClients)
+		{
+			SendRealmSay(player, senderId, message, maintainTime, type);
+		}
+
+		Logger.Log($"[CHAT:REALM] {senderName}: {message}", LogLevel.Debug);
+	}
+
+	private static void SendRealmSay(PlayerClient player, long senderId, string message, uint maintainTime, int type)
+	{
+		using PacketWriter pw = new();
+
+		pw.Write(senderId);
+		pw.Write(maintainTime);
+		pw.Write(type);
+		var msgBytes = Encoding.ASCII.GetBytes(message);
+		pw.Write(msgBytes);
+		pw.Write((byte)0);
+
+		player.Send(pw.ToSizedPacket(PacketType.SC_REALM_SAY), default).Wait();
+	}
+
+	// ============ SERVER NOTICES ============
+
+	/// <summary>
+	/// Sends a server notice to all connected players.
+	/// </summary>
+	/// <param name="sender">The player/GM sending the notice (null for system)</param>
+	/// <param name="message">The notice message text</param>
+	/// <returns>True if the notice was sent (GM permission check passed)</returns>
+	public bool SendServerNotice(PlayerClient? sender, string message)
+	{
+		string from = "System";
+
+		if (sender != null)
+		{
+			// Check GM permission (account level > 0)
+			var account = sender.GetAccount();
+			if (account == null || account.AccessLevel <= 0)
+			{
+				Logger.Log($"[NOTICE] Non-GM player attempted to send notice", LogLevel.Warning);
+				return false;
+			}
+			from = sender.GetCurrentCharacter()?.appearance.name ?? "GM";
+		}
+
+		foreach (var player in LimeServer.PlayerClients)
+		{
+			SendNotice(player, from, message);
+		}
+
+		Logger.Log($"[NOTICE] {from}: {message}", LogLevel.Information);
+		return true;
+	}
+
+	private static void SendNotice(PlayerClient player, string from, string message)
+	{
+		using PacketWriter pw = new();
+
+		// Write fixed 26-byte 'from' field
+		var fromBytes = Encoding.ASCII.GetBytes(from);
+		var fromBuffer = new byte[26];
+		Array.Copy(fromBytes, fromBuffer, Math.Min(fromBytes.Length, 25));
+		pw.Write(fromBuffer);
+
+		// Write variable-length message
+		var msgBytes = Encoding.ASCII.GetBytes(message);
+		pw.Write(msgBytes);
+		pw.Write((byte)0);
+
+		player.Send(pw.ToSizedPacket(PacketType.SC_NOTICE), default).Wait();
+	}
 }

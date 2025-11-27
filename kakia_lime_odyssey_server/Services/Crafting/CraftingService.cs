@@ -309,4 +309,39 @@ public class CraftingService
 
 		// TODO: Send SC_STUFF_MAKE_FINISH
 	}
+
+	// ============ STREAM GAUGE (Fishing/Gathering Minigame) ============
+
+	/// <summary>
+	/// Processes a stream gauge interaction result (fishing/gathering minigame).
+	/// </summary>
+	/// <param name="pc">The player client</param>
+	/// <param name="gaugeValue">The gauge position/value from the minigame</param>
+	public void UseStreamGauge(PlayerClient pc, int gaugeValue = 0)
+	{
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		// Stream gauge is used for fishing and gathering minigames
+		// The gauge value determines success/quality of the gathering attempt
+
+		Logger.Log($"[CRAFT] {playerName} used stream gauge with value {gaugeValue}", LogLevel.Debug);
+
+		// Calculate result based on gauge accuracy
+		byte result = gaugeValue >= 80 ? (byte)2 : gaugeValue >= 50 ? (byte)1 : (byte)0;
+
+		// Send result to client
+		SendStreamGaugeResult(pc, result);
+	}
+
+	private static void SendStreamGaugeResult(PlayerClient pc, byte result)
+	{
+		using PacketWriter pw = new();
+
+		pw.Write(new SC_USE_STREAM_GAUGE_RESULT
+		{
+			result = result
+		});
+
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
 }

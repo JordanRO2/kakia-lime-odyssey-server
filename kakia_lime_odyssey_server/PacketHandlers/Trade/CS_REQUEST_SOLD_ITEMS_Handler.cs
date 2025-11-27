@@ -24,7 +24,6 @@ class CS_REQUEST_SOLD_ITEMS_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} requesting sold items list", LogLevel.Debug);
 
-		// TODO: Get list of recently sold items for this player
-		// TODO: Send SC_SOLD_ITEM_LIST
+		LimeServer.TradeService.GetSoldItems(pc);
 	}
 }

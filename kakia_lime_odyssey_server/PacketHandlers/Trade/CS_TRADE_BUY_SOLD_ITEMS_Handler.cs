@@ -25,10 +25,6 @@ class CS_TRADE_BUY_SOLD_ITEMS_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} buying back sold items", LogLevel.Debug);
 
-		// TODO: Get sold items for this player
-		// TODO: Check player has enough gold
-		// TODO: Return items to inventory
-		// TODO: Clear sold items list
-		// TODO: Send SC_TRADE_BOUGHT_SOLD_ITEMS
+		LimeServer.TradeService.BuyBackSoldItems(pc);
 	}
 }

@@ -25,9 +25,22 @@ class CS_RETURN_LOBBY_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[AUTH] {playerName} returning to lobby", LogLevel.Information);
 
-		// TODO: Save character state before returning
-		// TODO: Notify other players of character leaving
-		// TODO: Clean up zone presence
+		// Save character state before returning
+		pc.Save();
+
+		// Notify other players that this character is leaving
+		pc.SendGlobalPacket(new PacketWriter().Write(new SC_LEAVE_SIGHT_PC
+		{
+			objInstID = pc.GetObjInstID()
+		}).ToPacket(), default).Wait();
+
+		// Clean up services state
+		LimeServer.PartyService.OnPlayerDisconnect(pc);
+		LimeServer.GuildService.OnPlayerDisconnect(pc);
+		LimeServer.ChatroomService.OnPlayerDisconnect(pc);
+		LimeServer.CraftingService.CleanupPlayer(pc.GetId());
+		LimeServer.SkillService.CleanupPlayer(pc.GetId());
+		LimeServer.TradeService.CleanupPlayer(pc.GetId());
 
 		// Send lobby reenter confirmation
 		SC_REENTER_LOBBY response = new();
@@ -36,7 +49,8 @@ class CS_RETURN_LOBBY_Handler : PacketHandler
 		pw.Write(response);
 		pc.Send(pw.ToPacket(), default).Wait();
 
-		// TODO: Reset client state to pre-game
+		// Reset to pre-game state (character selection)
+		pc.ResetToLobby();
 
 		Logger.Log($"[AUTH] {playerName} returned to lobby", LogLevel.Information);
 	}

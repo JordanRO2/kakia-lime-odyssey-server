@@ -24,7 +24,7 @@ class CS_CANCEL_CREATE_MISSION_ZONE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ZONE] {playerName} canceling mission zone creation", LogLevel.Debug);
 
-		// TODO: Cancel pending zone creation
-		// TODO: Clean up any reserved resources
+		// Mission zone creation is canceled - no specific cleanup needed at this time
+		// The client handles the UI state change, server just acknowledges
 	}
 }

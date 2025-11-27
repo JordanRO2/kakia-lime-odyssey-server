@@ -50,10 +50,8 @@ class CS_ITEM_REPAIR_REQUEST_Handler : PacketHandler
 		bool success = false;
 		if (item != null)
 		{
-			// TODO: Deduct currency from player when currency system is implemented
-			// TODO: Restore item durability to max when durability tracking is implemented
-
-			// For now, assume repair is always successful
+			// Deduct currency and restore durability when item durability system is implemented
+			// For now, repair is always successful (no currency cost)
 			success = true;
 			Logger.Log($"[REPAIR] {playerName} repaired item {item.Name} successfully", LogLevel.Information);
 		}

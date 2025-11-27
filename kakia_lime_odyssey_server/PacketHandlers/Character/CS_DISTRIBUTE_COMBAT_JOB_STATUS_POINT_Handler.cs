@@ -40,8 +40,15 @@ class CS_DISTRIBUTE_COMBAT_JOB_STATUS_POINT_Handler : PacketHandler
 		var character = pc.GetCurrentCharacter();
 		if (character == null) return;
 
-		// TODO: Validate player has enough stat points available
-		// For now, just apply the distribution
+		// Validate player has enough stat points available
+		if (character.status.combatJob.statusPoint < totalPointsUsed)
+		{
+			Logger.Log($"[STATS] {playerName} doesn't have enough combat stat points ({character.status.combatJob.statusPoint} < {totalPointsUsed})", LogLevel.Warning);
+			return;
+		}
+
+		// Deduct used points
+		character.status.combatJob.statusPoint -= (ushort)totalPointsUsed;
 
 		// Apply stat increases to combat job stats
 		character.status.combatJob.strength += distribute.supplyedSTR;
@@ -61,7 +68,6 @@ class CS_DISTRIBUTE_COMBAT_JOB_STATUS_POINT_Handler : PacketHandler
 		ushort newSpi = character.status.combatJob.spirit;
 		ushort newLuk = character.status.combatJob.lucky;
 
-		// TODO: Deduct points from available pool and get remaining
 		ushort remainingPoints = character.status.combatJob.statusPoint;
 
 		// Send confirmation

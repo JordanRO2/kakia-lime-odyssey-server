@@ -38,8 +38,15 @@ class CS_DISTRIBUTE_LIFE_JOB_STATUS_POINT_Handler : PacketHandler
 		var character = pc.GetCurrentCharacter();
 		if (character == null) return;
 
-		// TODO: Validate player has enough stat points available
-		// For now, just apply the distribution
+		// Validate player has enough stat points available
+		if (character.status.lifeJob.statusPoint < totalPointsUsed)
+		{
+			Logger.Log($"[STATS] {playerName} doesn't have enough life stat points ({character.status.lifeJob.statusPoint} < {totalPointsUsed})", LogLevel.Warning);
+			return;
+		}
+
+		// Deduct used points
+		character.status.lifeJob.statusPoint -= (ushort)totalPointsUsed;
 
 		// Apply stat increases to life job stats
 		character.status.lifeJob.idea += distribute.supplyedIdea;
@@ -53,7 +60,6 @@ class CS_DISTRIBUTE_LIFE_JOB_STATUS_POINT_Handler : PacketHandler
 		ushort newMind = character.status.lifeJob.mind;
 		ushort newCraft = character.status.lifeJob.craft;
 
-		// TODO: Deduct points from available pool and get remaining
 		ushort remainingPoints = character.status.lifeJob.statusPoint;
 
 		// Send confirmation

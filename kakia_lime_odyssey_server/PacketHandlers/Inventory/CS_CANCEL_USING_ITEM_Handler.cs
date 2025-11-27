@@ -24,7 +24,6 @@ class CS_CANCEL_USING_ITEM_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ITEM] {playerName} canceling item usage", LogLevel.Debug);
 
-		// TODO: Cancel pending item usage
-		// TODO: Clear item usage state
+		LimeServer.ItemService.CancelItemUsage(pc);
 	}
 }

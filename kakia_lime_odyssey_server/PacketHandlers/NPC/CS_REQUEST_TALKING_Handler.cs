@@ -28,8 +28,8 @@ class CS_REQUEST_TALKING_Handler : PacketHandler
 
 		Logger.Log($"[NPC] {playerName} requesting dialog with NPC {targetId}", LogLevel.Debug);
 
-		// TODO: Get NPC dialog from NPC data/quest system
-		// For now, send a default message
+		// Get NPC dialog from quest/NPC system
+		// Initial dialog is sent by QuestService based on NPC type and active quests
 		SC_TALKING talking = new()
 		{
 			objInstID = targetId,

@@ -50,6 +50,7 @@ public class PlayerClient : IPlayerClient, IEntity
 	private uint _movePacketCount = 0;
 	private bool _isJumping = false;
 	private DateTime _jumpStartTime = DateTime.MinValue;
+	private bool _isUnderwater = false;
 
 	// Skill cooldown tracking (server-side validation)
 	private SkillCooldownTracker? _skillCooldownTracker = null;
@@ -91,6 +92,20 @@ public class PlayerClient : IPlayerClient, IEntity
 		db.SavePlayerInventory(_accountId, _currentCharacter.appearance.name, _inventory);
 		db.SavePlayerEquipment(_accountId, _currentCharacter.appearance.name, _equipment);
 		db.SavePlayerQuests(_accountId, _currentCharacter.appearance.name, _quests.GetPersistenceData());
+	}
+
+	/// <summary>
+	/// Resets the player state when returning to lobby (character select).
+	/// </summary>
+	public void ResetToLobby()
+	{
+		_isLoaded = false;
+		_target = 0;
+		_inCombat = false;
+		_inMotion = false;
+		_isJumping = false;
+		_isUnderwater = false;
+		_knownPc.Clear();
 	}
 
 	public void Load()
@@ -1000,6 +1015,16 @@ public class PlayerClient : IPlayerClient, IEntity
 			return TimeSpan.Zero;
 		return DateTime.Now - _jumpStartTime;
 	}
+
+	/// <summary>
+	/// Gets whether the player is currently underwater.
+	/// </summary>
+	public bool IsUnderwater() => _isUnderwater;
+
+	/// <summary>
+	/// Sets the player's underwater state.
+	/// </summary>
+	public void SetUnderwater(bool underwater) => _isUnderwater = underwater;
 
 	/// <summary>
 	/// Get the skill cooldown tracker for this player

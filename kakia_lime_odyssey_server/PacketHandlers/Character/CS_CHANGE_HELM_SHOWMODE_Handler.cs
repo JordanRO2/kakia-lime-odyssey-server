@@ -30,7 +30,12 @@ class CS_CHANGE_HELM_SHOWMODE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CHAR] {playerName} changing helmet visibility to {packet.show}", LogLevel.Debug);
 
-		// TODO: Update character's helmet visibility setting in database
+		// Update character's helm show mode (saved on next character save)
+		var character = pc.GetCurrentCharacter();
+		if (character != null)
+		{
+			character.appearance.helmShowMode = packet.show;
+		}
 
 		// Send confirmation and broadcast to others
 		SC_CHANGE_HELM_SHOWMODE response = new()

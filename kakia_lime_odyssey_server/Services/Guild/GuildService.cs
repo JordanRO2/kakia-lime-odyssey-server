@@ -1,14 +1,23 @@
+/// <summary>
+/// Service for managing guilds with MongoDB persistence.
+/// </summary>
+/// <remarks>
+/// Uses: MongoDBService for guild persistence
+/// Handles: Create, disband, invite, join, leave, kick, leader change, options
+/// </remarks>
 using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Database;
+using kakia_lime_odyssey_server.Models.Persistence;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Guild;
 
 /// <summary>
-/// Service for managing guilds.
+/// Service for managing guilds with MongoDB persistence.
 /// </summary>
 public class GuildService : IGuildService
 {
@@ -16,6 +25,130 @@ public class GuildService : IGuildService
 	private readonly ConcurrentDictionary<uint, Guild> _guilds = new();
 	private readonly ConcurrentDictionary<long, uint> _playerGuildMap = new(); // Player instance ID -> Guild ID
 	private readonly ConcurrentDictionary<long, GuildInvitation> _pendingInvitations = new(); // Target player ID -> Invitation
+	private bool _initialized;
+
+	/// <summary>
+	/// Initializes the guild service by loading all guilds from the database.
+	/// </summary>
+	public void Initialize()
+	{
+		if (_initialized) return;
+
+		var guilds = MongoDBService.Instance.LoadAllGuilds();
+		foreach (var guildData in guilds)
+		{
+			var guild = GuildFromData(guildData);
+			_guilds[guild.Id] = guild;
+
+			if (guild.Id >= _nextGuildId)
+				_nextGuildId = guild.Id + 1;
+		}
+
+		Logger.Log($"[GUILD] Loaded {guilds.Count} guilds from database", LogLevel.Info);
+		_initialized = true;
+	}
+
+	/// <summary>
+	/// Converts GuildData (persistence) to Guild (runtime).
+	/// </summary>
+	private static Guild GuildFromData(GuildData data)
+	{
+		var guild = new Guild
+		{
+			Id = (uint)data.GuildId,
+			Name = data.Name,
+			LeaderId = 0,
+			Fame = data.Fame,
+			Point = 0,
+			Grade = data.Level,
+			Option = GuildOption.None,
+			Notice = data.Notice,
+			CreatedAt = data.CreatedAt
+		};
+
+		uint idx = 0;
+		foreach (var memberData in data.Members)
+		{
+			var member = new GuildMember
+			{
+				Index = idx,
+				Name = memberData.CharacterName,
+				Player = null, // Will be set on login
+				InstId = 0,
+				IsConnected = false,
+				CombatJobTypeId = 0,
+				LifeJobTypeId = 0,
+				CombatJobLevel = 1,
+				LifeJobLevel = 1,
+				ContributionPoints = memberData.ContributionPoints,
+				MemberType = (GuildMemberType)memberData.RankId
+			};
+
+			if (memberData.CharacterName == data.LeaderName)
+			{
+				guild.LeaderId = idx;
+				member.MemberType = GuildMemberType.Leader;
+			}
+
+			guild.Members.Add(member);
+			idx++;
+		}
+
+		return guild;
+	}
+
+	/// <summary>
+	/// Converts Guild (runtime) to GuildData (persistence).
+	/// </summary>
+	private static GuildData GuildToData(Guild guild)
+	{
+		var leader = guild.Members.FirstOrDefault(m => m.MemberType == GuildMemberType.Leader);
+
+		var data = new GuildData
+		{
+			GuildId = (int)guild.Id,
+			Name = guild.Name,
+			LeaderName = leader?.Name ?? string.Empty,
+			Notice = guild.Notice,
+			CreatedAt = guild.CreatedAt,
+			Level = (byte)guild.Grade,
+			Experience = 0,
+			Fame = guild.Fame,
+			Funds = 0,
+			MaxMembers = 50
+		};
+
+		foreach (var member in guild.Members)
+		{
+			data.Members.Add(new GuildMemberData
+			{
+				CharacterName = member.Name,
+				RankId = (byte)member.MemberType,
+				JoinedAt = DateTime.UtcNow,
+				LastOnline = member.IsConnected ? DateTime.UtcNow : DateTime.MinValue,
+				ContributionPoints = member.ContributionPoints
+			});
+		}
+
+		return data;
+	}
+
+	/// <summary>
+	/// Saves a guild to the database.
+	/// </summary>
+	private void SaveGuild(Guild guild)
+	{
+		var data = GuildToData(guild);
+		MongoDBService.Instance.SaveGuild(data);
+	}
+
+	/// <summary>
+	/// Deletes a guild from the database.
+	/// </summary>
+	private void DeleteGuildFromDb(uint guildId)
+	{
+		MongoDBService.Instance.DeleteGuild((int)guildId);
+	}
 
 	/// <summary>
 	/// Creates a new guild with the given player as leader.
@@ -80,6 +213,9 @@ public class GuildService : IGuildService
 		_guilds[guildId] = guild;
 		_playerGuildMap[playerId] = guildId;
 
+		// Save to database
+		SaveGuild(guild);
+
 		// Send SC_GUILD_CREATED to leader
 		SendGuildCreated(leader);
 
@@ -112,6 +248,9 @@ public class GuildService : IGuildService
 		}
 
 		_guilds.TryRemove(guild.Id, out _);
+
+		// Delete from database
+		DeleteGuildFromDb(guild.Id);
 
 		var character = leader.GetCurrentCharacter();
 		Logger.Log($"[GUILD] {character?.appearance.name} disbanded guild '{guild.Name}'", LogLevel.Info);
@@ -227,6 +366,9 @@ public class GuildService : IGuildService
 		guild.Members.Add(member);
 		_playerGuildMap[playerId] = guild.Id;
 
+		// Save to database
+		SaveGuild(guild);
+
 		// Send SC_GUILD_MEMBER_ADDED to existing members
 		foreach (var m in guild.Members.Where(m => m.Index != newIndex && m.IsConnected && m.Player != null))
 		{
@@ -247,6 +389,123 @@ public class GuildService : IGuildService
 	public void DeclineInvitation(PlayerClient player)
 	{
 		_pendingInvitations.TryRemove(player.GetId(), out _);
+	}
+
+	/// <summary>
+	/// Requests to join a guild by name.
+	/// </summary>
+	public GuildResult RequestJoin(PlayerClient requester, string guildName)
+	{
+		var requesterChar = requester.GetCurrentCharacter();
+		if (requesterChar == null)
+			return GuildResult.Fail(GuildError.PlayerNotFound);
+
+		// Check if requester is already in a guild
+		if (_playerGuildMap.ContainsKey(requester.GetId()))
+			return GuildResult.Fail(GuildError.AlreadyInGuild, "You are already in a guild");
+
+		// Find guild by name
+		var guild = _guilds.Values.FirstOrDefault(g =>
+			g.Name.Equals(guildName, StringComparison.OrdinalIgnoreCase));
+
+		if (guild == null)
+			return GuildResult.Fail(GuildError.GuildNotFound, $"Guild '{guildName}' not found");
+
+		// Check if guild accepts join requests
+		if (guild.Option == GuildOption.None)
+			return GuildResult.Fail(GuildError.NotEnoughPermission, "Guild is not accepting join requests");
+
+		// Check if guild is full
+		if (guild.IsFull)
+			return GuildResult.Fail(GuildError.GuildFull, "Guild is full");
+
+		// If open recruitment, auto-join
+		if (guild.Option == GuildOption.OpenRecruitment)
+		{
+			return JoinGuildDirectly(requester, guild);
+		}
+
+		// If requires approval, notify guild leader
+		var leader = guild.Members.FirstOrDefault(m => m.MemberType == GuildMemberType.Leader);
+		if (leader != null && leader.IsConnected && leader.Player != null)
+		{
+			SendJoinRequest(leader.Player, requesterChar.appearance.name, guild.Name);
+		}
+
+		Logger.Log($"[GUILD] {requesterChar.appearance.name} requested to join guild '{guild.Name}'", LogLevel.Debug);
+
+		return GuildResult.Ok(guild);
+	}
+
+	/// <summary>
+	/// Joins a guild directly (for open recruitment).
+	/// </summary>
+	private GuildResult JoinGuildDirectly(PlayerClient player, Guild guild)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null)
+			return GuildResult.Fail(GuildError.PlayerNotFound);
+
+		long playerId = player.GetId();
+		uint newIndex = guild.GetNextIndex();
+
+		var member = new GuildMember
+		{
+			Index = newIndex,
+			Name = character.appearance.name,
+			Player = player,
+			InstId = playerId,
+			IsConnected = true,
+			CombatJobTypeId = (byte)(character.combatJob?.jobTypeID ?? 0),
+			LifeJobTypeId = (byte)(character.lifeJob?.jobTypeID ?? 0),
+			CombatJobLevel = character.combatJob?.level ?? 1,
+			LifeJobLevel = character.lifeJob?.level ?? 1,
+			ContributionPoints = 0,
+			MemberType = GuildMemberType.Member
+		};
+
+		guild.Members.Add(member);
+		_playerGuildMap[playerId] = guild.Id;
+
+		// Save to database
+		SaveGuild(guild);
+
+		// Send SC_GUILD_MEMBER_ADDED to existing members
+		foreach (var m in guild.Members.Where(m => m.Index != newIndex && m.IsConnected && m.Player != null))
+		{
+			SendGuildMemberAdded(m.Player!, member, guild.GetLoginMemberCount(), guild.Members.Count);
+		}
+
+		// Send SC_GUILD_INFO to new member with all guild info
+		SendGuildInfo(player, guild, member);
+
+		Logger.Log($"[GUILD] {character.appearance.name} joined guild '{guild.Name}' via open recruitment", LogLevel.Info);
+
+		return GuildResult.Ok(guild);
+	}
+
+	/// <summary>
+	/// Sends join request notification to guild leader.
+	/// </summary>
+	private static void SendJoinRequest(PlayerClient leader, string requesterName, string guildName)
+	{
+		// Use SC_GUILD_INVITED to notify leader of join request
+		// The leader can then use invite to accept
+		var packet = new SC_GUILD_INVITED
+		{
+			pcName = new byte[26],
+			guildName = new byte[51]
+		};
+
+		var nameBytes = System.Text.Encoding.ASCII.GetBytes(requesterName);
+		Array.Copy(nameBytes, packet.pcName, Math.Min(nameBytes.Length, 25));
+
+		var guildBytes = System.Text.Encoding.ASCII.GetBytes(guildName);
+		Array.Copy(guildBytes, packet.guildName, Math.Min(guildBytes.Length, 50));
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		leader.Send(pw.ToPacket(), default).Wait();
 	}
 
 	/// <summary>
@@ -271,6 +530,9 @@ public class GuildService : IGuildService
 		// Remove member
 		guild.Members.Remove(member);
 		_playerGuildMap.TryRemove(playerId, out _);
+
+		// Save to database
+		SaveGuild(guild);
 
 		// Send SC_GUILD_SECEDED to leaving player
 		SendGuildSeceded(player, member.Index, guild.GetLoginMemberCount(), guild.Members.Count);
@@ -320,6 +582,9 @@ public class GuildService : IGuildService
 		guild.Members.Remove(targetMember);
 		_playerGuildMap.TryRemove(targetMember.InstId, out _);
 
+		// Save to database
+		SaveGuild(guild);
+
 		// Notify kicked player
 		if (targetMember.IsConnected && targetMember.Player != null)
 		{
@@ -360,6 +625,9 @@ public class GuildService : IGuildService
 		newLeader.MemberType = GuildMemberType.Leader;
 		guild.LeaderId = newLeaderIdx;
 
+		// Save to database
+		SaveGuild(guild);
+
 		// Notify all members
 		foreach (var m in guild.Members.Where(m => m.IsConnected && m.Player != null))
 		{
@@ -385,6 +653,9 @@ public class GuildService : IGuildService
 			return false;
 
 		guild.Option = option;
+
+		// Save to database
+		SaveGuild(guild);
 
 		// Notify all members
 		foreach (var m in guild.Members.Where(m => m.IsConnected && m.Player != null))
@@ -412,6 +683,9 @@ public class GuildService : IGuildService
 			return false;
 
 		guild.Notice = notice;
+
+		// Save to database
+		SaveGuild(guild);
 
 		// Notify all members
 		foreach (var m in guild.Members.Where(m => m.IsConnected && m.Player != null))

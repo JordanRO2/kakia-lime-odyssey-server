@@ -28,7 +28,6 @@ class CS_SLOT_ITEM_INFO_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ITEM] {playerName} requesting info for slot type {packet.slot.slotType} index {packet.slot.slotIdx}", LogLevel.Debug);
 
-		// TODO: Get item from specified slot
-		// TODO: Send SC_SLOT_ITEM_INFO with item details
+		LimeServer.ItemService.GetSlotItemInfo(pc, packet.slot.slotType, packet.slot.slotIdx);
 	}
 }

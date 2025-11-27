@@ -10,6 +10,7 @@ using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
 using kakia_lime_odyssey_contracts.Interfaces;
 using kakia_lime_odyssey_packets;
+using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.PacketHandlers.Movement;
@@ -24,8 +25,11 @@ class CS_HEAD_UNDER_WATER_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[MOVE] {playerName} head under water", LogLevel.Debug);
 
-		// TODO: Update player swimming state
-		// TODO: Start breath timer
-		// TODO: Notify nearby players
+		pc.SetUnderwater(true);
+
+		// Broadcast underwater state to nearby players
+		using PacketWriter pw = new();
+		pw.Write(new SC_HEAD_UNDER_WATER { objInstID = pc.GetObjInstID() });
+		pc.SendGlobalPacket(pw.ToPacket(), default).Wait();
 	}
 }

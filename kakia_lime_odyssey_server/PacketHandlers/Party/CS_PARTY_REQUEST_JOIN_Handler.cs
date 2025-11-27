@@ -28,13 +28,6 @@ class CS_PARTY_REQUEST_JOIN_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[PARTY] {playerName} requesting to join party of '{packet.name}'", LogLevel.Debug);
 
-		// TODO: Implement join request logic in PartyService
-		// This would:
-		// 1. Find the target player by name
-		// 2. Check if target has a party
-		// 3. Send join request notification to party leader
-		// 4. Wait for accept/reject response
-
 		var result = LimeServer.PartyService.RequestJoin(pc, packet.name);
 
 		if (!result.Success)

@@ -24,8 +24,9 @@ class CS_TALKING_CONFIRM_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[NPC] {playerName} confirmed dialog", LogLevel.Debug);
 
-		// TODO: Advance dialog state, trigger quest actions, etc.
-		// For now, just log the confirmation - the dialog system would
-		// track state and send the next appropriate response
+		// Dialog confirmation - advance to next dialog step or close
+		// The QuestService handles dialog progression and quest state changes
+		long targetId = pc.GetCurrentTarget();
+		LimeServer.QuestService.ProcessDialogChoice(pc, targetId, 0); // 0 = confirm/next
 	}
 }

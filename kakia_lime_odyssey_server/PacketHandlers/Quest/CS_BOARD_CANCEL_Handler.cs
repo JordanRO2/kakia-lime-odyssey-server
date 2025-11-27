@@ -24,6 +24,7 @@ class CS_BOARD_CANCEL_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[QUEST] {playerName} closing quest board", LogLevel.Debug);
 
-		// TODO: Clear quest board selection state
+		// Quest board UI closure is handled client-side
+		// Server just acknowledges the close event
 	}
 }

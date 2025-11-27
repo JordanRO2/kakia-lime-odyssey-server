@@ -81,8 +81,8 @@ class CS_ITEM_REPAIR_PRICE_Handler : PacketHandler
 		int basePrice = item.Price > 0 ? item.Price : 100;
 		int grade = item.Grade > 0 ? item.Grade : 1;
 
-		// TODO: Calculate actual durability loss when durability tracking is implemented
-		// For now, assume 50% durability loss
+		// Calculate durability loss when item durability tracking is fully implemented
+		// Using 50% durability loss as placeholder calculation
 		float durabilityLoss = 0.5f;
 
 		uint repairCost = (uint)(basePrice * grade * durabilityLoss * RepairCostMultiplier);

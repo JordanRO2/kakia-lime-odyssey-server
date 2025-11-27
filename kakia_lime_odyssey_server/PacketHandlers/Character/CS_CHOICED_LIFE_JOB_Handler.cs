@@ -33,10 +33,14 @@ class CS_CHOICED_LIFE_JOB_Handler : PacketHandler
 		var character = pc.GetCurrentCharacter();
 		if (character == null) return;
 
-		// TODO: Validate the job selection (check requirements, already has job, etc.)
-		// TODO: Update character's life job in database
+		// Validate: can't change job if already selected a valid job
+		if (character.status.lifeJob.typeID > 0)
+		{
+			Logger.Log($"[JOB] {playerName} already has life job {character.status.lifeJob.typeID}", LogLevel.Warning);
+			return;
+		}
 
-		// Update character's life job type
+		// Update character's life job type (saved on next character save)
 		character.status.lifeJob.typeID = choice.index;
 
 		// Send confirmation

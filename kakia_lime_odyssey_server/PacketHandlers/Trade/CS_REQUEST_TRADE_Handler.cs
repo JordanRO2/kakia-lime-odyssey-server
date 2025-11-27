@@ -24,8 +24,6 @@ class CS_REQUEST_TRADE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[TRADE] {playerName} requesting NPC trade", LogLevel.Debug);
 
-		// TODO: Get currently selected NPC
-		// TODO: Validate NPC is a merchant
-		// TODO: Send SC_TRADE_DESC with NPC's shop items
+		LimeServer.TradeService.OpenTradeWithCurrentTarget(pc);
 	}
 }

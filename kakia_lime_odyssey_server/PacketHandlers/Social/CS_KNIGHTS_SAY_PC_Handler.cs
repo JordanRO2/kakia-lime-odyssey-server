@@ -29,7 +29,6 @@ class CS_KNIGHTS_SAY_PC_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CHAT:KNIGHTS] {playerName}: {message}", LogLevel.Debug);
 
-		// TODO: Get player's guild
-		// TODO: Broadcast SC_KNIGHTS_SAY to all guild members
+		LimeServer.GuildService.SendGuildChat(pc, message, chat.maintainTime, chat.type);
 	}
 }

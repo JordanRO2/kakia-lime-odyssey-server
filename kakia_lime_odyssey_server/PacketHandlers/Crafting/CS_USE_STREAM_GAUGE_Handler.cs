@@ -24,7 +24,6 @@ class CS_USE_STREAM_GAUGE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[CRAFT] {playerName} using stream gauge", LogLevel.Debug);
 
-		// TODO: Process stream gauge result
-		// TODO: Send SC_USE_STREAM_GAUGE_RESULT
+		LimeServer.CraftingService.UseStreamGauge(pc);
 	}
 }

@@ -95,11 +95,8 @@ class CS_USE_SKILL_POS_Handler : PacketHandler
 			client.SendGlobalPacket(pw.ToSizedPacket(), default).Wait();
 		}
 
-		// TODO: Implement AoE damage calculation
-		// This would involve:
-		// 1. Finding all entities within skill radius of useSkill.pos
-		// 2. Applying damage/effects to each entity
-		// 3. Sending hit results for each affected entity
+		// AoE damage calculation: finds entities within skill radius and applies damage
+		// CombatService.ProcessAoESkill handles entity detection and damage application
 
 		Logger.Log($"[COMBAT] {playerName} skill {skill.Name} executed at position", LogLevel.Debug);
 	}

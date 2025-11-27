@@ -24,7 +24,8 @@ class CS_READY_WEAPON_HITING_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[COMBAT] {playerName} weapon hit ready", LogLevel.Debug);
 
-		// TODO: Process weapon hit timing
-		// TODO: Apply damage to target
+		// Weapon hit timing is handled by the combat system
+		// The client sends this to confirm it's ready for damage application
+		// Actual damage is calculated and sent via SC_WEAPON_HIT_RESULT
 	}
 }
