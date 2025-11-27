@@ -21,6 +21,7 @@ using kakia_lime_odyssey_server.Services.Quest;
 using kakia_lime_odyssey_server.Services.Chatroom;
 using kakia_lime_odyssey_server.Services.Skill;
 using kakia_lime_odyssey_server.Services.Item;
+using kakia_lime_odyssey_server.Services.Trade;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -65,6 +66,9 @@ public class LimeServer : SocketServer
 
 	/// <summary>Service for managing item usage and consumption</summary>
 	public static ItemService ItemService { get; } = new();
+
+	/// <summary>Service for managing NPC merchant transactions</summary>
+	public static TradeService TradeService { get; } = new();
 
 	public Config Config { get; set; }
 

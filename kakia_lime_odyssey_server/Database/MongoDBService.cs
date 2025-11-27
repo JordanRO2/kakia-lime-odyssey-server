@@ -63,6 +63,38 @@ public class MongoDBService : IDatabase
         return LoadPCAsync(accountId).GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Gets all characters for an account (alias for LoadPC).
+    /// </summary>
+    public List<CLIENT_PC> GetCharacters(string accountId)
+    {
+        return LoadPC(accountId);
+    }
+
+    /// <summary>
+    /// Deletes a character from the database.
+    /// </summary>
+    /// <param name="accountId">The account ID</param>
+    /// <param name="characterName">The character name to delete</param>
+    /// <returns>True if character was deleted, false otherwise</returns>
+    public async Task<bool> DeleteCharacterAsync(string accountId, string characterName)
+    {
+        var filter = Builders<PlayerDocument>.Filter.And(
+            Builders<PlayerDocument>.Filter.Eq(p => p.AccountId, accountId),
+            Builders<PlayerDocument>.Filter.Eq(p => p.CharacterName, characterName)
+        );
+        var result = await _players.DeleteOneAsync(filter);
+        return result.DeletedCount > 0;
+    }
+
+    /// <summary>
+    /// Deletes a character from the database (synchronous).
+    /// </summary>
+    public bool DeleteCharacter(string accountId, string characterName)
+    {
+        return DeleteCharacterAsync(accountId, characterName).GetAwaiter().GetResult();
+    }
+
     public async Task<PlayerDocument?> GetPlayerAsync(string accountId, string characterName)
     {
         var filter = Builders<PlayerDocument>.Filter.And(
