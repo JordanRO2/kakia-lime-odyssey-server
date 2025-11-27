@@ -29,20 +29,19 @@ class CS_RESURRECT_Handler : PacketHandler
 		string playerName = character.appearance.name ?? "Unknown";
 
 		// Check if player is actually dead
-		var status = pc.GetStatus();
-		if (status.hp > 0)
+		if (!pc.IsDead())
 		{
-			Logger.Log($"[RESURRECT] {playerName} attempted to resurrect but is not dead (HP: {status.hp})", LogLevel.Warning);
+			Logger.Log($"[RESURRECT] {playerName} attempted to resurrect but is not dead", LogLevel.Warning);
 			return;
 		}
 
 		Logger.Log($"[RESURRECT] {playerName} resurrecting at current location", LogLevel.Debug);
 
-		// Calculate resurrection HP (typically 10-30% of max HP)
-		uint resurrectHP = Math.Max(1, status.mhp / 5); // 20% of max HP
+		// Resurrect the player with 20% HP
+		var status = pc.GetStatus();
+		uint resurrectHP = Math.Max(1, status.mhp / 5);
 
-		// Update player HP
-		pc.UpdateHP((int)resurrectHP, false);
+		pc.Resurrect(resurrectHP);
 
 		// Send resurrection packet to player and nearby players
 		var packet = new SC_RESURRECTED
@@ -53,7 +52,7 @@ class CS_RESURRECT_Handler : PacketHandler
 
 		using PacketWriter pw = new();
 		pw.Write(packet);
-		var packetBytes = pw.ToSizedPacket();
+		var packetBytes = pw.ToPacket();
 
 		// Send to player
 		pc.Send(packetBytes, default).Wait();

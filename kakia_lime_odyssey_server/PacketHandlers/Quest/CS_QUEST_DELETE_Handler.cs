@@ -1,3 +1,12 @@
+/// <summary>
+/// Handles CS_QUEST_DELETE packet - player abandons a quest.
+/// </summary>
+/// <remarks>
+/// Triggered by: Player clicking "Abandon" on a quest in quest log
+/// Response packets: SC_QUEST_DELETE (via QuestService)
+/// Database: PlayerQuests (write)
+/// Validates: Quest is active, quest is cancelable
+/// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;

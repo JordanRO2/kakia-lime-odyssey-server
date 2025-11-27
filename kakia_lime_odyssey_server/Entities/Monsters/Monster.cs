@@ -399,6 +399,15 @@ public partial class Monster : INpc, IEntity
 		return Id;
 	}
 
+	/// <summary>
+	/// Gets the monster type ID from XML definition.
+	/// </summary>
+	/// <returns>Monster type ID.</returns>
+	public int GetEntityTypeId()
+	{
+		return _mobInfo.TypeID;
+	}
+
 	public FPOS GetPosition()
 	{
 		return GetMobCurrentPosition(LimeServer.GetCurrentTick());

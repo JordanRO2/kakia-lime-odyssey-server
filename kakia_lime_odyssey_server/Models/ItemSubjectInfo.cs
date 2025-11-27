@@ -21,7 +21,7 @@ public class ItemSubjectInfo
         if (_instance != null) return _instance;
 
         XmlSerializer serializer = new XmlSerializer(typeof(ItemSubjectInfo));
-        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.Categories, FileMode.Open);
+        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.ItemSubjectInfo, FileMode.Open);
         _instance = (ItemSubjectInfo)serializer.Deserialize(fileStream)!;
 
         _seriesCache = new Dictionary<int, ItemSeries>();

@@ -1,4 +1,7 @@
-﻿using kakia_lime_odyssey_packets.Packets.Models;
+﻿/// <summary>
+/// Interface for all game entities (players, monsters, NPCs).
+/// </summary>
+using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_server.Models;
 
 namespace kakia_lime_odyssey_server.Interfaces;
@@ -9,6 +12,12 @@ public interface IEntity
 	public FPOS GetPosition();
 	public FPOS GetDirection();
 	public EntityStatus GetEntityStatus();
+
+	/// <summary>
+	/// Gets the entity type ID (monster/NPC type from XML).
+	/// </summary>
+	/// <returns>Type ID for monsters/NPCs, 0 for players.</returns>
+	public int GetEntityTypeId();
 
 	/// <summary>
 	/// Can be used to both deal damage and heal the target.

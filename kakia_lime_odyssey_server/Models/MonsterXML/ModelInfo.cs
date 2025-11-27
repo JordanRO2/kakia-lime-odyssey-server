@@ -28,7 +28,7 @@ public class ModelInfo
 	public static List<Model> GetEntries()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(ModelInfo));
-		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Entities.Models, FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Entities.ModelsInfo, FileMode.Open);
 		var modelsInfo = (ModelInfo)serializer.Deserialize(fileStream)!;
 
 		return modelsInfo.Models;

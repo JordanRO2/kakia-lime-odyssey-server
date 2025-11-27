@@ -1,3 +1,12 @@
+/// <summary>
+/// Handles CS_QUEST_ADD packet - player accepts a quest.
+/// </summary>
+/// <remarks>
+/// Triggered by: Player accepting quest from NPC or quest board
+/// Response packets: SC_QUEST_ADD (via QuestService)
+/// Database: PlayerQuests (write)
+/// Validates: Quest exists, level requirement, not already active/completed
+/// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;

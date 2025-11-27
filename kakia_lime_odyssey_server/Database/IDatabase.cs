@@ -9,6 +9,20 @@ namespace kakia_lime_odyssey_server.Database;
 /// </summary>
 public interface IDatabase
 {
+    // Account operations
+    AccountDocument? GetAccount(string accountId);
+    AccountDocument? GetAccountByEmail(string email);
+    void SaveAccount(AccountDocument account);
+    bool DeleteAccount(string accountId);
+    bool AccountExists(string accountId);
+    bool EmailExists(string email);
+
+    // Ban operations
+    List<BanRecord> GetActiveBans();
+    List<BanRecord> GetBanHistory(string accountId);
+    void SaveBan(BanRecord ban);
+    bool RemoveBan(string accountId);
+
     // Player character operations
     List<CLIENT_PC> LoadPC(string accountId);
 

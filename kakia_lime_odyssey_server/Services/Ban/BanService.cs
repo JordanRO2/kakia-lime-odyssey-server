@@ -1,22 +1,60 @@
 using kakia_lime_odyssey_logging;
+using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Models.Persistence;
 
 namespace kakia_lime_odyssey_server.Services.Ban;
 
 /// <summary>
-/// Service for managing player bans
+/// Service for managing player bans.
 /// </summary>
+/// <remarks>
+/// Maintains in-memory cache synchronized with database for performance.
+/// Bans are persisted to MongoDB and loaded on server startup.
+/// </remarks>
 public static class BanService
 {
 	private static readonly Dictionary<string, BanRecord> _activeBans = new();
 	private static readonly object _lock = new();
+	private static readonly IDatabase _db = DatabaseFactory.Instance;
+	private static bool _initialized;
 
-	// Event for notifying when a player should be kicked
+	/// <summary>Event for notifying when a player should be kicked.</summary>
 	public static event Action<uint, string>? OnPlayerBanned;
 
 	/// <summary>
-	/// Ban an account for a specific duration
+	/// Initializes the ban service by loading active bans from database.
 	/// </summary>
+	public static void Initialize()
+	{
+		if (_initialized) return;
+
+		lock (_lock)
+		{
+			if (_initialized) return;
+
+			var bans = _db.GetActiveBans();
+			foreach (var ban in bans)
+			{
+				if (ban.IsActive)
+					_activeBans[ban.AccountId] = ban;
+			}
+
+			_initialized = true;
+			Logger.Log($"[BAN] Loaded {_activeBans.Count} active bans from database", LogLevel.Information);
+		}
+	}
+
+	/// <summary>
+	/// Ban an account for a specific duration.
+	/// </summary>
+	/// <param name="accountId">Account ID to ban.</param>
+	/// <param name="reason">Reason for the ban.</param>
+	/// <param name="cheatType">Type of cheat detected.</param>
+	/// <param name="ipAddress">IP address of the player.</param>
+	/// <param name="duration">Ban duration (null for permanent).</param>
+	/// <param name="issuedBy">Who issued the ban.</param>
+	/// <param name="details">Additional details.</param>
+	/// <returns>The created ban record.</returns>
 	public static BanRecord BanAccount(
 		string accountId,
 		string reason,
@@ -41,6 +79,9 @@ public static class BanService
 		{
 			_activeBans[accountId] = ban;
 		}
+
+		// Persist to database
+		_db.SaveBan(ban);
 
 		Logger.Log($"[BAN] Account {accountId} banned. Reason: {reason}, Expires: {ban.ExpiresAt?.ToString() ?? "Never"}", LogLevel.Warning);
 
@@ -79,19 +120,23 @@ public static class BanService
 	}
 
 	/// <summary>
-	/// Remove a ban from an account
+	/// Remove a ban from an account.
 	/// </summary>
+	/// <param name="accountId">Account ID to unban.</param>
+	/// <returns>True if ban was removed.</returns>
 	public static bool UnbanAccount(string accountId)
 	{
 		lock (_lock)
 		{
-			if (_activeBans.Remove(accountId))
-			{
-				Logger.Log($"[UNBAN] Account {accountId} has been unbanned", LogLevel.Information);
-				return true;
-			}
-			return false;
+			_activeBans.Remove(accountId);
 		}
+
+		// Persist to database
+		var removed = _db.RemoveBan(accountId);
+		if (removed)
+			Logger.Log($"[UNBAN] Account {accountId} has been unbanned", LogLevel.Information);
+
+		return removed;
 	}
 
 	/// <summary>

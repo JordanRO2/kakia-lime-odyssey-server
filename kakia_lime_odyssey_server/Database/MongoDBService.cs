@@ -12,6 +12,8 @@ public class MongoDBService : IDatabase
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<PlayerDocument> _players;
     private readonly IMongoCollection<GuildDocument> _guilds;
+    private readonly IMongoCollection<AccountDocument> _accounts;
+    private readonly IMongoCollection<BanDocument> _bans;
 
     private static MongoDBService? _instance;
     public static MongoDBService Instance => _instance ??= new MongoDBService();
@@ -23,6 +25,8 @@ public class MongoDBService : IDatabase
 
         _players = _database.GetCollection<PlayerDocument>("players");
         _guilds = _database.GetCollection<GuildDocument>("guilds");
+        _accounts = _database.GetCollection<AccountDocument>("accounts");
+        _bans = _database.GetCollection<BanDocument>("bans");
 
         CreateIndexes();
     }
@@ -42,6 +46,21 @@ public class MongoDBService : IDatabase
             guildIndexes.Ascending(g => g.GuildId)));
         _guilds.Indexes.CreateOne(new CreateIndexModel<GuildDocument>(
             guildIndexes.Ascending(g => g.Name)));
+
+        // Account indexes
+        var accountIndexes = Builders<AccountDocument>.IndexKeys;
+        _accounts.Indexes.CreateOne(new CreateIndexModel<AccountDocument>(
+            accountIndexes.Ascending(a => a.AccountId),
+            new CreateIndexOptions { Unique = true }));
+        _accounts.Indexes.CreateOne(new CreateIndexModel<AccountDocument>(
+            accountIndexes.Ascending(a => a.Email)));
+
+        // Ban indexes
+        var banIndexes = Builders<BanDocument>.IndexKeys;
+        _bans.Indexes.CreateOne(new CreateIndexModel<BanDocument>(
+            banIndexes.Ascending(b => b.AccountId)));
+        _bans.Indexes.CreateOne(new CreateIndexModel<BanDocument>(
+            banIndexes.Ascending(b => b.IsActive)));
     }
 
     #region Player Operations
@@ -493,6 +512,199 @@ public class MongoDBService : IDatabase
     }
 
     #endregion
+
+    #region Account Operations
+
+    /// <summary>
+    /// Gets an account by account ID.
+    /// </summary>
+    /// <param name="accountId">Account ID to search for.</param>
+    /// <returns>AccountDocument or null if not found.</returns>
+    public async Task<AccountDocument?> GetAccountAsync(string accountId)
+    {
+        var filter = Builders<AccountDocument>.Filter.Eq(a => a.AccountId, accountId);
+        return await _accounts.Find(filter).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Gets an account by account ID (synchronous).
+    /// </summary>
+    public AccountDocument? GetAccount(string accountId)
+    {
+        return GetAccountAsync(accountId).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Gets an account by email address.
+    /// </summary>
+    /// <param name="email">Email address to search for.</param>
+    /// <returns>AccountDocument or null if not found.</returns>
+    public async Task<AccountDocument?> GetAccountByEmailAsync(string email)
+    {
+        var filter = Builders<AccountDocument>.Filter.Regex(a => a.Email,
+            new BsonRegularExpression($"^{email}$", "i"));
+        return await _accounts.Find(filter).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Gets an account by email address (synchronous).
+    /// </summary>
+    public AccountDocument? GetAccountByEmail(string email)
+    {
+        return GetAccountByEmailAsync(email).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Saves an account to the database.
+    /// </summary>
+    /// <param name="account">Account document to save.</param>
+    public async Task SaveAccountAsync(AccountDocument account)
+    {
+        var filter = Builders<AccountDocument>.Filter.Eq(a => a.AccountId, account.AccountId);
+        await _accounts.ReplaceOneAsync(filter, account, new ReplaceOptions { IsUpsert = true });
+    }
+
+    /// <summary>
+    /// Saves an account to the database (synchronous).
+    /// </summary>
+    public void SaveAccount(AccountDocument account)
+    {
+        SaveAccountAsync(account).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Deletes an account from the database.
+    /// </summary>
+    /// <param name="accountId">Account ID to delete.</param>
+    /// <returns>True if deleted, false otherwise.</returns>
+    public async Task<bool> DeleteAccountAsync(string accountId)
+    {
+        var filter = Builders<AccountDocument>.Filter.Eq(a => a.AccountId, accountId);
+        var result = await _accounts.DeleteOneAsync(filter);
+        return result.DeletedCount > 0;
+    }
+
+    /// <summary>
+    /// Deletes an account from the database (synchronous).
+    /// </summary>
+    public bool DeleteAccount(string accountId)
+    {
+        return DeleteAccountAsync(accountId).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Checks if an account exists.
+    /// </summary>
+    /// <param name="accountId">Account ID to check.</param>
+    /// <returns>True if account exists.</returns>
+    public bool AccountExists(string accountId)
+    {
+        var filter = Builders<AccountDocument>.Filter.Eq(a => a.AccountId, accountId);
+        return _accounts.Find(filter).Any();
+    }
+
+    /// <summary>
+    /// Checks if an email is already registered.
+    /// </summary>
+    /// <param name="email">Email to check.</param>
+    /// <returns>True if email exists.</returns>
+    public bool EmailExists(string email)
+    {
+        var filter = Builders<AccountDocument>.Filter.Regex(a => a.Email,
+            new BsonRegularExpression($"^{email}$", "i"));
+        return _accounts.Find(filter).Any();
+    }
+
+    #endregion
+
+    #region Ban Operations
+
+    /// <summary>
+    /// Gets all active bans.
+    /// </summary>
+    /// <returns>List of active ban records.</returns>
+    public async Task<List<BanRecord>> GetActiveBansAsync()
+    {
+        var filter = Builders<BanDocument>.Filter.Eq(b => b.IsActive, true);
+        var docs = await _bans.Find(filter).ToListAsync();
+        return docs.Select(d => d.ToBanRecord()).ToList();
+    }
+
+    /// <summary>
+    /// Gets all active bans (synchronous).
+    /// </summary>
+    public List<BanRecord> GetActiveBans()
+    {
+        return GetActiveBansAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Gets ban history for an account.
+    /// </summary>
+    /// <param name="accountId">Account ID to get history for.</param>
+    /// <returns>List of all bans for the account.</returns>
+    public async Task<List<BanRecord>> GetBanHistoryAsync(string accountId)
+    {
+        var filter = Builders<BanDocument>.Filter.Eq(b => b.AccountId, accountId);
+        var docs = await _bans.Find(filter).ToListAsync();
+        return docs.Select(d => d.ToBanRecord()).ToList();
+    }
+
+    /// <summary>
+    /// Gets ban history for an account (synchronous).
+    /// </summary>
+    public List<BanRecord> GetBanHistory(string accountId)
+    {
+        return GetBanHistoryAsync(accountId).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Saves a ban record to the database.
+    /// </summary>
+    /// <param name="ban">Ban record to save.</param>
+    public async Task SaveBanAsync(BanRecord ban)
+    {
+        var doc = BanDocument.FromBanRecord(ban);
+        var filter = Builders<BanDocument>.Filter.And(
+            Builders<BanDocument>.Filter.Eq(b => b.AccountId, ban.AccountId),
+            Builders<BanDocument>.Filter.Eq(b => b.BannedAt, ban.BannedAt)
+        );
+        await _bans.ReplaceOneAsync(filter, doc, new ReplaceOptions { IsUpsert = true });
+    }
+
+    /// <summary>
+    /// Saves a ban record to the database (synchronous).
+    /// </summary>
+    public void SaveBan(BanRecord ban)
+    {
+        SaveBanAsync(ban).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Removes active ban for an account.
+    /// </summary>
+    /// <param name="accountId">Account ID to unban.</param>
+    /// <returns>True if ban was removed.</returns>
+    public async Task<bool> RemoveBanAsync(string accountId)
+    {
+        var filter = Builders<BanDocument>.Filter.And(
+            Builders<BanDocument>.Filter.Eq(b => b.AccountId, accountId),
+            Builders<BanDocument>.Filter.Eq(b => b.IsActive, true)
+        );
+        var update = Builders<BanDocument>.Update.Set(b => b.IsActive, false);
+        var result = await _bans.UpdateManyAsync(filter, update);
+        return result.ModifiedCount > 0;
+    }
+
+    /// <summary>
+    /// Removes active ban for an account (synchronous).
+    /// </summary>
+    public bool RemoveBan(string accountId)
+    {
+        return RemoveBanAsync(accountId).GetAwaiter().GetResult();
+    }
+
+    #endregion
 }
 
 #region MongoDB Document Models
@@ -560,6 +772,99 @@ public class GuildDocument
 
     [BsonElement("data")]
     public GuildData Data { get; set; } = new();
+}
+
+/// <summary>
+/// MongoDB document for ban records.
+/// </summary>
+public class BanDocument
+{
+    /// <summary>MongoDB document ID.</summary>
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? Id { get; set; }
+
+    /// <summary>Account ID of the banned player.</summary>
+    [BsonElement("accountId")]
+    public string AccountId { get; set; } = string.Empty;
+
+    /// <summary>Character name if ban is character-specific.</summary>
+    [BsonElement("characterName")]
+    public string? CharacterName { get; set; }
+
+    /// <summary>Reason for the ban.</summary>
+    [BsonElement("reason")]
+    public string Reason { get; set; } = string.Empty;
+
+    /// <summary>Type of cheat that triggered the ban.</summary>
+    [BsonElement("cheatType")]
+    public string CheatType { get; set; } = string.Empty;
+
+    /// <summary>When the ban was issued.</summary>
+    [BsonElement("bannedAt")]
+    public DateTime BannedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>When the ban expires (null for permanent).</summary>
+    [BsonElement("expiresAt")]
+    public DateTime? ExpiresAt { get; set; }
+
+    /// <summary>IP address at time of ban.</summary>
+    [BsonElement("ipAddress")]
+    public string IpAddress { get; set; } = string.Empty;
+
+    /// <summary>Who issued the ban.</summary>
+    [BsonElement("issuedBy")]
+    public string IssuedBy { get; set; } = "System";
+
+    /// <summary>Additional details about the violation.</summary>
+    [BsonElement("details")]
+    public string Details { get; set; } = string.Empty;
+
+    /// <summary>Whether the ban is currently active.</summary>
+    [BsonElement("isActive")]
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Converts this document to a BanRecord.
+    /// </summary>
+    /// <returns>BanRecord instance.</returns>
+    public BanRecord ToBanRecord()
+    {
+        return new BanRecord
+        {
+            AccountId = AccountId,
+            CharacterName = CharacterName,
+            Reason = Reason,
+            CheatType = CheatType,
+            BannedAt = BannedAt,
+            ExpiresAt = ExpiresAt,
+            IpAddress = IpAddress,
+            IssuedBy = IssuedBy,
+            Details = Details
+        };
+    }
+
+    /// <summary>
+    /// Creates a BanDocument from a BanRecord.
+    /// </summary>
+    /// <param name="ban">Ban record to convert.</param>
+    /// <returns>BanDocument instance.</returns>
+    public static BanDocument FromBanRecord(BanRecord ban)
+    {
+        return new BanDocument
+        {
+            AccountId = ban.AccountId,
+            CharacterName = ban.CharacterName,
+            Reason = ban.Reason,
+            CheatType = ban.CheatType,
+            BannedAt = ban.BannedAt,
+            ExpiresAt = ban.ExpiresAt,
+            IpAddress = ban.IpAddress,
+            IssuedBy = ban.IssuedBy,
+            Details = ban.Details,
+            IsActive = ban.IsActive
+        };
+    }
 }
 
 #endregion

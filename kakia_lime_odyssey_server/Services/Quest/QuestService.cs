@@ -504,5 +504,41 @@ public class QuestService
 		player.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
+	/// <summary>
+	/// Sends the quest turn-in dialog to the player and sets up pending turn-in tracking.
+	/// </summary>
+	/// <param name="player">The player turning in the quest.</param>
+	/// <param name="questTypeID">Quest type ID being turned in.</param>
+	/// <param name="npcObjInstID">NPC instance ID handling the turn-in.</param>
+	/// <returns>True if quest report dialog was sent.</returns>
+	public bool StartQuestTurnIn(PlayerClient player, uint questTypeID, long npcObjInstID)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null) return false;
+
+		string accountId = player.GetAccountId();
+		string charName = character.appearance.name;
+		var quests = GetOrLoadQuests(accountId, charName);
+
+		// Verify quest is active
+		var quest = quests.ActiveQuests.FirstOrDefault(q => q.QuestId == (int)questTypeID);
+		if (quest == null)
+		{
+			Logger.Log($"[QUEST] Cannot turn in quest {questTypeID} - not active", LogLevel.Debug);
+			return false;
+		}
+
+		// Set pending turn-in state so CS_QUEST_COMPLETE knows which quest
+		player.SetPendingTurnInQuest(questTypeID);
+
+		// Send quest report talk dialog
+		using PacketWriter pw = new();
+		pw.Write(new SC_QUEST_REPORT_TALK { typeID = questTypeID, objInstID = npcObjInstID });
+		player.Send(pw.ToSizedPacket(), default).Wait();
+
+		Logger.Log($"[QUEST] {charName} started turn-in dialog for quest {questTypeID}", LogLevel.Debug);
+		return true;
+	}
+
 	#endregion
 }

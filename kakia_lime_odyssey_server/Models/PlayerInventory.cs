@@ -10,6 +10,14 @@ public class PlayerInventory : IPlayerInventory
 	public int MaxSize = 96;
 	public byte Grade = 1;
 
+	/// <summary>Wallet currency - Peder (primary currency).</summary>
+	[JsonProperty]
+	public long WalletPeder { get; set; }
+
+	/// <summary>Wallet currency - Lant (secondary/premium currency).</summary>
+	[JsonProperty]
+	public long WalletLant { get; set; }
+
 	[JsonProperty]
 	private Dictionary<int, Item?> _inventory = new();
 

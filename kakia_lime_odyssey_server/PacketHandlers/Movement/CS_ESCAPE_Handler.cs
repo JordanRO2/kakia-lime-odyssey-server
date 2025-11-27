@@ -3,8 +3,9 @@
 /// </summary>
 /// <remarks>
 /// Triggered by: Player using escape command/item (return to town)
-/// Response packets: SC_WARP
+/// Response packets: SC_WARP, SC_RESURRECTED (if dead)
 /// Note: Warps the player to a predetermined safe location (town spawn point).
+/// If the player is dead, this also resurrects them with reduced HP.
 /// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
@@ -34,10 +35,37 @@ class CS_ESCAPE_Handler : PacketHandler
 		if (client is not PlayerClient pc) return;
 
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
-		Logger.Log($"[MOVEMENT] {playerName} using escape to return to safe location", LogLevel.Debug);
+		bool wasDead = pc.IsDead();
+
+		Logger.Log($"[ESCAPE] {playerName} using escape to return to safe location (wasDead: {wasDead})", LogLevel.Debug);
 
 		// Get spawn point for current zone
 		FPOS spawnPoint = GetSpawnPointForZone(pc.GetZone());
+
+		// If player was dead, resurrect them first
+		if (wasDead)
+		{
+			// Resurrect with 10% HP (less than in-place resurrection)
+			var status = pc.GetStatus();
+			uint resurrectHP = Math.Max(1, status.mhp / 10);
+
+			pc.Resurrect(resurrectHP);
+
+			// Send resurrection packet
+			SC_RESURRECTED resPacket = new()
+			{
+				objInstID = pc.GetObjInstID(),
+				hp = resurrectHP
+			};
+
+			using PacketWriter resPw = new();
+			resPw.Write(resPacket);
+			var resBytes = resPw.ToPacket();
+			pc.Send(resBytes, default).Wait();
+			pc.SendGlobalPacket(resBytes, default).Wait();
+
+			Logger.Log($"[ESCAPE] {playerName} resurrected at town with {resurrectHP} HP", LogLevel.Information);
+		}
 
 		// Update player position
 		pc.UpdatePosition(spawnPoint);
@@ -55,7 +83,7 @@ class CS_ESCAPE_Handler : PacketHandler
 		pc.Send(pw.ToPacket(), default).Wait();
 		pc.SendGlobalPacket(pw.ToPacket(), default).Wait();
 
-		Logger.Log($"[MOVEMENT] {playerName} escaped to spawn point ({spawnPoint.x}, {spawnPoint.y}, {spawnPoint.z})", LogLevel.Debug);
+		Logger.Log($"[ESCAPE] {playerName} escaped to spawn point ({spawnPoint.x}, {spawnPoint.y}, {spawnPoint.z})", LogLevel.Debug);
 	}
 
 	/// <summary>

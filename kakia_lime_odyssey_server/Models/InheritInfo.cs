@@ -16,7 +16,7 @@ public class InheritInfo
         if (_cache != null) return _cache;
 
         XmlSerializer serializer = new XmlSerializer(typeof(InheritInfo));
-        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Characters.InheritTypes, FileMode.Open);
+        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Characters.Inherit, FileMode.Open);
         var inheritInfo = (InheritInfo)serializer.Deserialize(fileStream)!;
 
         _cache = new Dictionary<int, XmlInherit>();

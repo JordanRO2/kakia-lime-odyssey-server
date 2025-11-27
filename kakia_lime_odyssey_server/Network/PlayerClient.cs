@@ -43,6 +43,13 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	private bool _inMotion = false;
 
+	// Death state tracking
+	private bool _isDead = false;
+	private DateTime _deathTime = DateTime.MinValue;
+
+	// Quest turn-in tracking (set when player opens quest turn-in dialog)
+	private uint _pendingTurnInQuestId = 0;
+
 	// Anti-cheat tracking fields
 	private uint _lastClientTick = 0;
 	private FPOS _lastPosition = new();
@@ -820,6 +827,12 @@ public class PlayerClient : IPlayerClient, IEntity
 		return GetObjInstID();
 	}
 
+	/// <summary>
+	/// Gets the entity type ID. Returns 0 for players (not a monster/NPC type).
+	/// </summary>
+	/// <returns>0 for players.</returns>
+	public int GetEntityTypeId() => 0;
+
 	public EntityStatus GetEntityStatus()
 	{
 		// Combat job (jobId 1) - return combat-focused stats
@@ -943,10 +956,20 @@ public class PlayerClient : IPlayerClient, IEntity
 	}
 
 	/// <summary>
-	/// Sends death notification to player and nearby players
+	/// Sends death notification to player and nearby players.
 	/// </summary>
+	/// <remarks>
+	/// Sets the player's death state, applies death penalty (EXP loss),
+	/// and broadcasts the death to all nearby players.
+	/// </remarks>
 	public void SendDeath()
 	{
+		// Mark player as dead
+		SetDead(true);
+
+		// Apply death penalty (lose 5% of current level EXP)
+		ApplyDeathPenalty();
+
 		SC_DEAD deathPacket = new()
 		{
 			objInstID = GetObjInstID()
@@ -959,7 +982,51 @@ public class PlayerClient : IPlayerClient, IEntity
 		Send(packet, default).Wait();
 		SendGlobalPacket(packet, default).Wait();
 
-		Logger.Log($"[PlayerClient] Player {GetCurrentCharacter().appearance.name} ({GetObjInstID()}) has died");
+		Logger.Log($"[DEATH] Player {GetCurrentCharacter().appearance.name} ({GetObjInstID()}) has died", LogLevel.Information);
+	}
+
+	/// <summary>
+	/// Applies the death penalty to the player (EXP loss).
+	/// </summary>
+	/// <remarks>
+	/// Players lose 5% of their current EXP on death.
+	/// EXP cannot go below 0.
+	/// </remarks>
+	private void ApplyDeathPenalty()
+	{
+		uint currentExp = _currentCharacter.status.combatJob.exp;
+		uint expLoss = currentExp / 20; // 5% loss
+
+		if (expLoss > 0)
+		{
+			_currentCharacter.status.combatJob.exp = currentExp - expLoss;
+			Logger.Log($"[DEATH] {GetCurrentCharacter().appearance.name} lost {expLoss} EXP (death penalty)", LogLevel.Debug);
+		}
+	}
+
+	/// <summary>
+	/// Resurrects the player with the specified HP.
+	/// </summary>
+	/// <param name="hp">HP amount after resurrection.</param>
+	/// <remarks>
+	/// Clears the death state and restores player HP.
+	/// Does not send packets - caller is responsible for broadcasting SC_RESURRECTED.
+	/// </remarks>
+	public void Resurrect(uint hp)
+	{
+		if (!_isDead)
+		{
+			Logger.Log($"[RESURRECT] Attempted to resurrect {GetCurrentCharacter().appearance.name} but player is not dead", LogLevel.Warning);
+			return;
+		}
+
+		// Clear death state
+		SetDead(false);
+
+		// Restore HP
+		UpdateHP((int)hp, false);
+
+		Logger.Log($"[RESURRECT] {GetCurrentCharacter().appearance.name} resurrection complete with {hp} HP", LogLevel.Debug);
 	}
 
 	public bool AddExp(ulong exp)
@@ -1025,6 +1092,57 @@ public class PlayerClient : IPlayerClient, IEntity
 	/// Sets the player's underwater state.
 	/// </summary>
 	public void SetUnderwater(bool underwater) => _isUnderwater = underwater;
+
+	/// <summary>
+	/// Gets whether the player is currently dead.
+	/// </summary>
+	/// <returns>True if the player is dead (HP = 0).</returns>
+	public bool IsDead() => _isDead;
+
+	/// <summary>
+	/// Gets the time when the player died.
+	/// </summary>
+	/// <returns>DateTime of death, or DateTime.MinValue if not dead.</returns>
+	public DateTime GetDeathTime() => _deathTime;
+
+	/// <summary>
+	/// Sets the player's death state.
+	/// </summary>
+	/// <param name="dead">Whether the player is dead.</param>
+	private void SetDead(bool dead)
+	{
+		_isDead = dead;
+		if (dead)
+		{
+			_deathTime = DateTime.UtcNow;
+			_inCombat = false;
+		}
+		else
+		{
+			_deathTime = DateTime.MinValue;
+		}
+	}
+
+	/// <summary>
+	/// Sets the quest ID that the player is about to turn in.
+	/// </summary>
+	/// <remarks>
+	/// Called when server sends SC_QUEST_REPORT_TALK to track which quest
+	/// is being turned in. CS_QUEST_COMPLETE does not include quest ID.
+	/// </remarks>
+	/// <param name="questTypeID">Quest type ID being turned in, or 0 to clear.</param>
+	public void SetPendingTurnInQuest(uint questTypeID) => _pendingTurnInQuestId = questTypeID;
+
+	/// <summary>
+	/// Gets the quest ID that the player is currently turning in.
+	/// </summary>
+	/// <returns>Quest type ID, or 0 if no pending turn-in.</returns>
+	public uint GetPendingTurnInQuest() => _pendingTurnInQuestId;
+
+	/// <summary>
+	/// Clears the pending turn-in quest (after completion or cancel).
+	/// </summary>
+	public void ClearPendingTurnInQuest() => _pendingTurnInQuestId = 0;
 
 	/// <summary>
 	/// Get the skill cooldown tracker for this player

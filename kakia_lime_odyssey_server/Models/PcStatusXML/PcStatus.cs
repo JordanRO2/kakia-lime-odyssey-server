@@ -12,7 +12,7 @@ public class PcStatus
 	public static Dictionary<int, Exp> GetEntries()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(PcStatus));
-		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Characters.ExperienceTable, FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Characters.PcStatus, FileMode.Open);
 		var pcStatus = (PcStatus)serializer.Deserialize(fileStream)!;
 
 		var entries = new Dictionary<int, Exp>();

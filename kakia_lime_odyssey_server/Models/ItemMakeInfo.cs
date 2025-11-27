@@ -19,7 +19,7 @@ public class ItemMakeInfo
         if (_instance != null) return _instance;
 
         XmlSerializer serializer = new XmlSerializer(typeof(ItemMakeInfo));
-        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.Crafting, FileMode.Open);
+        using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.ItemMakeInfo, FileMode.Open);
         _instance = (ItemMakeInfo)serializer.Deserialize(fileStream)!;
 
         return _instance;

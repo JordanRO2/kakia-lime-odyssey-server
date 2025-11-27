@@ -14,7 +14,7 @@ public class ItemInfo
 	public static List<Item> GetItems()
 	{
 		XmlSerializer serializer = new XmlSerializer(typeof(ItemInfo));
-		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.Items, FileMode.Open);
+		using FileStream fileStream = new FileStream(GameDataPaths.Definitions.Items.ItemInfo, FileMode.Open);
 		var info = (ItemInfo)serializer.Deserialize(fileStream)!;
 
 		return info.Items;

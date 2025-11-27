@@ -1,22 +1,3 @@
-using kakia_lime_odyssey_packets;
-using kakia_lime_odyssey_packets.Packets.Enums;
-using kakia_lime_odyssey_packets.Packets.SC;
-using kakia_lime_odyssey_server.Interfaces;
-using kakia_lime_odyssey_server.Models;
-using kakia_lime_odyssey_server.Models.SkillXML;
-
-namespace kakia_lime_odyssey_server.Services.Combat;
-
-/// <summary>
-/// Skill damage type determines which stats are used for calculation.
-/// </summary>
-public enum SkillDamageType
-{
-	Physical,
-	Magical,
-	Hybrid
-}
-
 /// <summary>
 /// Service for handling combat calculations including damage, hit rolls, and critical strikes.
 /// </summary>
@@ -31,7 +12,24 @@ public enum SkillDamageType
 /// - HIT_FAIL_AVOID (4): Dodge
 /// - HIT_FAIL_SHIELD (5): Block
 /// - HIT_FAIL_GUARD (6): Parry
+///
+/// Skill damage types are determined by XmlSkill.GetDamageType() based on skill ID ranges:
+/// - Fighter/Thief skills: Physical damage
+/// - Priest/Mage skills: Magical damage
+/// - Life job skills: Non-combat
 /// </remarks>
+using kakia_lime_odyssey_packets;
+using kakia_lime_odyssey_packets.Packets.Enums;
+using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Interfaces;
+using kakia_lime_odyssey_server.Models;
+using kakia_lime_odyssey_server.Models.SkillXML;
+
+namespace kakia_lime_odyssey_server.Services.Combat;
+
+/// <summary>
+/// Service for handling combat calculations including damage, hit rolls, and critical strikes.
+/// </summary>
 public class CombatService : ICombatService
 {
 	private static readonly ThreadLocal<Random> _random = new(() => new Random());
@@ -45,26 +43,6 @@ public class CombatService : ICombatService
 	/// Block damage reduction percentage.
 	/// </summary>
 	private const float BlockDamageReduction = 0.75f;
-
-	// Skill type to damage type mapping based on skill class/type
-	private static readonly Dictionary<string, SkillDamageType> SkillTypeMapping = new(StringComparer.OrdinalIgnoreCase)
-	{
-		// Fighter skills - Physical
-		{ "StrikingSword", SkillDamageType.Physical },
-		{ "TitanCrush", SkillDamageType.Physical },
-		{ "HeavyBlow", SkillDamageType.Physical },
-		{ "LimitBreaker", SkillDamageType.Physical },
-		{ "MissionCarry", SkillDamageType.Physical },
-
-		// Mage skills - Magical
-		{ "Fireball", SkillDamageType.Magical },
-		{ "IceBolt", SkillDamageType.Magical },
-		{ "Lightning", SkillDamageType.Magical },
-		{ "MagicMissile", SkillDamageType.Magical },
-
-		// Hybrid skills
-		{ "ElementalStrike", SkillDamageType.Hybrid }
-	};
 
 	/// <inheritdoc/>
 	public DamageResult DealWeaponDamage(IEntity source, IEntity target)
@@ -421,24 +399,32 @@ public class CombatService : ICombatService
 	}
 
 	/// <summary>
-	/// Gets the damage type for a skill based on its type attribute.
+	/// Gets the damage type for a skill from its XML definition.
 	/// </summary>
+	/// <remarks>
+	/// Uses XmlSkill.GetDamageType() which determines type by skill ID range:
+	/// - Fighter/Thief (ID 1-14, 501-599, 1001-1999): Physical
+	/// - Priest/Mage (ID 2001-2999, 3001-3999): Magical
+	/// - Life jobs (ID 5000+): None
+	/// </remarks>
 	private static SkillDamageType GetSkillDamageType(XmlSkill? skill)
 	{
 		if (skill == null)
 			return SkillDamageType.Physical;
 
-		// Check skill type mapping
-		if (SkillTypeMapping.TryGetValue(skill.Type, out var damageType))
-			return damageType;
-
-		// Default to physical for unknown skills
-		return SkillDamageType.Physical;
+		return skill.GetDamageType();
 	}
 
 	/// <summary>
 	/// Gets combat stats based on damage type.
 	/// </summary>
+	/// <remarks>
+	/// Maps skill damage types to appropriate attack/defense stats:
+	/// - Physical: Uses melee attack/defense stats
+	/// - Magical: Uses spell attack/defense stats
+	/// - Hybrid: Uses average of both
+	/// - None: Uses melee stats (non-combat skills shouldn't call this)
+	/// </remarks>
 	private static (ushort atk, ushort def, ushort hit, ushort flee, int crit) GetCombatStats(
 		EntityStatus source, EntityStatus target, SkillDamageType damageType)
 	{
@@ -459,6 +445,7 @@ public class CombatService : ICombatService
 				(ushort)((target.MeleeAttack.FleeRate + target.SpellAttack.FleeRate) / 2),
 				(source.MeleeAttack.CritRate + source.SpellAttack.CritRate) / 2
 			),
+			// Physical and None both use melee stats
 			_ => (
 				source.MeleeAttack.Atk,
 				target.MeleeAttack.Def,
