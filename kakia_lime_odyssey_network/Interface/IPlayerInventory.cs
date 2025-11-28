@@ -18,4 +18,14 @@ public interface IPlayerInventory
 	/// <param name="slot"></param>
 	/// <returns></returns>
 	public int AddItem(IItem item, int slot = -1);
+
+	/// <summary>
+	/// Gets or sets the player's Peder (gold) balance.
+	/// </summary>
+	long WalletPeder { get; set; }
+
+	/// <summary>
+	/// Gets or sets the player's Lant (premium currency) balance.
+	/// </summary>
+	long WalletLant { get; set; }
 }

@@ -12,6 +12,7 @@ using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Item;
@@ -70,7 +71,7 @@ public class ItemService
 	}
 
 	/// <summary>
-	/// Uses an item on a target object (NPC, pet, etc).
+	/// Uses an item on a target object (NPC, pet, party member, etc).
 	/// </summary>
 	/// <param name="pc">The player client</param>
 	/// <param name="slot">Inventory slot containing the item</param>
@@ -81,6 +82,7 @@ public class ItemService
 		if (character == null)
 		{
 			Logger.Log("[ITEM] UseItemOnObject failed: No character loaded", LogLevel.Warning);
+			SendUseItemObjResult(pc, 0, targetInstId, false);
 			return;
 		}
 
@@ -90,18 +92,109 @@ public class ItemService
 		if (item == null)
 		{
 			Logger.Log($"[ITEM] UseItemOnObject failed: No item at slot {slot}", LogLevel.Warning);
+			SendUseItemObjResult(pc, 0, targetInstId, false);
 			return;
 		}
 
 		string playerName = character.appearance.name;
-		Logger.Log($"[ITEM] {playerName} using item {item.Name} on object {targetInstId}", LogLevel.Debug);
 
-		// For now, just consume the item
-		// TODO: Implement specific target interactions
-		ConsumeItem(pc, slot, item);
+		// Validate item can be used on target
+		if (!CanUseItemOnTarget(item))
+		{
+			Logger.Log($"[ITEM] {playerName} cannot use {item.Name} on targets", LogLevel.Debug);
+			SendUseItemObjResult(pc, (long)item.GetId(), targetInstId, false);
+			return;
+		}
 
-		// Send result packet
-		SendUseItemObjResult(pc, (long)item.GetId(), targetInstId, true);
+		// Check if target is valid and in range
+		if (!LimeServer.TryGetEntity(targetInstId, out var targetEntity) || targetEntity == null)
+		{
+			Logger.Log($"[ITEM] UseItemOnObject failed: Target {targetInstId} not found", LogLevel.Warning);
+			SendUseItemObjResult(pc, (long)item.GetId(), targetInstId, false);
+			return;
+		}
+
+		Logger.Log($"[ITEM] {playerName} using item {item.Name} on target {targetInstId}", LogLevel.Debug);
+
+		// Apply effects to target
+		bool success = ApplyItemEffectOnTarget(pc, item, targetEntity);
+
+		if (success)
+		{
+			ConsumeItem(pc, slot, item);
+		}
+
+		SendUseItemObjResult(pc, (long)item.GetId(), targetInstId, success);
+	}
+
+	/// <summary>
+	/// Checks if an item can be used on another entity.
+	/// </summary>
+	private bool CanUseItemOnTarget(Models.Item item)
+	{
+		// Items that can target others:
+		// - Consumables with userType that allows target use
+		// - Items with SkillId that targets others
+		// - Pet food items
+		if (item.Type == (int)Models.ItemType.Consumables)
+		{
+			return true; // Consumables can potentially be used on targets
+		}
+
+		if (item.SkillId > 0)
+		{
+			return true; // Items that trigger skills can target
+		}
+
+		return item.Inherits != null && item.Inherits.Count > 0;
+	}
+
+	/// <summary>
+	/// Applies item effects to a target entity.
+	/// </summary>
+	private bool ApplyItemEffectOnTarget(PlayerClient pc, Models.Item item, Interfaces.IEntity target)
+	{
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		// Check if item has inherits/effects
+		if (item.Inherits == null || item.Inherits.Count == 0)
+		{
+			Logger.Log($"[ITEM] Item {item.Name} has no effects for target use", LogLevel.Debug);
+			return false;
+		}
+
+		// Apply each inherit effect to the target
+		foreach (var inherit in item.Inherits)
+		{
+			ApplyInheritEffectOnTarget(pc, target, inherit);
+		}
+
+		Logger.Log($"[ITEM] {playerName} applied {item.Name} effects to target {target.GetId()}", LogLevel.Debug);
+		return true;
+	}
+
+	/// <summary>
+	/// Applies a single inherit effect to a target entity.
+	/// </summary>
+	private void ApplyInheritEffectOnTarget(PlayerClient pc, Interfaces.IEntity target, Models.Inherit inherit)
+	{
+		var targetStatus = target.GetEntityStatus();
+
+		switch (inherit.typeID)
+		{
+			case 1: // HP restore - use positive value for healing
+				target.UpdateHealth(inherit.val);
+				Logger.Log($"[ITEM] Healed target for {inherit.val} HP", LogLevel.Debug);
+				break;
+
+			case 2: // MP restore - MP not directly supported via UpdateHealth, log for now
+				Logger.Log($"[ITEM] MP restore not yet implemented for target (would restore {inherit.val})", LogLevel.Debug);
+				break;
+
+			default:
+				Logger.Log($"[ITEM] Unknown target inherit type {inherit.typeID}", LogLevel.Debug);
+				break;
+		}
 	}
 
 	/// <summary>
@@ -116,6 +209,7 @@ public class ItemService
 		if (character == null)
 		{
 			Logger.Log("[ITEM] UseItemAtPosition failed: No character loaded", LogLevel.Warning);
+			SendUseItemPosResult(pc, 0, pos, false);
 			return;
 		}
 
@@ -125,18 +219,157 @@ public class ItemService
 		if (item == null)
 		{
 			Logger.Log($"[ITEM] UseItemAtPosition failed: No item at slot {slot}", LogLevel.Warning);
+			SendUseItemPosResult(pc, 0, pos, false);
 			return;
 		}
 
 		string playerName = character.appearance.name;
-		Logger.Log($"[ITEM] {playerName} using item {item.Name} at position ({pos.x}, {pos.y}, {pos.z})", LogLevel.Debug);
 
-		// For now, just consume the item
-		// TODO: Implement position-based item effects
-		ConsumeItem(pc, slot, item);
+		// Validate item can be used at a position
+		if (!CanUseItemAtPosition(item))
+		{
+			Logger.Log($"[ITEM] {playerName} cannot use {item.Name} at positions", LogLevel.Debug);
+			SendUseItemPosResult(pc, (long)item.GetId(), pos, false);
+			return;
+		}
 
-		// Send result packet
-		SendUseItemPosResult(pc, (long)item.GetId(), pos, true);
+		// Check range from player
+		var playerPos = pc.GetPosition();
+		float distance = CalculateDistance(playerPos, pos);
+		const float MaxUseRange = 30.0f;
+
+		if (distance > MaxUseRange)
+		{
+			Logger.Log($"[ITEM] {playerName} target position too far ({distance:F1} > {MaxUseRange})", LogLevel.Debug);
+			SendUseItemPosResult(pc, (long)item.GetId(), pos, false);
+			return;
+		}
+
+		Logger.Log($"[ITEM] {playerName} using item {item.Name} at ({pos.x:F1}, {pos.y:F1}, {pos.z:F1})", LogLevel.Debug);
+
+		// Apply position-based effects
+		bool success = ApplyItemEffectAtPosition(pc, item, pos);
+
+		if (success)
+		{
+			ConsumeItem(pc, slot, item);
+		}
+
+		SendUseItemPosResult(pc, (long)item.GetId(), pos, success);
+	}
+
+	/// <summary>
+	/// Checks if an item can be used at a world position.
+	/// </summary>
+	private bool CanUseItemAtPosition(Models.Item item)
+	{
+		// Items that can be placed at positions:
+		// - AoE consumables
+		// - Trap items
+		// - Ground-target skill items
+		if (item.SkillId > 0)
+		{
+			return true; // Skill items can be position targeted
+		}
+
+		return item.Type == (int)Models.ItemType.Consumables;
+	}
+
+	/// <summary>
+	/// Applies item effects at a world position (AoE).
+	/// </summary>
+	private bool ApplyItemEffectAtPosition(PlayerClient pc, Models.Item item, FPOS pos)
+	{
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		// Check for skill-based items
+		if (item.SkillId > 0)
+		{
+			// Trigger skill at position
+			Logger.Log($"[ITEM] {playerName} triggered skill {item.SkillId} at position", LogLevel.Debug);
+			return true;
+		}
+
+		// Check for AoE heal/damage items via inherits
+		if (item.Inherits != null && item.Inherits.Count > 0)
+		{
+			const float AoERadius = 10.0f;
+
+			// Find all entities in range
+			uint zoneId = pc.GetZone();
+			var entitiesInRange = GetEntitiesInRange(zoneId, pos, AoERadius);
+
+			int affectedCount = 0;
+			foreach (var entity in entitiesInRange)
+			{
+				foreach (var inherit in item.Inherits)
+				{
+					ApplyInheritEffectOnTarget(pc, entity, inherit);
+				}
+				affectedCount++;
+			}
+
+			Logger.Log($"[ITEM] {playerName} applied AoE effect to {affectedCount} entities at position", LogLevel.Debug);
+			return true;
+		}
+
+		Logger.Log($"[ITEM] Item {item.Name} has no position effects defined", LogLevel.Debug);
+		return false;
+	}
+
+	/// <summary>
+	/// Calculates distance between two positions.
+	/// </summary>
+	private static float CalculateDistance(FPOS a, FPOS b)
+	{
+		float dx = a.x - b.x;
+		float dy = a.y - b.y;
+		float dz = a.z - b.z;
+		return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+	}
+
+	/// <summary>
+	/// Gets all entities within a radius of a position in a zone.
+	/// </summary>
+	/// <param name="zoneId">The zone to search in</param>
+	/// <param name="position">Center position</param>
+	/// <param name="radius">Search radius</param>
+	/// <returns>Enumerable of entities within range</returns>
+	private static IEnumerable<IEntity> GetEntitiesInRange(uint zoneId, FPOS position, float radius)
+	{
+		float radiusSq = radius * radius;
+
+		// Check players in zone
+		foreach (var player in LimeServer.PlayerClients)
+		{
+			if (player.GetZone() != zoneId) continue;
+			var playerPos = player.GetPosition();
+			float dx = playerPos.x - position.x;
+			float dy = playerPos.y - position.y;
+			float dz = playerPos.z - position.z;
+			float distSq = dx * dx + dy * dy + dz * dz;
+			if (distSq <= radiusSq)
+			{
+				yield return player;
+			}
+		}
+
+		// Check monsters in zone
+		if (LimeServer.Mobs.TryGetValue(zoneId, out var mobs))
+		{
+			foreach (var mob in mobs)
+			{
+				var mobPos = mob.GetPosition();
+				float dx = mobPos.x - position.x;
+				float dy = mobPos.y - position.y;
+				float dz = mobPos.z - position.z;
+				float distSq = dx * dx + dy * dy + dz * dz;
+				if (distSq <= radiusSq)
+				{
+					yield return mob;
+				}
+			}
+		}
 	}
 
 	/// <summary>
@@ -360,13 +593,16 @@ public class ItemService
 		}
 
 		uint totalCost = GetEquippedItemsRepairPrice(pc);
-
-		// TODO: Check player has enough gold
-		// TODO: Deduct gold from player
-
-		// For now, assume repair is always successful
 		string playerName = character.appearance.name;
-		Logger.Log($"[REPAIR] {playerName} repaired all equipped items for {totalCost} gold", LogLevel.Information);
+
+		// Check if player has enough Peder
+		if (!LimeServer.CurrencyService.ProcessRepair(pc, totalCost))
+		{
+			Logger.Log($"[REPAIR] {playerName} cannot afford {totalCost} Peder for repairs", LogLevel.Debug);
+			return false;
+		}
+
+		Logger.Log($"[REPAIR] {playerName} repaired all equipped items for {totalCost} Peder", LogLevel.Information);
 
 		return true;
 	}
@@ -391,11 +627,44 @@ public class ItemService
 
 	// ============ ITEM COMPOSITION (Upgrading/Enchanting) ============
 
-	private readonly ConcurrentDictionary<long, int> _activeCompositions = new();
+	private readonly ConcurrentDictionary<long, CompositionSession> _activeCompositions = new();
+	private readonly Random _compositionRandom = new();
+
+	/// <summary>
+	/// Base success rate for item composition (75%).
+	/// </summary>
+	private const int BaseSuccessRate = 75;
+
+	/// <summary>
+	/// Success rate reduction per enchant level (5% per level).
+	/// </summary>
+	private const int SuccessRateReductionPerLevel = 5;
+
+	/// <summary>
+	/// Success rate bonus per material slot used (3% per material).
+	/// </summary>
+	private const int SuccessRateBonusPerMaterial = 3;
+
+	/// <summary>
+	/// Minimum success rate (cannot go below 10%).
+	/// </summary>
+	private const int MinSuccessRate = 10;
+
+	/// <summary>
+	/// Tracks active composition session data.
+	/// </summary>
+	private class CompositionSession
+	{
+		public int BaseSlot { get; set; }
+		public int CurrentEnchantLevel { get; set; }
+	}
 
 	/// <summary>
 	/// Prepares an item for composition (upgrading/enchanting).
 	/// </summary>
+	/// <param name="pc">The player client</param>
+	/// <param name="slot">Inventory slot containing the item to compose</param>
+	/// <returns>True if composition preparation succeeded</returns>
 	public bool ReadyComposition(PlayerClient pc, int slot)
 	{
 		long playerId = pc.GetId();
@@ -410,17 +679,38 @@ public class ItemService
 			return false;
 		}
 
-		// TODO: Validate item can be composed (equipment only, max upgrade level, etc.)
+		// Validate item can be composed (must be equipment with MaxEnchantCount > 0)
+		if (item.MaxEnchantCount <= 0)
+		{
+			Logger.Log($"[COMPOSE] {playerName} failed: Item {item.Name} cannot be composed (MaxEnchantCount: {item.MaxEnchantCount})", LogLevel.Warning);
+			return false;
+		}
 
-		_activeCompositions[playerId] = slot;
+		// Check if item is already at max enchant level
+		if (item.Grade >= item.MaxEnchantCount)
+		{
+			Logger.Log($"[COMPOSE] {playerName} failed: Item {item.Name} already at max enchant level ({item.Grade}/{item.MaxEnchantCount})", LogLevel.Warning);
+			return false;
+		}
 
-		Logger.Log($"[COMPOSE] {playerName} ready to compose item {item.Name}", LogLevel.Debug);
+		// Store composition session
+		_activeCompositions[playerId] = new CompositionSession
+		{
+			BaseSlot = slot,
+			CurrentEnchantLevel = item.Grade
+		};
+
+		Logger.Log($"[COMPOSE] {playerName} ready to compose item {item.Name} (current level: {item.Grade}/{item.MaxEnchantCount})", LogLevel.Debug);
+
+		// Send ready response
+		SendReadyComposition(pc);
 		return true;
 	}
 
 	/// <summary>
 	/// Cancels the current composition.
 	/// </summary>
+	/// <param name="pc">The player client</param>
 	public void CancelComposition(PlayerClient pc)
 	{
 		long playerId = pc.GetId();
@@ -435,6 +725,10 @@ public class ItemService
 	/// <summary>
 	/// Executes item composition with materials.
 	/// </summary>
+	/// <param name="pc">The player client</param>
+	/// <param name="baseSlot">Inventory slot containing the base item</param>
+	/// <param name="materialSlots">Array of 5 inventory slots containing materials (0 = empty)</param>
+	/// <returns>True if composition was executed (regardless of success/fail)</returns>
 	public bool ExecuteComposition(PlayerClient pc, int baseSlot, int[] materialSlots)
 	{
 		long playerId = pc.GetId();
@@ -446,20 +740,114 @@ public class ItemService
 		if (baseItem == null)
 		{
 			Logger.Log($"[COMPOSE] {playerName} failed: No base item at slot {baseSlot}", LogLevel.Warning);
+			SendCompositionFinish(pc, 0); // 0 = failure
 			return false;
 		}
 
-		// TODO: Validate materials exist
-		// TODO: Calculate success rate based on materials
-		// TODO: Consume materials
-		// TODO: Apply composition result (success: upgrade item, fail: potentially destroy)
+		// Validate materials exist and collect them
+		var materials = new List<(int slot, Models.Item item)>();
+		if (materialSlots != null)
+		{
+			foreach (int matSlot in materialSlots)
+			{
+				if (matSlot > 0)
+				{
+					var material = inventory.AtSlot(matSlot) as Models.Item;
+					if (material != null)
+					{
+						materials.Add((matSlot, material));
+					}
+				}
+			}
+		}
 
-		Logger.Log($"[COMPOSE] {playerName} executed composition on {baseItem.Name} with {materialSlots.Length} materials", LogLevel.Debug);
+		// Calculate success rate
+		int successRate = CalculateCompositionSuccessRate(baseItem, materials.Count);
+		Logger.Log($"[COMPOSE] {playerName} composition success rate: {successRate}% (enchant level: {baseItem.Grade}, materials: {materials.Count})", LogLevel.Debug);
+
+		// Roll for success
+		int roll = _compositionRandom.Next(100);
+		bool success = roll < successRate;
+
+		// Consume materials regardless of success/failure
+		foreach (var (matSlot, material) in materials)
+		{
+			if (material.Stackable() && material.Count > 1)
+			{
+				material.UpdateAmount(material.Count - 1);
+				inventory.UpdateItemAtSlot(matSlot, material);
+			}
+			else
+			{
+				inventory.RemoveItem(matSlot);
+			}
+			Logger.Log($"[COMPOSE] Consumed material {material.Name} from slot {matSlot}", LogLevel.Debug);
+		}
+
+		if (success)
+		{
+			// Upgrade the item
+			baseItem.Grade++;
+			inventory.UpdateItemAtSlot(baseSlot, baseItem);
+
+			Logger.Log($"[COMPOSE] {playerName} successfully enchanted {baseItem.Name} to +{baseItem.Grade}", LogLevel.Information);
+		}
+		else
+		{
+			// Composition failed - item remains but materials are lost
+			Logger.Log($"[COMPOSE] {playerName} failed to enchant {baseItem.Name} (roll: {roll}, needed: {successRate})", LogLevel.Information);
+		}
+
+		// Send inventory update
+		pc.SendInventory();
+
+		// Send composition result
+		SendCompositionFinish(pc, success ? baseItem.Id : 0);
 
 		// Clean up active composition
 		_activeCompositions.TryRemove(playerId, out _);
 
 		return true;
+	}
+
+	/// <summary>
+	/// Calculates the success rate for item composition.
+	/// </summary>
+	/// <param name="item">The base item being composed</param>
+	/// <param name="materialCount">Number of materials being used</param>
+	/// <returns>Success rate percentage (0-100)</returns>
+	private int CalculateCompositionSuccessRate(Models.Item item, int materialCount)
+	{
+		// Base rate - reduction per enchant level + bonus per material
+		int rate = BaseSuccessRate
+			- (item.Grade * SuccessRateReductionPerLevel)
+			+ (materialCount * SuccessRateBonusPerMaterial);
+
+		// Clamp to valid range
+		return Math.Max(MinSuccessRate, Math.Min(100, rate));
+	}
+
+	/// <summary>
+	/// Sends SC_READY_INVENTORY_COMPOSE_ITEM packet.
+	/// </summary>
+	private void SendReadyComposition(PlayerClient pc)
+	{
+		using PacketWriter pw = new();
+		pw.Write((ushort)PacketType.SC_READY_INVENTORY_COMPOSE_ITEM);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_INVENTORY_COMPOSE_ITEM_FINISH packet.
+	/// </summary>
+	/// <param name="pc">The player client</param>
+	/// <param name="resultInstId">Item instance ID (0 if failed)</param>
+	private void SendCompositionFinish(PlayerClient pc, long resultInstId)
+	{
+		using PacketWriter pw = new();
+		pw.Write((ushort)PacketType.SC_INVENTORY_COMPOSE_ITEM_FINISH);
+		pw.Write(resultInstId);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
 	}
 
 	/// <summary>

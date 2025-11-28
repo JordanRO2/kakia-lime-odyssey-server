@@ -3,12 +3,16 @@
 /// </summary>
 /// <remarks>
 /// Handles item making (crafting) and stuff making (gathering/processing).
+/// Uses: ItemMakeInfo for recipe definitions, PlayerInventory for materials
 /// </remarks>
 using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
+using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
+using kakia_lime_odyssey_server.Models;
+using kakia_lime_odyssey_server.Models.ItemMakeXML;
 using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.Services.Crafting;
@@ -19,10 +23,15 @@ namespace kakia_lime_odyssey_server.Services.Crafting;
 public class CraftingSession
 {
 	public uint RecipeTypeID { get; set; }
+	public MakeItemSkill? Recipe { get; set; }
 	public int TargetCount { get; set; }
 	public int CompletedCount { get; set; }
 	public bool IsContinuous { get; set; }
 	public DateTime StartTime { get; set; }
+	public int SuccessRate { get; set; } = 75;
+	public int CriticalRate { get; set; } = 10;
+	public uint CraftTime { get; set; } = 3000;
+	public ushort LpCost { get; set; } = 5;
 }
 
 /// <summary>
@@ -60,24 +69,48 @@ public class CraftingService
 		long playerId = pc.GetId();
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 
-		// TODO: Validate recipe exists
-		// TODO: Check player has required life job level
-		// TODO: Check player has required materials
+		// Validate recipe exists
+		var recipe = ItemMakeInfo.GetMakeItemSkill((int)typeID);
+		if (recipe == null)
+		{
+			Logger.Log($"[CRAFT] {playerName} tried unknown recipe {typeID}", LogLevel.Warning);
+			return false;
+		}
+
+		// Check player has required materials
+		var inventory = pc.GetInventory();
+		var requiredItems = recipe.GetRequiredItems();
+
+		foreach (var (itemId, count) in requiredItems)
+		{
+			int slot = inventory.FindItem(itemId, (ulong)count);
+			if (slot < 0)
+			{
+				Logger.Log($"[CRAFT] {playerName} missing material {itemId} x{count}", LogLevel.Debug);
+				return false;
+			}
+		}
 
 		var session = new CraftingSession
 		{
 			RecipeTypeID = typeID,
+			Recipe = recipe,
 			TargetCount = 1,
 			CompletedCount = 0,
 			IsContinuous = false,
-			StartTime = DateTime.Now
+			StartTime = DateTime.Now,
+			SuccessRate = 75,
+			CriticalRate = 10,
+			CraftTime = 3000,
+			LpCost = 5
 		};
 
 		_activeSessions[playerId] = session;
 
 		Logger.Log($"[CRAFT] {playerName} ready to craft recipe {typeID}", LogLevel.Debug);
 
-		// TODO: Send SC_ITEM_MAKE_UPDATE_REPORT
+		// Send SC_ITEM_MAKE_UPDATE_REPORT
+		SendUpdateReport(pc, session);
 		return true;
 	}
 
@@ -95,13 +128,49 @@ public class CraftingService
 			return false;
 		}
 
+		if (session.Recipe == null)
+		{
+			Logger.Log($"[CRAFT] {playerName} session has no recipe", LogLevel.Warning);
+			return false;
+		}
+
+		// Consume materials
+		var inventory = pc.GetInventory();
+		var requiredItems = session.Recipe.GetRequiredItems();
+
+		foreach (var (itemId, count) in requiredItems)
+		{
+			int slot = inventory.FindItem(itemId, (ulong)count);
+			if (slot < 0)
+			{
+				Logger.Log($"[CRAFT] {playerName} missing material {itemId} during start", LogLevel.Warning);
+				return false;
+			}
+
+			var item = inventory.AtSlot(slot) as Models.Item;
+			if (item != null)
+			{
+				if (item.GetAmount() <= (ulong)count)
+				{
+					inventory.RemoveItem(slot);
+				}
+				else
+				{
+					item.UpdateAmount(item.GetAmount() - (ulong)count);
+					inventory.UpdateItemAtSlot(slot, item);
+				}
+			}
+		}
+
 		session.StartTime = DateTime.Now;
 
-		Logger.Log($"[CRAFT] {playerName} started crafting", LogLevel.Debug);
+		// Determine if critical based on rate
+		bool isCritical = Random.Shared.Next(100) < session.CriticalRate;
 
-		// TODO: Consume materials
-		// TODO: Start crafting timer
-		// TODO: Send SC_ITEM_MAKE_START_CASTING
+		Logger.Log($"[CRAFT] {playerName} started crafting recipe {session.RecipeTypeID}", LogLevel.Debug);
+
+		// Send SC_ITEM_MAKE_START_CASTING
+		SendStartCasting(pc, session, isCritical);
 
 		return true;
 	}
@@ -114,12 +183,13 @@ public class CraftingService
 		long playerId = pc.GetId();
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 
-		if (_activeSessions.TryRemove(playerId, out _))
+		if (_activeSessions.TryRemove(playerId, out var session))
 		{
 			Logger.Log($"[CRAFT] {playerName} canceled crafting", LogLevel.Debug);
-		}
 
-		// TODO: Send SC_ITEM_MAKE_FINISH
+			// Send SC_ITEM_MAKE_FINISH with cancelled result
+			SendCraftFinish(pc, CraftResult.Cancelled, session?.LpCost ?? 0, 0);
+		}
 	}
 
 	/// <summary>
@@ -344,4 +414,143 @@ public class CraftingService
 
 		pc.Send(pw.ToPacket(), default).Wait();
 	}
+
+	// ============ PACKET HELPERS ============
+
+	/// <summary>
+	/// Sends SC_ITEM_MAKE_UPDATE_REPORT with recipe details.
+	/// </summary>
+	private void SendUpdateReport(PlayerClient pc, CraftingSession session)
+	{
+		// Get result item definition (simplified - assumes first item in recipe materials is the result)
+		var resultItem = session.Recipe != null ? LimeServer.ItemDB.FirstOrDefault(i => i.Id == session.Recipe.SkillId) : null;
+
+		var packet = new SC_ITEM_MAKE_UPDATE_REPORT
+		{
+			typeID = session.RecipeTypeID,
+			successPercent = session.SuccessRate,
+			criticalSuccessPercent = session.CriticalRate,
+			makeTime = session.CraftTime,
+			requestLP = session.LpCost,
+			itemTypeID = resultItem?.Id ?? 0,
+			count = 1,
+			durability = 100,
+			mdurability = 100,
+			inherits = new ITEM_INHERITS(),
+			criticalItemTypeID = resultItem?.Id ?? 0,
+			criticalCount = 2,
+			criticalDurability = 100,
+			criticalMdurability = 100,
+			criticalInherits = new ITEM_INHERITS()
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_ITEM_MAKE_START_CASTING to begin craft animation.
+	/// </summary>
+	private void SendStartCasting(PlayerClient pc, CraftingSession session, bool isCritical)
+	{
+		var packet = new SC_ITEM_MAKE_START_CASTING
+		{
+			InstID = pc.GetObjInstID(),
+			typeID = session.RecipeTypeID,
+			castTime = session.CraftTime,
+			isCritical = isCritical
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_ITEM_MAKE_FINISH with craft result.
+	/// </summary>
+	private void SendCraftFinish(PlayerClient pc, CraftResult result, ushort lpUsed, int remainCount)
+	{
+		var packet = new SC_ITEM_MAKE_FINISH
+		{
+			finishResult = (byte)result,
+			InstID = pc.GetObjInstID(),
+			useLP = lpUsed,
+			currentLP = 100,
+			remainCount = remainCount
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Completes a crafting operation and awards the result item.
+	/// </summary>
+	public void CompleteCraft(PlayerClient pc, bool success, bool critical)
+	{
+		long playerId = pc.GetId();
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		if (!_activeSessions.TryGetValue(playerId, out var session))
+		{
+			return;
+		}
+
+		var result = success ? (critical ? CraftResult.Critical : CraftResult.Success) : CraftResult.Fail;
+
+		if (success && session.Recipe != null)
+		{
+			// Award the crafted item
+			var resultItemDef = LimeServer.ItemDB.FirstOrDefault(i => i.Id == session.Recipe.SkillId);
+			if (resultItemDef != null)
+			{
+				var inventory = pc.GetInventory();
+				var newItem = new Models.Item
+				{
+					Id = resultItemDef.Id,
+					ModelId = resultItemDef.ModelId,
+					Name = resultItemDef.Name,
+					Desc = resultItemDef.Desc,
+					Grade = resultItemDef.Grade,
+					Type = resultItemDef.Type,
+					SecondType = resultItemDef.SecondType,
+					Level = resultItemDef.Level,
+					Price = resultItemDef.Price,
+					Inherits = resultItemDef.Inherits ?? new List<Models.Inherit>()
+				};
+				newItem.UpdateAmount(critical ? 2ul : 1ul);
+				inventory.AddItem(newItem);
+
+				Logger.Log($"[CRAFT] {playerName} crafted {resultItemDef.Name} x{(critical ? 2 : 1)}", LogLevel.Information);
+			}
+
+			session.CompletedCount++;
+		}
+
+		int remainCount = session.IsContinuous ? (session.TargetCount - session.CompletedCount) : 0;
+
+		SendCraftFinish(pc, result, session.LpCost, remainCount);
+
+		// Clean up if not continuous or completed all
+		if (!session.IsContinuous || remainCount <= 0)
+		{
+			_activeSessions.TryRemove(playerId, out _);
+		}
+
+		pc.SendInventory();
+	}
+}
+
+/// <summary>
+/// Result of a crafting attempt.
+/// </summary>
+public enum CraftResult : byte
+{
+	Fail = 0,
+	Success = 1,
+	Critical = 2,
+	Cancelled = 3
 }

@@ -11,6 +11,7 @@ using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Database;
+using kakia_lime_odyssey_server.Models;
 using kakia_lime_odyssey_server.Models.Persistence;
 using kakia_lime_odyssey_server.Network;
 
@@ -169,7 +170,7 @@ public class PostService
 	}
 
 	/// <summary>
-	/// Takes attachments from a mail message.
+	/// Takes attachments from a mail message and adds them to player inventory.
 	/// </summary>
 	public bool TakePostItems(PlayerClient player, int indexNumber)
 	{
@@ -188,6 +189,56 @@ public class PostService
 
 		if (post.AttachmentsClaimed || post.Attachments.Count == 0)
 			return false;
+
+		// Add each attached item to player's inventory
+		var inventory = player.GetInventory();
+		foreach (var attachment in post.Attachments)
+		{
+			// Get item definition from ItemDB
+			var itemDef = LimeServer.ItemDB.FirstOrDefault(i => i.Id == attachment.TypeID);
+			if (itemDef == null)
+			{
+				Logger.Log($"[POST] Could not find item definition for TypeID {attachment.TypeID}", LogLevel.Warning);
+				continue;
+			}
+
+			// Create new item instance with attachment data
+			var newItem = new Models.Item
+			{
+				Id = itemDef.Id,
+				ModelId = itemDef.ModelId,
+				Name = itemDef.Name,
+				Desc = itemDef.Desc,
+				Grade = attachment.Grade > 0 ? attachment.Grade : itemDef.Grade,
+				MaxEnchantCount = itemDef.MaxEnchantCount,
+				Type = itemDef.Type,
+				SecondType = itemDef.SecondType,
+				Level = itemDef.Level,
+				TribeClass = itemDef.TribeClass,
+				JobClassType = itemDef.JobClassType,
+				JobClassTypeId = itemDef.JobClassTypeId,
+				WeaponType = itemDef.WeaponType,
+				UserType = itemDef.UserType,
+				StuffType = itemDef.StuffType,
+				SkillId = itemDef.SkillId,
+				ImageName = itemDef.ImageName,
+				SmallImageName = itemDef.SmallImageName,
+				SortingType = itemDef.SortingType,
+				Series = itemDef.Series,
+				IsSell = itemDef.IsSell,
+				IsExchange = itemDef.IsExchange,
+				IsDiscard = itemDef.IsDiscard,
+				Material = itemDef.Material,
+				Durable = itemDef.Durable,
+				Price = itemDef.Price,
+				Inherits = itemDef.Inherits,
+				Count = (ulong)attachment.Count,
+				CurrentDurability = attachment.Durability > 0 ? attachment.Durability : itemDef.Durable
+			};
+
+			inventory.AddItem(newItem);
+			Logger.Log($"[POST] {charName} received {newItem.Name} x{attachment.Count} from mail", LogLevel.Debug);
+		}
 
 		post.AttachmentsClaimed = true;
 		SaveMail(accountId, charName, mail);
@@ -403,6 +454,14 @@ public class PostService
 			isSuccess = success
 		});
 		player.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends mail result directly (for use by handlers).
+	/// </summary>
+	public void SendPostResultDirect(PlayerClient player, bool success)
+	{
+		SendPostResult(player, success);
 	}
 
 	private void SendNewPostAlarm(PlayerClient player, int count)

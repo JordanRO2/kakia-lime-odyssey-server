@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
+using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Entities.Npcs;
 using kakia_lime_odyssey_server.Network;
@@ -28,6 +29,21 @@ public class SoldItem
 }
 
 /// <summary>
+/// Represents an NPC shop configuration.
+/// </summary>
+public class ShopConfig
+{
+	/// <summary>List of item type IDs sold by this shop</summary>
+	public List<int> ItemTypeIds { get; set; } = new();
+
+	/// <summary>Discount rate as percentage (0-100)</summary>
+	public int DiscountRate { get; set; } = 0;
+
+	/// <summary>Whether this shop can repair items</summary>
+	public bool CanRepair { get; set; } = false;
+}
+
+/// <summary>
 /// Service for managing NPC merchant buy/sell transactions.
 /// </summary>
 public class TradeService
@@ -35,8 +51,79 @@ public class TradeService
 	/// <summary>Tracks recently sold items per player for buyback</summary>
 	private readonly ConcurrentDictionary<long, List<SoldItem>> _soldItems = new();
 
+	/// <summary>Shop configurations by NPC type ID</summary>
+	private readonly Dictionary<int, ShopConfig> _shopConfigs = new();
+
 	/// <summary>Maximum items to keep in sold list per player</summary>
 	private const int MaxSoldItems = 20;
+
+	/// <summary>
+	/// Initializes the trade service with default shop configurations.
+	/// </summary>
+	public TradeService()
+	{
+		InitializeDefaultShops();
+	}
+
+	/// <summary>
+	/// Sets up default shop inventories for common NPC types.
+	/// </summary>
+	private void InitializeDefaultShops()
+	{
+		// General Goods Merchant (potions, basic supplies)
+		RegisterShop(1001, new ShopConfig
+		{
+			ItemTypeIds = new List<int> { 1, 2, 3, 4, 5, 10, 11, 12, 13, 14 },
+			DiscountRate = 0,
+			CanRepair = false
+		});
+
+		// Blacksmith (weapons, repairs)
+		RegisterShop(1002, new ShopConfig
+		{
+			ItemTypeIds = new List<int> { 100, 101, 102, 103, 104, 105, 106, 107, 108, 109 },
+			DiscountRate = 0,
+			CanRepair = true
+		});
+
+		// Armor Vendor
+		RegisterShop(1003, new ShopConfig
+		{
+			ItemTypeIds = new List<int> { 200, 201, 202, 203, 204, 205, 206, 207, 208, 209 },
+			DiscountRate = 0,
+			CanRepair = true
+		});
+
+		// Magic Shop
+		RegisterShop(1004, new ShopConfig
+		{
+			ItemTypeIds = new List<int> { 300, 301, 302, 303, 304 },
+			DiscountRate = 0,
+			CanRepair = false
+		});
+
+		Logger.Log($"[TRADE] Initialized {_shopConfigs.Count} shop configurations", LogLevel.Information);
+	}
+
+	/// <summary>
+	/// Registers a shop configuration for an NPC type.
+	/// </summary>
+	/// <param name="npcTypeId">NPC type identifier</param>
+	/// <param name="config">Shop configuration</param>
+	public void RegisterShop(int npcTypeId, ShopConfig config)
+	{
+		_shopConfigs[npcTypeId] = config;
+	}
+
+	/// <summary>
+	/// Gets the shop configuration for an NPC type.
+	/// </summary>
+	/// <param name="npcTypeId">NPC type identifier</param>
+	/// <returns>Shop configuration or null if not a merchant</returns>
+	public ShopConfig? GetShopConfig(int npcTypeId)
+	{
+		return _shopConfigs.TryGetValue(npcTypeId, out var config) ? config : null;
+	}
 	/// <summary>
 	/// Processes a buy request from NPC merchant.
 	/// </summary>
@@ -63,12 +150,15 @@ public class TradeService
 			return;
 		}
 
-		// Calculate total price
-		long totalPrice = itemDef.Price * count;
+		// Calculate total price using CurrencyService
+		long totalPrice = LimeServer.CurrencyService.CalculateBuyPrice(itemDef.Price, count);
 
-		// TODO: Check if player has enough currency when currency system is implemented
-		// For now, allow purchase (client-side validates currency)
-		long totalPriceValue = totalPrice; // For logging
+		// Check if player has enough Peder
+		if (!LimeServer.CurrencyService.ProcessShopBuy(pc, itemDef.Price, count))
+		{
+			Logger.Log($"[TRADE] {playerName} cannot afford {totalPrice} Peder for {itemDef.Name} x{count}", LogLevel.Debug);
+			return;
+		}
 
 		// Check inventory space
 		var inventory = pc.GetInventory();
@@ -110,7 +200,7 @@ public class TradeService
 		// Add item to inventory
 		inventory.AddItem(newItem, targetSlot);
 
-		Logger.Log($"[TRADE] {playerName} bought {itemDef.Name} x{count} for {totalPriceValue} Peder", LogLevel.Information);
+		Logger.Log($"[TRADE] {playerName} bought {itemDef.Name} x{count} for {totalPrice} Peder", LogLevel.Information);
 
 		// Send confirmation
 		SendBuySellConfirmation(pc, targetSlot);
@@ -158,14 +248,11 @@ public class TradeService
 			count = (long)item.GetAmount();
 		}
 
-		// Calculate sell price (typically 50% of buy price)
-		long sellPrice = (item.Price / 2) * count;
+		// Calculate sell price using CurrencyService (30% of buy price by default)
+		long sellPrice = LimeServer.CurrencyService.CalculateSellPrice(item.Price, count);
 		if (sellPrice <= 0) sellPrice = 1;
 
-		// TODO: Add currency when currency system is implemented
-		// Client-side handles currency addition based on SC_TRADE_BOUGHT_SOLD_ITEMS response
-
-		// Remove/reduce item
+		// Remove/reduce item first, then add currency
 		if (count >= (long)item.GetAmount())
 		{
 			inventory.RemoveItem(slot);
@@ -175,6 +262,12 @@ public class TradeService
 			item.UpdateAmount(item.GetAmount() - (ulong)count);
 			inventory.UpdateItemAtSlot(slot, item);
 		}
+
+		// Add currency to player wallet
+		LimeServer.CurrencyService.AddPeder(pc, sellPrice);
+
+		// Track sold items for buyback
+		AddToSoldItems(pc, item, count, sellPrice);
 
 		Logger.Log($"[TRADE] {playerName} sold {item.Name} x{count} for {sellPrice} Peder", LogLevel.Information);
 
@@ -298,13 +391,135 @@ public class TradeService
 	/// </summary>
 	private void SendTradeDesc(PlayerClient pc, Npc npc)
 	{
-		// For now, send a basic trade description
-		// TODO: Implement actual shop inventory lookup based on NPC type
+		int npcTypeId = (int)npc.Appearance.appearance.typeID;
+		var shopConfig = GetShopConfig(npcTypeId);
+
+		// Get shop items
+		var tradeItems = BuildTradeItemList(shopConfig);
+
+		// Build packet: SC_TRADE_DESC header + TRADE_ITEM array
 		using PacketWriter pw = new();
 		pw.Write((ushort)PacketType.SC_TRADE_DESC);
-		pw.Write((long)npc.Id); // NPC instance ID
-		pw.Write((int)npc.Appearance.appearance.typeID); // NPC type ID
+		pw.Write((long)npc.Id);                          // objInstID
+		pw.Write((uint)tradeItems.Count);                // itemCount
+		pw.Write(shopConfig?.DiscountRate ?? 0);         // discountRate
+		pw.Write(shopConfig?.CanRepair ?? false);        // isRepairable
+
+		// Write each TRADE_ITEM as raw bytes
+		foreach (var tradeItem in tradeItems)
+		{
+			WriteTradeItem(pw, tradeItem);
+		}
+
 		pc.Send(pw.ToSizedPacket(), default).Wait();
+
+		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+		Logger.Log($"[TRADE] Sent shop inventory to {playerName}: {tradeItems.Count} items from NPC type {npcTypeId}", LogLevel.Debug);
+	}
+
+	/// <summary>
+	/// Writes a TRADE_ITEM structure to the packet writer.
+	/// </summary>
+	private static void WriteTradeItem(PacketWriter pw, TRADE_ITEM item)
+	{
+		pw.Write(item.typeID);
+		pw.Write(item.count);
+		pw.Write(item.price);
+		pw.Write(item.durability);
+		pw.Write(item.mdurability);
+		pw.Write(item.grade);
+
+		// Write ITEM_INHERITS (25 x ITEM_INHERIT)
+		for (int i = 0; i < 25; i++)
+		{
+			var inherit = item.inherits.inherits[i];
+			pw.Write(inherit.typeID);
+			pw.Write(inherit.value);
+			pw.Write(inherit.type);
+			pw.Write(inherit.padding1);
+			pw.Write(inherit.padding2);
+			pw.Write(inherit.padding3);
+		}
+	}
+
+	/// <summary>
+	/// Builds a list of TRADE_ITEM structures from shop configuration.
+	/// </summary>
+	/// <param name="shopConfig">Shop configuration or null for no items</param>
+	/// <returns>List of TRADE_ITEM structures</returns>
+	private List<TRADE_ITEM> BuildTradeItemList(ShopConfig? shopConfig)
+	{
+		var result = new List<TRADE_ITEM>();
+
+		if (shopConfig == null)
+		{
+			return result;
+		}
+
+		foreach (int itemTypeId in shopConfig.ItemTypeIds)
+		{
+			var itemDef = LimeServer.ItemDB.FirstOrDefault(i => i.Id == itemTypeId);
+			if (itemDef == null)
+			{
+				Logger.Log($"[TRADE] Warning: Shop item {itemTypeId} not found in ItemDB", LogLevel.Warning);
+				continue;
+			}
+
+			// Use Durable property for durability (default to 100 if not set)
+			int durability = itemDef.Durable > 0 ? itemDef.Durable : 100;
+
+			// Create TRADE_ITEM from item definition
+			var tradeItem = new TRADE_ITEM
+			{
+				typeID = itemDef.Id,
+				count = 99,                              // Unlimited stock
+				price = (uint)itemDef.Price,
+				durability = durability,
+				mdurability = durability,
+				grade = 0,                               // No enchant on shop items
+				inherits = CreateItemInherits(itemDef)
+			};
+
+			result.Add(tradeItem);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Creates ITEM_INHERITS from item definition.
+	/// </summary>
+	private static ITEM_INHERITS CreateItemInherits(Models.Item itemDef)
+	{
+		var inherits = new ITEM_INHERITS
+		{
+			inherits = new ITEM_INHERIT[25]
+		};
+
+		// Initialize all 25 slots to empty
+		for (int i = 0; i < 25; i++)
+		{
+			inherits.inherits[i] = new ITEM_INHERIT();
+		}
+
+		// Copy inherits from item definition if any
+		if (itemDef.Inherits != null)
+		{
+			int index = 0;
+			foreach (var inherit in itemDef.Inherits)
+			{
+				if (index >= 25) break;
+				inherits.inherits[index] = new ITEM_INHERIT
+				{
+					typeID = (uint)inherit.typeID,
+					value = inherit.val,
+					type = 0
+				};
+				index++;
+			}
+		}
+
+		return inherits;
 	}
 
 	// ============ SOLD ITEMS BUYBACK ============
@@ -384,7 +599,15 @@ public class TradeService
 		// Calculate total cost
 		long totalCost = soldItems.Sum(i => i.SellPrice);
 
-		// TODO: Check if player has enough gold when currency system is implemented
+		// Check if player has enough Peder for buyback
+		if (!LimeServer.CurrencyService.HasEnoughPeder(pc, totalCost))
+		{
+			Logger.Log($"[TRADE] {playerName} cannot afford {totalCost} Peder for buyback", LogLevel.Debug);
+			return;
+		}
+
+		// Deduct the buyback cost
+		LimeServer.CurrencyService.RemovePeder(pc, totalCost);
 
 		var inventory = pc.GetInventory();
 		int itemsReturned = 0;

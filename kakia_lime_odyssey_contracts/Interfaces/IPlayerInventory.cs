@@ -19,4 +19,14 @@ public interface IPlayerInventory
     /// <param name="slot">Target slot index, or -1 for first free slot</param>
     /// <returns>The slot index where item was placed, or -1 if failed</returns>
     int AddItem(IItem item, int slot = -1);
+
+    /// <summary>
+    /// Gets or sets the player's Peder (gold) balance.
+    /// </summary>
+    long WalletPeder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the player's Lant (premium currency) balance.
+    /// </summary>
+    long WalletLant { get; set; }
 }

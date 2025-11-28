@@ -50,10 +50,41 @@ class CS_ITEM_REPAIR_REQUEST_Handler : PacketHandler
 		bool success = false;
 		if (item != null)
 		{
-			// Deduct currency and restore durability when item durability system is implemented
-			// For now, repair is always successful (no currency cost)
-			success = true;
-			Logger.Log($"[REPAIR] {playerName} repaired item {item.Name} successfully", LogLevel.Information);
+			// Calculate repair cost based on missing durability
+			int missingDurability = item.GetMaxDurability() - item.GetDurability();
+			if (missingDurability <= 0)
+			{
+				// Item doesn't need repair
+				Logger.Log($"[REPAIR] {playerName} item {item.Name} doesn't need repair", LogLevel.Debug);
+				success = true;
+			}
+			else
+			{
+				// Repair cost: 1 Peder per durability point (can be adjusted)
+				long repairCost = missingDurability;
+				if (LimeServer.CurrencyService.ProcessRepair(pc, repairCost))
+				{
+					// Repair successful - restore durability
+					item.RepairFully();
+					success = true;
+
+					Logger.Log($"[REPAIR] {playerName} repaired item {item.Name} for {repairCost} Peder", LogLevel.Information);
+
+					// Send durability update
+					if (request.isEquiped)
+					{
+						SendEquipDurabilityUpdate(pc, (byte)request.index, item);
+					}
+					else
+					{
+						SendInventoryDurabilityUpdate(pc, request.index, item);
+					}
+				}
+				else
+				{
+					Logger.Log($"[REPAIR] {playerName} cannot afford repair cost for {item.Name}", LogLevel.Debug);
+				}
+			}
 		}
 		else
 		{
@@ -68,6 +99,40 @@ class CS_ITEM_REPAIR_REQUEST_Handler : PacketHandler
 
 		using PacketWriter pw = new();
 		pw.Write(response);
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends durability update for an inventory item.
+	/// </summary>
+	private static void SendInventoryDurabilityUpdate(PlayerClient pc, int slot, Item item)
+	{
+		var packet = new SC_UPDATE_DURABILITY_INVENTORY_ITEM
+		{
+			slot = slot,
+			durability = item.GetDurability(),
+			mdurability = item.GetMaxDurability()
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends durability update for an equipped item.
+	/// </summary>
+	private static void SendEquipDurabilityUpdate(PlayerClient pc, byte equipSlot, Item item)
+	{
+		var packet = new SC_UPDATE_DURABILITY_EQUIPPED_ITEM
+		{
+			equipSlot = equipSlot,
+			durability = item.GetDurability(),
+			mdurability = item.GetMaxDurability()
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
 		pc.Send(pw.ToPacket(), default).Wait();
 	}
 }

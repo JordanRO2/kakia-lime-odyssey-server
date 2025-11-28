@@ -1,3 +1,11 @@
+/// <summary>
+/// Handles CS_SEND_POST packet - player sends mail to another player.
+/// </summary>
+/// <remarks>
+/// Triggered by: Player sending mail from post UI
+/// Response packets: SC_SEND_POST_RESULT
+/// Database: mail (write)
+/// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_network.Handler;
@@ -35,25 +43,74 @@ class CS_SEND_POST_Handler : PacketHandler
 		if (string.IsNullOrWhiteSpace(toName))
 		{
 			Logger.Log($"[POST] {playerName} tried to send mail with empty recipient", LogLevel.Debug);
+			LimeServer.PostService.SendPostResultDirect(pc, false);
 			return;
 		}
 
+		// Get player inventory to extract actual item data from slots
+		var inventory = pc.GetInventory();
 		var attachments = new List<PostAttachment>();
+		var itemsToRemove = new List<(int slot, long count)>();
+
 		for (int i = 0; i < packet.attaching.Length; i++)
 		{
 			var att = packet.attaching[i];
-			if (att.slot > 0 && att.count > 0)
+			if (att.slot >= 0 && att.count > 0)
 			{
+				// Get item from inventory slot
+				var item = inventory.AtSlot(att.slot) as Models.Item;
+				if (item == null)
+				{
+					Logger.Log($"[POST] {playerName} tried to attach item from empty slot {att.slot}", LogLevel.Debug);
+					continue;
+				}
+
+				// Validate count
+				if ((long)item.GetAmount() < att.count)
+				{
+					Logger.Log($"[POST] {playerName} tried to attach more items than available in slot {att.slot}", LogLevel.Debug);
+					continue;
+				}
+
 				attachments.Add(new PostAttachment
 				{
-					TypeID = att.slot,
-					Count = (int)att.count
+					TypeID = item.Id,
+					Count = (int)att.count,
+					Durability = item.GetDurability(),
+					MaxDurability = item.GetMaxDurability(),
+					Grade = item.Grade,
+					RemainExpiryTime = -1,
+					Inherits = item.GetInherits()
 				});
+
+				itemsToRemove.Add((att.slot, att.count));
 			}
 		}
 
 		Logger.Log($"[POST] {playerName} sending mail to '{toName}': {title} ({attachments.Count} attachments)", LogLevel.Debug);
 
-		LimeServer.PostService.SendPost(pc, toName, title, body, attachments);
+		// Send mail first
+		bool success = LimeServer.PostService.SendPost(pc, toName, title, body, attachments);
+
+		// Only remove items from inventory if mail was sent successfully
+		if (success && itemsToRemove.Count > 0)
+		{
+			foreach (var (slot, count) in itemsToRemove)
+			{
+				var item = inventory.AtSlot(slot) as Models.Item;
+				if (item != null)
+				{
+					if ((long)item.GetAmount() <= count)
+					{
+						inventory.RemoveItem(slot);
+					}
+					else
+					{
+						item.UpdateAmount(item.GetAmount() - (ulong)count);
+					}
+				}
+			}
+			Logger.Log($"[POST] Removed {itemsToRemove.Count} items from {playerName}'s inventory", LogLevel.Debug);
+		}
 	}
 }

@@ -234,7 +234,10 @@ public class QuestService
 	/// </summary>
 	private static void GrantQuestRewards(Interfaces.IEntity entity, PlayerClient player, XmlQuest questDef, int[] rewardChoices)
 	{
-		// Grant experience rewards
+		string playerName = player.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+		bool inventoryChanged = false;
+
+		// Grant combat experience rewards
 		if (questDef.RewardEXP > 0 || questDef.RewardCombatJobEXP > 0)
 		{
 			ulong totalExp = questDef.RewardEXP + questDef.RewardCombatJobEXP;
@@ -270,18 +273,24 @@ public class QuestService
 					player.SendGlobalPacket(lvPw.ToPacket(), default).Wait();
 				}
 
-				Logger.Log($"[QUEST] Granted {totalExp} exp from quest {questDef.TypeID}", LogLevel.Debug);
+				Logger.Log($"[QUEST] Granted {totalExp} combat exp to {playerName} from quest {questDef.TypeID}", LogLevel.Debug);
 			}
+		}
+
+		// Grant life job experience rewards
+		if (questDef.RewardLifeJobEXP > 0)
+		{
+			// Life job exp would need separate tracking - for now log it
+			Logger.Log($"[QUEST] Life job EXP reward: {questDef.RewardLifeJobEXP} (tracking not yet implemented)", LogLevel.Debug);
 		}
 
 		// Grant basic reward items
 		if (questDef.BasicReward != null && questDef.BasicReward.TypeID > 0)
 		{
-			// TODO: Add items to player inventory via InventoryService
-			Logger.Log($"[QUEST] Basic reward: {questDef.BasicReward.Count}x item {questDef.BasicReward.TypeID}", LogLevel.Debug);
+			inventoryChanged |= GrantItemReward(player, questDef.BasicReward.TypeID, questDef.BasicReward.Count);
 		}
 
-		// Grant selected choice rewards
+		// Grant selected choice rewards (player selected from UI)
 		if (rewardChoices != null && questDef.ChoiceRewards.Count > 0)
 		{
 			foreach (int choice in rewardChoices)
@@ -289,10 +298,93 @@ public class QuestService
 				if (choice >= 0 && choice < questDef.ChoiceRewards.Count)
 				{
 					var reward = questDef.ChoiceRewards[choice];
-					// TODO: Add items to player inventory via InventoryService
-					Logger.Log($"[QUEST] Choice reward {choice}: {reward.Count}x item {reward.TypeID}", LogLevel.Debug);
+					inventoryChanged |= GrantItemReward(player, reward.TypeID, reward.Count);
 				}
 			}
+		}
+
+		// Send inventory update if items were added
+		if (inventoryChanged)
+		{
+			player.SendInventory();
+		}
+	}
+
+	/// <summary>
+	/// Grants a single item reward to the player.
+	/// </summary>
+	/// <param name="player">The player receiving the reward.</param>
+	/// <param name="itemTypeId">Item type ID to grant.</param>
+	/// <param name="count">Number of items to grant.</param>
+	/// <returns>True if item was added to inventory.</returns>
+	private static bool GrantItemReward(PlayerClient player, uint itemTypeId, int count)
+	{
+		if (itemTypeId == 0 || count <= 0) return false;
+
+		string playerName = player.GetCurrentCharacter()?.appearance.name ?? "Unknown";
+
+		// Check for Peder (gold) reward - type ID 1 is typically gold
+		if (itemTypeId == 1)
+		{
+			LimeServer.CurrencyService.AddPeder(player, count);
+			Logger.Log($"[QUEST] Granted {count} Peder to {playerName}", LogLevel.Debug);
+			return false; // No inventory change for currency
+		}
+
+		// Get item definition from ItemDB
+		var itemDef = LimeServer.ItemDB.FirstOrDefault(i => i.Id == (int)itemTypeId);
+		if (itemDef == null)
+		{
+			Logger.Log($"[QUEST] Item {itemTypeId} not found in ItemDB for reward", LogLevel.Warning);
+			return false;
+		}
+
+		// Clone item definition and set count
+		var rewardItem = new Models.Item
+		{
+			Id = itemDef.Id,
+			ModelId = itemDef.ModelId,
+			Name = itemDef.Name,
+			Desc = itemDef.Desc,
+			Grade = itemDef.Grade,
+			MaxEnchantCount = itemDef.MaxEnchantCount,
+			Type = itemDef.Type,
+			SecondType = itemDef.SecondType,
+			Level = itemDef.Level,
+			TribeClass = itemDef.TribeClass,
+			JobClassType = itemDef.JobClassType,
+			JobClassTypeId = itemDef.JobClassTypeId,
+			WeaponType = itemDef.WeaponType,
+			UserType = itemDef.UserType,
+			StuffType = itemDef.StuffType,
+			SkillId = itemDef.SkillId,
+			ImageName = itemDef.ImageName,
+			SmallImageName = itemDef.SmallImageName,
+			SortingType = itemDef.SortingType,
+			Series = itemDef.Series,
+			IsSell = itemDef.IsSell,
+			IsExchange = itemDef.IsExchange,
+			IsDiscard = itemDef.IsDiscard,
+			Material = itemDef.Material,
+			Durable = itemDef.Durable,
+			Price = itemDef.Price,
+			Inherits = itemDef.Inherits != null ? new List<Models.Inherit>(itemDef.Inherits) : new List<Models.Inherit>(),
+			Count = (ulong)count
+		};
+
+		// Add to inventory
+		var inventory = player.GetInventory();
+		int slot = inventory.AddItem(rewardItem);
+
+		if (slot >= 0)
+		{
+			Logger.Log($"[QUEST] Granted {count}x {itemDef.Name} (ID: {itemTypeId}) to {playerName} at slot {slot}", LogLevel.Debug);
+			return true;
+		}
+		else
+		{
+			Logger.Log($"[QUEST] Failed to add {itemDef.Name} to {playerName}'s inventory (full?)", LogLevel.Warning);
+			return false;
 		}
 	}
 

@@ -4,7 +4,6 @@ using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
-using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
 using kakia_lime_odyssey_server.Models.MonsterXML;

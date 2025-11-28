@@ -23,14 +23,15 @@ class CS_LOGIN_Handler : PacketHandler
 
 		Logger.Log($"Account login [{login.id}:{login.pw}][REV: {login.revision}]");
 
-		var characters = JsonDB.LoadPC(login.id);
+		var db = DatabaseFactory.Instance;
+		var characters = db.LoadPC(login.id);
 
 		var updated = new List<CLIENT_PC>();
 
 		foreach (var character in characters)
 		{
 			var characterName = global::System.Text.Encoding.ASCII.GetString(character.appearance.name).TrimEnd('\0');
-			var equip = JsonDB.GetPlayerEquipment(login.id, characterName);
+			var equip = db.GetPlayerEquipment(login.id, characterName);
 			var equipped = equip.Combat.GetEquipped();
 			var modApp = new ModAppearance(character.appearance);
 			modApp.equiped = new ModEquipped(equipped);

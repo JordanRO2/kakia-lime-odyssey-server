@@ -4,7 +4,6 @@ using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.Enums;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
-using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models.MonsterXML;
 using kakia_lime_odyssey_server.Network;
@@ -83,10 +82,9 @@ public partial class Monster : INPC, IEntity
 		_currentState = MOB_STATE.ROAMING;
 
 		Lootable = new List<LootableItem>();
-		var dropTable = JsonDB.LoadItemDropTable();
+		var dropTable = WorldDataLoader.LoadDropTables();
 		if (dropTable == null)
 			return;
-		
 
 		if (dropTable.ContainsKey(lootTable))
 		{

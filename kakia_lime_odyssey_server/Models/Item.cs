@@ -155,6 +155,59 @@ public class Item : IItem
 	[XmlIgnore]
 	public static ulong MaxStackSize = 99;
 
+	/// <summary>
+	/// Current durability of this item instance. Defaults to max durability (Durable).
+	/// </summary>
+	[XmlIgnore]
+	public int CurrentDurability { get; set; } = -1;
+
+	/// <summary>
+	/// Gets the current durability, initializing to max if not set.
+	/// </summary>
+	public int GetDurability()
+	{
+		if (CurrentDurability < 0)
+		{
+			CurrentDurability = Durable > 0 ? Durable : 100;
+		}
+		return CurrentDurability;
+	}
+
+	/// <summary>
+	/// Gets the maximum durability for this item.
+	/// </summary>
+	public int GetMaxDurability()
+	{
+		return Durable > 0 ? Durable : 100;
+	}
+
+	/// <summary>
+	/// Decreases durability by the specified amount.
+	/// </summary>
+	/// <param name="amount">Amount to decrease</param>
+	/// <returns>True if item is still usable (durability > 0)</returns>
+	public bool DecreaseDurability(int amount = 1)
+	{
+		CurrentDurability = Math.Max(0, GetDurability() - amount);
+		return CurrentDurability > 0;
+	}
+
+	/// <summary>
+	/// Restores durability to maximum.
+	/// </summary>
+	public void RepairFully()
+	{
+		CurrentDurability = GetMaxDurability();
+	}
+
+	/// <summary>
+	/// Checks if the item is broken (0 durability).
+	/// </summary>
+	public bool IsBroken()
+	{
+		return GetDurability() <= 0;
+	}
+
 	public void UpdateAmount(ulong amount)
 	{
 		Count = amount;
@@ -201,8 +254,8 @@ public class Item : IItem
 			slot = slot,
 			typeID = Id,
 			count = (long)Count,
-			durability = 1500,
-			mdurability = 1500,
+			durability = GetDurability(),
+			mdurability = GetMaxDurability(),
 			remainExpiryTime = -1,
 			grade = Grade,
 			inherits = GetInherits()
@@ -216,8 +269,8 @@ public class Item : IItem
 			itemTypeID = Id,
 			equipSlot = (byte)GetEquipSlot(),
 			wiredSlot = 0,
-			mdurability = 200,
-			durability = 200,
+			mdurability = GetMaxDurability(),
+			durability = GetDurability(),
 			grade = Grade,
 			inherits = GetInherits()
 		};
