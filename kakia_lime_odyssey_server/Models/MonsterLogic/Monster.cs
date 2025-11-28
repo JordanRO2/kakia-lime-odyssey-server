@@ -373,8 +373,13 @@ public partial class Monster : INPC, IEntity
 
 	private float GetCurrentAccel()
 	{
-		// TODO: Enable velocity-based acceleration when needed
-		return 1.0f;
+		var velocities = GetVelocities();
+		return _moveType switch
+		{
+			MOVE_TYPE.MOVE_TYPE_RUN => velocities.runAccel,
+			MOVE_TYPE.MOVE_TYPE_WALK => velocities.walkAccel,
+			_ => velocities.walkAccel
+		};
 	}
 
 	private VELOCITIES GetVelocities()
@@ -472,9 +477,15 @@ public partial class Monster : INPC, IEntity
 		};
 	}
 
+	/// <summary>
+	/// Adds experience to monster. Monsters don't gain experience.
+	/// </summary>
+	/// <param name="exp">Experience amount.</param>
+	/// <returns>False since monsters don't gain experience.</returns>
 	public bool AddExp(ulong exp)
 	{
-		throw new NotImplementedException();
+		// Monsters don't gain experience
+		return false;
 	}
 
 	public List<Item> GetLoot()

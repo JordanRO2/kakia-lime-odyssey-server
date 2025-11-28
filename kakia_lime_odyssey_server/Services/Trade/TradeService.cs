@@ -4,6 +4,7 @@
 /// <remarks>
 /// Handles buying items from and selling items to NPC merchants.
 /// Uses: PlayerInventory for item access, ItemDB for item definitions and prices
+/// All buy/sell transactions are tracked via audit services.
 /// </remarks>
 using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
@@ -13,6 +14,7 @@ using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Entities.Npcs;
 using kakia_lime_odyssey_server.Network;
+using kakia_lime_odyssey_server.Services.Audit;
 
 namespace kakia_lime_odyssey_server.Services.Trade;
 
@@ -150,17 +152,7 @@ public class TradeService
 			return;
 		}
 
-		// Calculate total price using CurrencyService
-		long totalPrice = LimeServer.CurrencyService.CalculateBuyPrice(itemDef.Price, count);
-
-		// Check if player has enough Peder
-		if (!LimeServer.CurrencyService.ProcessShopBuy(pc, itemDef.Price, count))
-		{
-			Logger.Log($"[TRADE] {playerName} cannot afford {totalPrice} Peder for {itemDef.Name} x{count}", LogLevel.Debug);
-			return;
-		}
-
-		// Check inventory space
+		// Check inventory space first (before taking money)
 		var inventory = pc.GetInventory();
 		if (targetSlot <= 0)
 		{
@@ -197,10 +189,24 @@ public class TradeService
 		};
 		newItem.UpdateAmount((ulong)count);
 
+		// Track item creation for audit
+		var instanceId = LimeServer.ItemAuditService.CreateTrackedItem(newItem, ItemCreationSource.Shop, pc, $"BoughtFromNPC");
+
+		// Process purchase with audited currency method
+		if (!LimeServer.CurrencyService.ProcessShopBuyAudited(pc, itemTypeId, itemDef.Name, itemDef.Price, count, instanceId))
+		{
+			long totalPrice = LimeServer.CurrencyService.CalculateBuyPrice(itemDef.Price, count);
+			Logger.Log($"[TRADE] {playerName} cannot afford {totalPrice} Peder for {itemDef.Name} x{count}", LogLevel.Debug);
+			return;
+		}
+
 		// Add item to inventory
 		inventory.AddItem(newItem, targetSlot);
 
-		Logger.Log($"[TRADE] {playerName} bought {itemDef.Name} x{count} for {totalPrice} Peder", LogLevel.Information);
+		// Log item bought from NPC
+		LimeServer.ItemAuditService.LogBoughtFromNpc(instanceId, pc, (ulong)count, itemDef.Price * (int)count);
+
+		Logger.Log($"[TRADE] {playerName} bought {itemDef.Name} x{count}", LogLevel.Information);
 
 		// Send confirmation
 		SendBuySellConfirmation(pc, targetSlot);
@@ -248,9 +254,8 @@ public class TradeService
 			count = (long)item.GetAmount();
 		}
 
-		// Calculate sell price using CurrencyService (30% of buy price by default)
-		long sellPrice = LimeServer.CurrencyService.CalculateSellPrice(item.Price, count);
-		if (sellPrice <= 0) sellPrice = 1;
+		// Create tracked item instance for audit trail before selling
+		var instanceId = LimeServer.ItemAuditService.CreateTrackedItem(item, ItemCreationSource.Unknown, pc, "SoldToNPC");
 
 		// Remove/reduce item first, then add currency
 		if (count >= (long)item.GetAmount())
@@ -263,8 +268,11 @@ public class TradeService
 			inventory.UpdateItemAtSlot(slot, item);
 		}
 
-		// Add currency to player wallet
-		LimeServer.CurrencyService.AddPeder(pc, sellPrice);
+		// Process sell with audited currency method
+		long sellPrice = LimeServer.CurrencyService.ProcessShopSellAudited(pc, item.Id, item.Name, item.Price, count, instanceId);
+
+		// Log item sold to NPC
+		LimeServer.ItemAuditService.LogSoldToNpc(instanceId, pc, (ulong)count, (int)sellPrice);
 
 		// Track sold items for buyback
 		AddToSoldItems(pc, item, count, sellPrice);
@@ -382,7 +390,7 @@ public class TradeService
 		Logger.Log($"[TRADE] {playerName} opened trade with NPC {npc.Appearance.appearance.typeID}", LogLevel.Debug);
 
 		// Send trade description packet with NPC shop items
-		// TODO: Load shop items from NPC definition when shop system is implemented
+		// Shop items are loaded from registered shop configurations (see InitializeDefaultShops)
 		SendTradeDesc(pc, npc);
 	}
 

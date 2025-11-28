@@ -162,6 +162,24 @@ public class Item : IItem
 	public int CurrentDurability { get; set; } = -1;
 
 	/// <summary>
+	/// Expiration time for this item instance (UTC). Null means no expiration.
+	/// </summary>
+	[XmlIgnore]
+	public DateTime? ExpirationTime { get; set; } = null;
+
+	/// <summary>
+	/// Socketed inherits added via gems. Instance-specific, not from XML definition.
+	/// </summary>
+	[XmlIgnore]
+	public List<SocketedInherit> SocketedInherits { get; set; } = new();
+
+	/// <summary>
+	/// Maximum number of sockets this item instance has (based on MaxEnchantCount or grade).
+	/// </summary>
+	[XmlIgnore]
+	public int SocketCount { get; set; } = 0;
+
+	/// <summary>
 	/// Gets the current durability, initializing to max if not set.
 	/// </summary>
 	public int GetDurability()
@@ -208,6 +226,63 @@ public class Item : IItem
 		return GetDurability() <= 0;
 	}
 
+	/// <summary>
+	/// Checks if this item has an expiration time set.
+	/// </summary>
+	public bool HasExpiration()
+	{
+		return ExpirationTime.HasValue;
+	}
+
+	/// <summary>
+	/// Checks if this item has expired.
+	/// </summary>
+	public bool IsExpired()
+	{
+		return ExpirationTime.HasValue && DateTime.UtcNow >= ExpirationTime.Value;
+	}
+
+	/// <summary>
+	/// Gets the remaining seconds until expiration, or -1 if no expiration.
+	/// </summary>
+	public int GetRemainingExpirySeconds()
+	{
+		if (!ExpirationTime.HasValue)
+			return -1;
+
+		var remaining = ExpirationTime.Value - DateTime.UtcNow;
+		if (remaining.TotalSeconds <= 0)
+			return 0;
+
+		return (int)remaining.TotalSeconds;
+	}
+
+	/// <summary>
+	/// Sets the item to expire after a specified duration.
+	/// </summary>
+	/// <param name="duration">Time until expiration</param>
+	public void SetExpiration(TimeSpan duration)
+	{
+		ExpirationTime = DateTime.UtcNow + duration;
+	}
+
+	/// <summary>
+	/// Sets the item to expire at a specific time.
+	/// </summary>
+	/// <param name="expiryTime">Expiration time (UTC)</param>
+	public void SetExpiration(DateTime expiryTime)
+	{
+		ExpirationTime = expiryTime;
+	}
+
+	/// <summary>
+	/// Removes any expiration from this item.
+	/// </summary>
+	public void ClearExpiration()
+	{
+		ExpirationTime = null;
+	}
+
 	public void UpdateAmount(ulong amount)
 	{
 		Count = amount;
@@ -235,16 +310,101 @@ public class Item : IItem
 		{
 			inherits = new ITEM_INHERIT[25]
 		};
-		for (int i = 0; i < Inherits.Count; i++)
+
+		int index = 0;
+
+		// Add base inherits from XML definition (type = 0)
+		if (Inherits != null)
 		{
-			inherit.inherits[i] = new ITEM_INHERIT()
+			for (int i = 0; i < Inherits.Count && index < 25; i++)
 			{
-				type = 0,
-				typeID = (uint)Inherits[i].typeID,
-				value = Inherits[i].val
-			};
+				inherit.inherits[index++] = new ITEM_INHERIT()
+				{
+					type = 0, // Base inherit
+					typeID = (uint)Inherits[i].typeID,
+					value = Inherits[i].val
+				};
+			}
 		}
+
+		// Add socketed inherits (type = 1)
+		if (SocketedInherits != null)
+		{
+			foreach (var socketed in SocketedInherits)
+			{
+				if (index >= 25) break;
+				inherit.inherits[index++] = new ITEM_INHERIT()
+				{
+					type = 1, // Socketed inherit
+					typeID = (uint)socketed.InheritTypeId,
+					value = socketed.Value
+				};
+			}
+		}
+
 		return inherit;
+	}
+
+	/// <summary>
+	/// Gets the number of available socket slots (unfilled sockets).
+	/// </summary>
+	public int GetAvailableSocketSlots()
+	{
+		int usedSockets = SocketedInherits?.Count ?? 0;
+		return Math.Max(0, SocketCount - usedSockets);
+	}
+
+	/// <summary>
+	/// Checks if a socket can be added to this item.
+	/// </summary>
+	public bool CanAddSocket()
+	{
+		return GetAvailableSocketSlots() > 0;
+	}
+
+	/// <summary>
+	/// Adds a socketed inherit to this item.
+	/// </summary>
+	/// <param name="inheritTypeId">The inherit type ID.</param>
+	/// <param name="value">The inherit value.</param>
+	/// <param name="gemItemId">The gem item ID that was socketed.</param>
+	/// <returns>True if successful.</returns>
+	public bool AddSocketedInherit(int inheritTypeId, int value, int gemItemId)
+	{
+		if (!CanAddSocket())
+			return false;
+
+		SocketedInherits ??= new List<SocketedInherit>();
+		SocketedInherits.Add(new SocketedInherit
+		{
+			InheritTypeId = inheritTypeId,
+			Value = value,
+			GemItemId = gemItemId
+		});
+		return true;
+	}
+
+	/// <summary>
+	/// Removes a socketed inherit at the specified index.
+	/// </summary>
+	/// <param name="socketIndex">Index in the socketed inherits list.</param>
+	/// <returns>The removed inherit, or null if index invalid.</returns>
+	public SocketedInherit? RemoveSocketedInherit(int socketIndex)
+	{
+		if (SocketedInherits == null || socketIndex < 0 || socketIndex >= SocketedInherits.Count)
+			return null;
+
+		var removed = SocketedInherits[socketIndex];
+		SocketedInherits.RemoveAt(socketIndex);
+		return removed;
+	}
+
+	/// <summary>
+	/// Clears all socketed inherits from this item.
+	/// </summary>
+	public void ClearSocketedInherits()
+	{
+		SocketedInherits?.Clear();
 	}
 
 	public INVENTORY_ITEM AsInventoryItem(int slot = 0)
@@ -256,7 +416,7 @@ public class Item : IItem
 			count = (long)Count,
 			durability = GetDurability(),
 			mdurability = GetMaxDurability(),
-			remainExpiryTime = -1,
+			remainExpiryTime = GetRemainingExpirySeconds(),
 			grade = Grade,
 			inherits = GetInherits()
 		};
@@ -456,4 +616,22 @@ public class Inherit
 {
 	public int typeID { get; set; }
 	public int val { get; set; }
+}
+
+/// <summary>
+/// Represents a socketed inherit added via a gem item.
+/// </summary>
+public class SocketedInherit
+{
+	/// <summary>The inherit type ID.</summary>
+	public int InheritTypeId { get; set; }
+
+	/// <summary>The inherit value/bonus.</summary>
+	public int Value { get; set; }
+
+	/// <summary>The gem item ID that provided this inherit.</summary>
+	public int GemItemId { get; set; }
+
+	/// <summary>When this gem was socketed (UTC).</summary>
+	public DateTime SocketedAt { get; set; } = DateTime.UtcNow;
 }

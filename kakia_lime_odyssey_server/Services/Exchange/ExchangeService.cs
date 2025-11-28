@@ -4,12 +4,14 @@
 /// <remarks>
 /// Handles: Exchange requests, item/currency offers, trade completion
 /// Uses: PlayerClient inventory, CurrencyService for Peder
+/// All item transfers and currency exchanges are tracked via audit services.
 /// </remarks>
 using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_packets;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Network;
+using kakia_lime_odyssey_server.Services.Audit;
 
 namespace kakia_lime_odyssey_server.Services.Exchange;
 
@@ -339,14 +341,14 @@ public class ExchangeService
 			TransferItem(session.Player2, session.Player1, item);
 		}
 
-		// Transfer currency
+		// Transfer currency with audit logging
 		if (session.Player1Peder > 0)
 		{
-			LimeServer.CurrencyService.TransferPeder(session.Player1, session.Player2, session.Player1Peder);
+			LimeServer.CurrencyService.TransferPederAudited(session.Player1, session.Player2, session.Player1Peder, "Exchange");
 		}
 		if (session.Player2Peder > 0)
 		{
-			LimeServer.CurrencyService.TransferPeder(session.Player2, session.Player1, session.Player2Peder);
+			LimeServer.CurrencyService.TransferPederAudited(session.Player2, session.Player1, session.Player2Peder, "Exchange");
 		}
 
 		// Send success notifications (client will refresh inventory)
@@ -413,6 +415,9 @@ public class ExchangeService
 		var sourceItem = sourceInv.AtSlot(exchangeItem.OriginalInventorySlot) as Models.Item;
 		if (sourceItem == null) return;
 
+		// Create tracked item instance for audit trail
+		var instanceId = LimeServer.ItemAuditService.CreateTrackedItem(sourceItem, ItemCreationSource.Exchange, source, "FromExchange");
+
 		// Remove from source
 		if ((long)sourceItem.GetAmount() <= exchangeItem.Count)
 		{
@@ -461,6 +466,9 @@ public class ExchangeService
 
 		// Add to target inventory
 		targetInv.AddItem(newItem);
+
+		// Log item transfer in audit trail
+		LimeServer.ItemAuditService.LogTransfer(instanceId, source, target, (ulong)exchangeItem.Count, "Exchange");
 
 		var sourceName = source.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		var targetName = target.GetCurrentCharacter()?.appearance.name ?? "Unknown";

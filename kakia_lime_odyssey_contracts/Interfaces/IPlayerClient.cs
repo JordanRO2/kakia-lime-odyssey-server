@@ -61,6 +61,7 @@ public interface IPlayerClient
 
     IPlayerInventory GetInventory();
     IPlayerEquipment GetEquipment(bool combat);
+    IPlayerBank GetBank();
     IPlayerQuests GetQuests();
 
     void SendInventory();

@@ -16,6 +16,7 @@ public class PartyService : IPartyService
 	private readonly ConcurrentDictionary<uint, Party> _parties = new();
 	private readonly ConcurrentDictionary<long, uint> _playerPartyMap = new(); // Player instance ID -> Party ID
 	private readonly ConcurrentDictionary<long, PartyInvitation> _pendingInvitations = new(); // Target player ID -> Invitation
+	private readonly ConcurrentDictionary<long, PartyJoinRequest> _pendingJoinRequests = new(); // Leader player ID -> Join request
 
 	/// <summary>
 	/// Creates a new party with the given player as leader.
@@ -241,6 +242,87 @@ public class PartyService : IPartyService
 	}
 
 	/// <summary>
+	/// Accepts a pending join request (leader approves player joining).
+	/// </summary>
+	public PartyResult AcceptJoinRequest(PlayerClient leader)
+	{
+		long leaderId = leader.GetId();
+
+		// Check for pending join request
+		if (!_pendingJoinRequests.TryRemove(leaderId, out var request))
+			return PartyResult.Fail(PartyError.NoPendingInvitation, "No pending join request");
+
+		// Check if request expired
+		if (request.IsExpired)
+			return PartyResult.Fail(PartyError.InvitationExpired, "Join request has expired");
+
+		// Get leader's party
+		var party = GetParty(leader);
+		if (party == null)
+			return PartyResult.Fail(PartyError.NotInParty, "You are not in a party");
+
+		// Check if still leader
+		if (!IsPartyLeader(leader))
+			return PartyResult.Fail(PartyError.NotPartyLeader, "You are not the party leader");
+
+		// Check if party is full
+		if (party.IsFull)
+			return PartyResult.Fail(PartyError.PartyFull, "Party is full");
+
+		// Get the requester
+		var requester = request.Requester;
+		if (requester == null)
+			return PartyResult.Fail(PartyError.PlayerNotFound, "Requester no longer available");
+
+		// Check if requester is still online and not in a party
+		if (_playerPartyMap.ContainsKey(request.RequesterInstId))
+			return PartyResult.Fail(PartyError.PlayerAlreadyInParty, "Player is already in a party");
+
+		// Add requester to party
+		var pos = requester.GetPosition();
+		var requesterChar = requester.GetCurrentCharacter();
+		if (requesterChar == null)
+			return PartyResult.Fail(PartyError.PlayerNotFound, "Requester character not found");
+
+		var member = new PartyMember
+		{
+			Index = party.GetNextIndex(),
+			Name = requesterChar.appearance.name,
+			Player = requester,
+			InstId = request.RequesterInstId,
+			IsConnected = true,
+			ZoneId = requester.GetZone(),
+			PosX = pos.x,
+			PosY = pos.y,
+			PosZ = pos.z
+		};
+
+		party.Members.Add(member);
+		_playerPartyMap[request.RequesterInstId] = party.Id;
+
+		// Send SC_PARTY_JOINED to new member with party info
+		SendPartyJoined(requester, party, member);
+
+		// Send SC_PARTY_MEMBER_ADDED to all existing members
+		foreach (var m in party.Members.Where(m => m.IsConnected && m.Player != null && m.InstId != request.RequesterInstId))
+		{
+			SendPartyMemberAdded(m.Player!, member);
+		}
+
+		Logger.Log($"[PARTY] {requesterChar.appearance.name} joined party '{party.Name}' via join request", LogLevel.Debug);
+
+		return PartyResult.Ok(party);
+	}
+
+	/// <summary>
+	/// Declines a pending join request.
+	/// </summary>
+	public void DeclineJoinRequest(PlayerClient leader)
+	{
+		_pendingJoinRequests.TryRemove(leader.GetId(), out _);
+	}
+
+	/// <summary>
 	/// Requests to join a player's party.
 	/// </summary>
 	public PartyResult RequestJoin(PlayerClient requester, string targetName)
@@ -281,8 +363,24 @@ public class PartyService : IPartyService
 		if (leader == null)
 			return PartyResult.Fail(PartyError.NotPartyLeader, "Party has no leader");
 
-		// TODO: Send join request notification to party leader
-		// For now, just log the request
+		// Store pending join request
+		var joinRequest = new PartyJoinRequest
+		{
+			PartyId = party.Id,
+			PartyName = party.Name,
+			RequesterName = requesterChar.appearance.name,
+			RequesterInstId = requester.GetId(),
+			Requester = requester,
+			SentAt = DateTime.Now
+		};
+
+		long leaderId = leader.GetId();
+		_pendingJoinRequests[leaderId] = joinRequest;
+
+		// Send SC_PARTY_INVITED to party leader (reusing packet for join request notification)
+		// Leader sees: "Player X wants to join your party Y"
+		SendPartyInvited(leader, requesterChar.appearance.name, party.Name);
+
 		Logger.Log($"[PARTY] {requesterChar.appearance.name} requested to join party '{party.Name}'", LogLevel.Debug);
 
 		return PartyResult.Ok(party);

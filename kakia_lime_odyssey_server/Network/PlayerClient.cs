@@ -12,6 +12,7 @@ using kakia_lime_odyssey_server.Database;
 using kakia_lime_odyssey_server.Interfaces;
 using kakia_lime_odyssey_server.Models;
 using kakia_lime_odyssey_server.Models.PcStatusXML;
+using kakia_lime_odyssey_server.Services.Bank;
 using System.Threading;
 
 namespace kakia_lime_odyssey_server.Network;
@@ -40,6 +41,7 @@ public class PlayerClient : IPlayerClient, IEntity
 	private PlayerInventory _inventory { get; set; } = new();
 	private PlayerEquips _equipment { get; set; } = new();
 	private PlayerQuestsTracker _quests { get; set; } = new();
+	private PlayerBankStorage _bank { get; set; } = new();
 
 	private bool _inMotion = false;
 
@@ -794,6 +796,11 @@ public class PlayerClient : IPlayerClient, IEntity
 		return combat ? _equipment.Combat : _equipment.Life;
 	}
 
+	public IPlayerBank GetBank()
+	{
+		return _bank;
+	}
+
 	public IPlayerQuests GetQuests()
 	{
 		return _quests;
@@ -1056,14 +1063,22 @@ public class PlayerClient : IPlayerClient, IEntity
 		return true;
 	}
 
+	/// <summary>
+	/// Gets loot from this player. Players don't drop loot on death.
+	/// </summary>
+	/// <returns>Empty list since players don't have loot.</returns>
 	public List<Item> GetLoot()
 	{
-		throw new NotImplementedException();
+		return new List<Item>();
 	}
 
+	/// <summary>
+	/// Removes item from loot. No-op for players since they don't have loot.
+	/// </summary>
+	/// <param name="item">Item to remove from loot.</param>
 	public void Loot(Item item)
 	{
-		throw new NotImplementedException();
+		// Players don't drop loot, so this is a no-op
 	}
 
 	// Anti-cheat helper methods

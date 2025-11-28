@@ -79,37 +79,32 @@ class CS_START_GAME_Handler : PacketHandler
 		}
 
 
-		// TODO: FIX THESE
+		// Send player inventory and equipment
 		client.SendInventory();
 		client.SendEquipment();
 
-		// POC quests (added just to have something in the quest list)
+		// Load player's active quests from QuestService
+		var pc = client as PlayerClient;
+		var activeQuests = pc != null ? LimeServer.QuestService.GetPlayerQuests(pc) : new List<Models.Persistence.QuestProgress>();
+		var questDetails = new List<QuestDetail>();
+
+		foreach (var quest in activeQuests)
+		{
+			var questDef = Services.Quest.QuestService.GetQuestDefinition((uint)quest.QuestId);
+			questDetails.Add(new QuestDetail()
+			{
+				questId = quest.QuestId,
+				questState = quest.State,
+				questDescription = questDef?.TypeName ?? $"Quest {quest.QuestId}"
+			});
+		}
+
 		SC_QUEST_LIST questList = new()
 		{
 			completedMain = 0,
 			completedSub = 0,
 			completedNormal = 0,
-			details = new List<QuestDetail>()
-			{
-				new QuestDetail()
-				{
-					questId = 203101190,
-					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
-					questDescription = "Try to play the game."
-				},
-				new QuestDetail()
-				{
-					questId = 203101300,
-					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
-					questDescription = "Try to play the game."
-				},
-				new QuestDetail()
-				{
-					questId = 203101360,
-					questState = (int)QUEST_STATE.QUEST_STATE_PROGRESSING,
-					questDescription = "Try to play the game."
-				}
-			}
+			details = questDetails
 		};
 
 		using (PacketWriter pw = new())

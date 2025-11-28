@@ -25,6 +25,7 @@ using kakia_lime_odyssey_server.Services.Item;
 using kakia_lime_odyssey_server.Services.Trade;
 using kakia_lime_odyssey_server.Services.Crafting;
 using kakia_lime_odyssey_server.Services.Currency;
+using kakia_lime_odyssey_server.Services.Audit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -79,6 +80,12 @@ public class LimeServer : SocketServer
 
 	/// <summary>Service for managing player currency (Peder and Lant)</summary>
 	public static CurrencyService CurrencyService { get; } = new();
+
+	/// <summary>Service for tracking item lifecycle and audit logging</summary>
+	public static ItemAuditService ItemAuditService { get; } = new();
+
+	/// <summary>Service for tracking currency transactions and audit logging</summary>
+	public static CurrencyAuditService CurrencyAuditService { get; } = new();
 
 	public Config Config { get; set; }
 

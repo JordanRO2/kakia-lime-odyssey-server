@@ -47,6 +47,19 @@ public interface IPartyService
 	void DeclineInvitation(PlayerClient player);
 
 	/// <summary>
+	/// Accepts a pending join request (leader approves player joining).
+	/// </summary>
+	/// <param name="leader">Party leader accepting the request</param>
+	/// <returns>Result of accepting the join request</returns>
+	PartyResult AcceptJoinRequest(PlayerClient leader);
+
+	/// <summary>
+	/// Declines a pending join request.
+	/// </summary>
+	/// <param name="leader">Party leader declining the request</param>
+	void DeclineJoinRequest(PlayerClient leader);
+
+	/// <summary>
 	/// Player voluntarily leaves party.
 	/// </summary>
 	/// <param name="player">Player leaving</param>
@@ -371,5 +384,35 @@ public class PartyInvitation
 	public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
 
 	/// <summary>Whether the invitation has expired</summary>
+	public bool IsExpired => DateTime.Now - SentAt > Timeout;
+}
+
+/// <summary>
+/// Pending party join request (player requests to join an existing party).
+/// </summary>
+public class PartyJoinRequest
+{
+	/// <summary>Party ID the player wants to join</summary>
+	public uint PartyId { get; set; }
+
+	/// <summary>Party name</summary>
+	public string PartyName { get; set; } = string.Empty;
+
+	/// <summary>Requester's character name</summary>
+	public string RequesterName { get; set; } = string.Empty;
+
+	/// <summary>Requester's instance ID</summary>
+	public long RequesterInstId { get; set; }
+
+	/// <summary>Requester's player client</summary>
+	public PlayerClient? Requester { get; set; }
+
+	/// <summary>When the request was sent</summary>
+	public DateTime SentAt { get; set; } = DateTime.Now;
+
+	/// <summary>Request timeout (default 60 seconds)</summary>
+	public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
+
+	/// <summary>Whether the request has expired</summary>
 	public bool IsExpired => DateTime.Now - SentAt > Timeout;
 }
