@@ -16,6 +16,12 @@ public static class CheatDetection
 	public static bool AutoBanEnabled { get; set; } = false;
 
 	/// <summary>
+	/// Set to false to disable movement validation enforcement (rubber-banding)
+	/// When false, suspicious movements are logged but not blocked
+	/// </summary>
+	public static bool MovementValidationEnabled { get; set; } = false;
+
+	/// <summary>
 	/// Set to true to log all detections to a file for tuning
 	/// </summary>
 	public static bool FileLoggingEnabled { get; set; } = true;
@@ -174,11 +180,11 @@ public static class CheatDetection
 	}
 
 	/// <summary>
-	/// Log fly hack detection
+	/// Log fly hack detection (Z is height in Lime Odyssey)
 	/// </summary>
 	public static void LogFlyHack(uint playerId, string playerName, float oldHeight, float newHeight, float heightDelta, float maxJumpHeight)
 	{
-		string details = $"Height change: {heightDelta:F2} (max: {maxJumpHeight:F2}), From Y={oldHeight:F2} to Y={newHeight:F2}";
+		string details = $"Height change: {heightDelta:F2} (max: {maxJumpHeight:F2}), From Z={oldHeight:F2} to Z={newHeight:F2}";
 		LogCheat(playerId, playerName, CheatType.FlyHack, details);
 	}
 

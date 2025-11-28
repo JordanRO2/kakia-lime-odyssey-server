@@ -65,16 +65,18 @@ class CS_MOVE_PC_Handler : PacketHandler
 
 				CheatDetection.LogSpeedHack(playerId, playerName, actualSpeed, maxSpeed, distance, deltaTime);
 
-				// Rubber-band player back to last valid position
-				move_pc.pos = lastPos;
+				// Rubber-band player back to last valid position (only if enforcement enabled)
+				if (CheatDetection.MovementValidationEnabled)
+					move_pc.pos = lastPos;
 			}
 
 			// ANTI-CHEAT: Detect teleport hacking
 			if (MovementValidator.IsTeleport(lastPos, move_pc.pos, out float teleportDistance))
 			{
 				CheatDetection.LogTeleport(playerId, playerName, lastPos, move_pc.pos, teleportDistance);
-				// Rubber-band player back
-				move_pc.pos = lastPos;
+				// Rubber-band player back (only if enforcement enabled)
+				if (CheatDetection.MovementValidationEnabled)
+					move_pc.pos = lastPos;
 			}
 
 			// ANTI-CHEAT: Detect fly hacking (upward movement without jumping)
@@ -83,9 +85,11 @@ class CS_MOVE_PC_Handler : PacketHandler
 
 			if (MovementValidator.IsFlyHack(lastPos, move_pc.pos, isJumpingValid, GameConstants.Movement.PC_MAX_JUMP_HEIGHT, out float heightDelta))
 			{
-				CheatDetection.LogFlyHack(playerId, playerName, lastPos.y, move_pc.pos.y, heightDelta, GameConstants.Movement.PC_MAX_JUMP_HEIGHT);
-				// Rubber-band player back to last valid position
-				move_pc.pos = lastPos;
+				// Z is height in Lime Odyssey
+				CheatDetection.LogFlyHack(playerId, playerName, lastPos.z, move_pc.pos.z, heightDelta, GameConstants.Movement.PC_MAX_JUMP_HEIGHT);
+				// Rubber-band player back to last valid position (only if enforcement enabled)
+				if (CheatDetection.MovementValidationEnabled)
+					move_pc.pos = lastPos;
 			}
 
 			// Clear jumping state if player is moving downward (landed)
@@ -111,8 +115,9 @@ class CS_MOVE_PC_Handler : PacketHandler
 			if (MovementValidator.IsOutOfBounds(move_pc.pos, minBounds, maxBounds))
 			{
 				CheatDetection.LogOutOfBounds(playerId, playerName, move_pc.pos, "map boundaries");
-				// Rubber-band player back to last valid position
-				move_pc.pos = lastPos;
+				// Rubber-band player back to last valid position (only if enforcement enabled)
+				if (CheatDetection.MovementValidationEnabled)
+					move_pc.pos = lastPos;
 			}
 		}
 

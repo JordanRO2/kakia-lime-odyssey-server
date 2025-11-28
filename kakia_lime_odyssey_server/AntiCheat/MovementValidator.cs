@@ -112,6 +112,7 @@ public static class MovementValidator
 
 	/// <summary>
 	/// Detect fly hacking by checking vertical movement
+	/// Note: In Lime Odyssey, Z is the vertical/height coordinate (not Y)
 	/// </summary>
 	/// <param name="oldPos">Previous position</param>
 	/// <param name="newPos">New position</param>
@@ -121,7 +122,8 @@ public static class MovementValidator
 	/// <returns>True if fly hack detected</returns>
 	public static bool IsFlyHack(FPOS oldPos, FPOS newPos, bool isJumping, float maxJumpHeight, out float heightDelta)
 	{
-		heightDelta = newPos.y - oldPos.y;
+		// Z is the height coordinate in Lime Odyssey (not Y)
+		heightDelta = newPos.z - oldPos.z;
 
 		// Ignore downward movement (falling is always allowed)
 		if (heightDelta <= 0)
@@ -161,13 +163,14 @@ public static class MovementValidator
 	}
 
 	/// <summary>
-	/// Calculate 2D horizontal distance (ignore Y/height)
+	/// Calculate 2D horizontal distance (ignore Z/height)
+	/// Note: In Lime Odyssey, X and Y are horizontal, Z is height
 	/// Used for ground-based movement validation
 	/// </summary>
 	public static float Calculate2DDistance(FPOS pos1, FPOS pos2)
 	{
 		float dx = pos2.x - pos1.x;
-		float dz = pos2.z - pos1.z;
-		return (float)Math.Sqrt(dx * dx + dz * dz);
+		float dy = pos2.y - pos1.y;
+		return (float)Math.Sqrt(dx * dx + dy * dy);
 	}
 }

@@ -92,26 +92,27 @@ public static class GameConstants
 
 	/// <summary>
 	/// Map boundary constants
-	/// Note: These are default boundaries. Actual boundaries should be loaded from map data.
+	/// Note: In Lime Odyssey, X and Y are horizontal coordinates, Z is height.
+	/// These are default boundaries. Actual boundaries should be loaded from map data.
 	/// </summary>
 	public static class MapBounds
 	{
-		/// <summary>Default minimum X coordinate</summary>
-		public const float DEFAULT_MIN_X = -2048.0f;
+		/// <summary>Default minimum X coordinate (horizontal)</summary>
+		public const float DEFAULT_MIN_X = -10000.0f;
 
-		/// <summary>Default maximum X coordinate</summary>
-		public const float DEFAULT_MAX_X = 2048.0f;
+		/// <summary>Default maximum X coordinate (horizontal)</summary>
+		public const float DEFAULT_MAX_X = 10000.0f;
 
-		/// <summary>Default minimum Y coordinate (height)</summary>
-		public const float DEFAULT_MIN_Y = -100.0f;
+		/// <summary>Default minimum Y coordinate (horizontal - NOT height!)</summary>
+		public const float DEFAULT_MIN_Y = -10000.0f;
 
-		/// <summary>Default maximum Y coordinate (height)</summary>
-		public const float DEFAULT_MAX_Y = 1000.0f;
+		/// <summary>Default maximum Y coordinate (horizontal - NOT height!)</summary>
+		public const float DEFAULT_MAX_Y = 10000.0f;
 
-		/// <summary>Default minimum Z coordinate</summary>
-		public const float DEFAULT_MIN_Z = -2048.0f;
+		/// <summary>Default minimum Z coordinate (HEIGHT in Lime Odyssey)</summary>
+		public const float DEFAULT_MIN_Z = -100.0f;
 
-		/// <summary>Default maximum Z coordinate</summary>
-		public const float DEFAULT_MAX_Z = 2048.0f;
+		/// <summary>Default maximum Z coordinate (HEIGHT in Lime Odyssey)</summary>
+		public const float DEFAULT_MAX_Z = 2000.0f;
 	}
 }
