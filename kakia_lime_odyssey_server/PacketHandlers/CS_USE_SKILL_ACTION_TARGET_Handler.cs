@@ -112,6 +112,13 @@ class CS_USE_SKILL_ACTION_TARGET_Handler : PacketHandler
 				client.SendGlobalPacket(pw.ToPacket(), default).Wait();
 			}
 
+			// Update quest hunt objectives for monster kills (non-player targets)
+			if (client is PlayerClient killerPlayer && target is not PlayerClient)
+			{
+				int monsterTypeId = target.GetEntityTypeId();
+				LimeServer.QuestService.OnMonsterKilled(killerPlayer, monsterTypeId);
+			}
+
 			if (result.ExpReward == 0)
 				return;
 

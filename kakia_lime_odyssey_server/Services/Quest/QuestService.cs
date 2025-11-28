@@ -560,7 +560,180 @@ public class QuestService
 
 	#endregion
 
+	#region Objective Tracking
+
+	/// <summary>
+	/// Called when a monster is killed. Updates Hunt objectives for all relevant quests.
+	/// </summary>
+	/// <param name="player">The player who killed the monster.</param>
+	/// <param name="monsterTypeId">The type ID of the killed monster.</param>
+	public void OnMonsterKilled(PlayerClient player, int monsterTypeId)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null) return;
+
+		string accountId = player.GetAccountId();
+		string charName = character.appearance.name;
+		var quests = GetOrLoadQuests(accountId, charName);
+
+		bool anyUpdated = false;
+
+		foreach (var quest in quests.ActiveQuests)
+		{
+			var questDef = GetQuestDefinition((uint)quest.QuestId);
+			if (questDef?.Storage == null) continue;
+
+			var huntObjectives = questDef.Storage.GetHuntObjectives();
+			foreach (var objective in huntObjectives)
+			{
+				if (objective.TargetTypeID != monsterTypeId) continue;
+
+				// Get current progress
+				int currentProgress = quest.ObjectiveProgress.GetValueOrDefault(objective.Index, 0);
+				if (currentProgress >= objective.Goal) continue; // Already completed
+
+				// Increment progress
+				int newProgress = currentProgress + 1;
+				quest.ObjectiveProgress[objective.Index] = newProgress;
+				anyUpdated = true;
+
+				// Check if objective completed
+				bool objectiveCompleted = newProgress >= objective.Goal;
+
+				// Notify client
+				SendQuestSubjectChange(player, (uint)quest.QuestId, (byte)objective.Index, objectiveCompleted);
+
+				Logger.Log($"[QUEST] {charName} hunt progress: quest {quest.QuestId} obj {objective.Index} = {newProgress}/{objective.Goal}", LogLevel.Debug);
+			}
+		}
+
+		if (anyUpdated)
+		{
+			SaveQuests(accountId, charName, quests);
+		}
+	}
+
+	/// <summary>
+	/// Called when an item is collected/picked up. Updates Collect objectives for all relevant quests.
+	/// </summary>
+	/// <param name="player">The player who collected the item.</param>
+	/// <param name="itemTypeId">The type ID of the collected item.</param>
+	/// <param name="count">Number of items collected.</param>
+	public void OnItemCollected(PlayerClient player, int itemTypeId, int count = 1)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null) return;
+
+		string accountId = player.GetAccountId();
+		string charName = character.appearance.name;
+		var quests = GetOrLoadQuests(accountId, charName);
+
+		bool anyUpdated = false;
+
+		foreach (var quest in quests.ActiveQuests)
+		{
+			var questDef = GetQuestDefinition((uint)quest.QuestId);
+			if (questDef?.Storage == null) continue;
+
+			var collectObjectives = questDef.Storage.GetCollectObjectives();
+			foreach (var objective in collectObjectives)
+			{
+				if (objective.TargetTypeID != itemTypeId) continue;
+
+				// Get current progress
+				int currentProgress = quest.ObjectiveProgress.GetValueOrDefault(objective.Index, 0);
+				if (currentProgress >= objective.Goal) continue; // Already completed
+
+				// Increment progress (capped at goal)
+				int newProgress = Math.Min(currentProgress + count, objective.Goal);
+				quest.ObjectiveProgress[objective.Index] = newProgress;
+				anyUpdated = true;
+
+				// Check if objective completed
+				bool objectiveCompleted = newProgress >= objective.Goal;
+
+				// Notify client
+				SendQuestSubjectChange(player, (uint)quest.QuestId, (byte)objective.Index, objectiveCompleted);
+
+				Logger.Log($"[QUEST] {charName} collect progress: quest {quest.QuestId} obj {objective.Index} = {newProgress}/{objective.Goal}", LogLevel.Debug);
+			}
+		}
+
+		if (anyUpdated)
+		{
+			SaveQuests(accountId, charName, quests);
+		}
+	}
+
+	/// <summary>
+	/// Checks if all objectives for a quest are completed.
+	/// </summary>
+	/// <param name="player">The player to check.</param>
+	/// <param name="questTypeID">Quest type ID to check.</param>
+	/// <returns>True if all objectives are met.</returns>
+	public bool AreAllObjectivesComplete(PlayerClient player, uint questTypeID)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null) return false;
+
+		string accountId = player.GetAccountId();
+		string charName = character.appearance.name;
+		var quests = GetOrLoadQuests(accountId, charName);
+
+		var quest = quests.ActiveQuests.FirstOrDefault(q => q.QuestId == (int)questTypeID);
+		if (quest == null) return false;
+
+		var questDef = GetQuestDefinition(questTypeID);
+		if (questDef?.Storage == null) return true; // No objectives = complete
+
+		var allObjectives = questDef.Storage.GetAllObjectives();
+		foreach (var objective in allObjectives)
+		{
+			int currentProgress = quest.ObjectiveProgress.GetValueOrDefault(objective.Index, 0);
+			if (currentProgress < objective.Goal)
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Gets the current progress for a specific quest objective.
+	/// </summary>
+	/// <param name="player">The player.</param>
+	/// <param name="questTypeID">Quest type ID.</param>
+	/// <param name="objectiveIndex">Objective index (0-2).</param>
+	/// <returns>Current progress count.</returns>
+	public int GetObjectiveProgress(PlayerClient player, uint questTypeID, int objectiveIndex)
+	{
+		var character = player.GetCurrentCharacter();
+		if (character == null) return 0;
+
+		string accountId = player.GetAccountId();
+		string charName = character.appearance.name;
+		var quests = GetOrLoadQuests(accountId, charName);
+
+		var quest = quests.ActiveQuests.FirstOrDefault(q => q.QuestId == (int)questTypeID);
+		if (quest == null) return 0;
+
+		return quest.ObjectiveProgress.GetValueOrDefault(objectiveIndex, 0);
+	}
+
+	#endregion
+
 	#region Packet Sending
+
+	private static void SendQuestSubjectChange(PlayerClient player, uint questTypeID, byte subjectNum, bool completed)
+	{
+		using PacketWriter pw = new();
+		pw.Write(new SC_CHANGE_QUEST_SUBJECT
+		{
+			typeID = questTypeID,
+			subjectNum = subjectNum,
+			isSuccessed = completed
+		});
+		player.Send(pw.ToPacket(), default).Wait();
+	}
 
 	private static void SendQuestAdd(PlayerClient player, uint questTypeID)
 	{

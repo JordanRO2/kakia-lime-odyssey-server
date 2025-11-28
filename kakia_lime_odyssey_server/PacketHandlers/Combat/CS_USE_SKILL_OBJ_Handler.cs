@@ -148,6 +148,13 @@ class CS_USE_SKILL_OBJ_Handler : PacketHandler
 			if (result.TargetKilled)
 			{
 				SendDeathPackets(target, client);
+
+				// Update quest hunt objectives for monster kills
+				if (client is PlayerClient killerPlayer)
+				{
+					int monsterTypeId = target.GetEntityTypeId();
+					LimeServer.QuestService.OnMonsterKilled(killerPlayer, monsterTypeId);
+				}
 			}
 		}
 

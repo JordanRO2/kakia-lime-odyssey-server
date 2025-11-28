@@ -100,5 +100,10 @@ class CS_LOOT_ITEM_Handler : PacketHandler
 			client.Send(pw.ToPacket(), default).Wait();
 		}
 
+		// Update quest collect objectives for item pickup
+		if (client is PlayerClient playerClient)
+		{
+			LimeServer.QuestService.OnItemCollected(playerClient, item.Id, 1);
+		}
 	}
 }
