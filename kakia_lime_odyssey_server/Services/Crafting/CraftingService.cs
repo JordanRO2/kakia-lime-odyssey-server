@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
 using kakia_lime_odyssey_packets;
+using kakia_lime_odyssey_packets.Packets.Common;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Models;
@@ -206,15 +207,36 @@ public class CraftingService
 			return false;
 		}
 
+		if (session.Recipe == null)
+		{
+			Logger.Log($"[CRAFT] {playerName} session has no recipe for continuous", LogLevel.Warning);
+			return false;
+		}
+
+		// Validate player can craft requested count
+		var inventory = pc.GetInventory();
+		var requiredItems = session.Recipe.GetRequiredItems();
+		foreach (var (itemId, required) in requiredItems)
+		{
+			int slot = inventory.FindItem(itemId, (ulong)(required * count));
+			if (slot < 0)
+			{
+				Logger.Log($"[CRAFT] {playerName} not enough {itemId} for {count}x craft", LogLevel.Debug);
+				return false;
+			}
+		}
+
 		session.TargetCount = count;
 		session.IsContinuous = true;
 		session.StartTime = DateTime.Now;
 
 		Logger.Log($"[CRAFT] {playerName} started continuous crafting x{count}", LogLevel.Debug);
 
-		// TODO: Validate can craft requested count
-		// TODO: Start continuous crafting loop
-		// TODO: Send SC_ITEM_MAKE_START_CASTING
+		// Determine if critical based on rate
+		bool isCritical = Random.Shared.Next(100) < session.CriticalRate;
+
+		// Send start casting for first item
+		SendStartCasting(pc, session, isCritical);
 
 		return true;
 	}
@@ -229,11 +251,16 @@ public class CraftingService
 
 		if (_activeSessions.TryGetValue(playerId, out var session))
 		{
+			int remainCount = session.TargetCount - session.CompletedCount;
 			session.IsContinuous = false;
 			Logger.Log($"[CRAFT] {playerName} stopped continuous crafting at {session.CompletedCount}/{session.TargetCount}", LogLevel.Debug);
-		}
 
-		// TODO: Send SC_ITEM_MAKE_FINISH with progress
+			// Send finish with cancelled status and remaining count
+			SendCraftFinish(pc, CraftResult.Cancelled, session.LpCost, remainCount);
+
+			// Clean up session
+			_activeSessions.TryRemove(playerId, out _);
+		}
 	}
 
 	/// <summary>
@@ -246,7 +273,11 @@ public class CraftingService
 
 		Logger.Log($"[CRAFT] {playerName} requested crafting report", LogLevel.Debug);
 
-		// TODO: Send SC_ITEM_MAKE_UPDATE_REPORT with current status
+		// Send update report with current session status
+		if (_activeSessions.TryGetValue(playerId, out var session))
+		{
+			SendUpdateReport(pc, session);
+		}
 	}
 
 	/// <summary>
@@ -286,7 +317,7 @@ public class CraftingService
 
 		Logger.Log($"[CRAFT] {playerName} ready for stuff make type {typeID}", LogLevel.Debug);
 
-		// TODO: Send SC_STUFF_MAKE_READY_SUCCESS
+		SendStuffMakeReadySuccess(pc, typeID);
 		return true;
 	}
 
@@ -304,12 +335,20 @@ public class CraftingService
 			return false;
 		}
 
-		// TODO: Validate item exists in inventory slot
+		// Validate item exists in inventory slot
+		var inventory = pc.GetInventory();
+		var item = inventory.AtSlot(slot);
+		if (item == null)
+		{
+			Logger.Log($"[CRAFT] {playerName} no item at slot {slot}", LogLevel.Warning);
+			return false;
+		}
+
 		session.Items.Add(new StuffMakeItem { Slot = slot, Count = count });
 
 		Logger.Log($"[CRAFT] {playerName} added slot {slot} x{count} to stuff make list", LogLevel.Debug);
 
-		// TODO: Send SC_STUFF_MAKE_ADD_LIST_SUCCESS
+		SendStuffMakeAddListSuccess(pc, session, slot, count);
 		return true;
 	}
 
@@ -335,7 +374,7 @@ public class CraftingService
 
 		Logger.Log($"[CRAFT] {playerName} removed slot {slot} from stuff make list", LogLevel.Debug);
 
-		// TODO: Send SC_STUFF_MAKE_DELETE_LIST_SUCCESS
+		SendStuffMakeDeleteListSuccess(pc, session, slot, itemToRemove?.Count ?? 0);
 		return true;
 	}
 
@@ -357,9 +396,29 @@ public class CraftingService
 
 		Logger.Log($"[CRAFT] {playerName} started stuff make with {session.Items.Count} items", LogLevel.Debug);
 
-		// TODO: Consume materials
-		// TODO: Start processing timer
-		// TODO: Send SC_STUFF_MAKE_START_CASTING
+		// Consume materials from inventory
+		var inventory = pc.GetInventory();
+		foreach (var stuffItem in session.Items)
+		{
+			var item = inventory.AtSlot(stuffItem.Slot);
+			if (item != null)
+			{
+				// Reduce count or remove entirely based on amount
+				if (item.GetAmount() <= (ulong)stuffItem.Count)
+				{
+					inventory.RemoveItem(stuffItem.Slot);
+				}
+				else
+				{
+					item.UpdateAmount(item.GetAmount() - (ulong)stuffItem.Count);
+					inventory.UpdateItemAtSlot(stuffItem.Slot, item);
+				}
+			}
+		}
+
+		// For now, complete immediately (no processing timer yet)
+		// In a full implementation, this would start a timer
+		SendStuffMakeFinish(pc, 1, 0, 10, 100); // result=success, LP=10
 
 		return true;
 	}
@@ -377,7 +436,8 @@ public class CraftingService
 			Logger.Log($"[CRAFT] {playerName} canceled stuff make", LogLevel.Debug);
 		}
 
-		// TODO: Send SC_STUFF_MAKE_FINISH
+		// Send cancelled result (finishResult=3 for cancelled)
+		SendStuffMakeFinish(pc, 3, 0, 0, 100);
 	}
 
 	// ============ STREAM GAUGE (Fishing/Gathering Minigame) ============
@@ -484,6 +544,148 @@ public class CraftingService
 		using PacketWriter pw = new();
 		pw.Write(packet);
 		pc.Send(pw.ToSizedPacket(), default).Wait();
+	}
+
+	// ============ STUFF MAKE PACKET HELPERS ============
+
+	/// <summary>
+	/// Sends SC_STUFF_MAKE_READY_SUCCESS to indicate material processing is ready.
+	/// </summary>
+	private static void SendStuffMakeReadySuccess(PlayerClient pc, uint typeID)
+	{
+		var packet = new SC_STUFF_MAKE_READY_SUCCESS
+		{
+			typeID = typeID
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_STUFF_MAKE_ADD_LIST_SUCCESS when an item is added to the processing queue.
+	/// </summary>
+	private static void SendStuffMakeAddListSuccess(PlayerClient pc, StuffMakeSession session, int slot, long count)
+	{
+		// Build result items array from session
+		var resultItems = new STUFF_MAKE_ITEMS
+		{
+			stuffMakeItems = new STUFF_MAKE_ITEM[5]
+		};
+
+		// Initialize all slots
+		for (int i = 0; i < 5; i++)
+		{
+			if (i < session.Items.Count)
+			{
+				var inventory = pc.GetInventory();
+				var item = inventory.AtSlot(session.Items[i].Slot);
+				resultItems.stuffMakeItems[i] = new STUFF_MAKE_ITEM
+				{
+					typeID = (int)(item?.GetId() ?? 0),
+					count = session.Items[i].Count
+				};
+			}
+			else
+			{
+				resultItems.stuffMakeItems[i] = new STUFF_MAKE_ITEM();
+			}
+		}
+
+		var addedSlot = new STUFF_MAKE_SLOT
+		{
+			slot = slot,
+			count = count
+		};
+
+		var packet = new SC_STUFF_MAKE_ADD_LIST_SUCCESS
+		{
+			typeID = session.TypeID,
+			successPercent = 75,
+			makeTime = 3000,
+			requestLP = 10,
+			resultItems = resultItems,
+			addedItem = addedSlot
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_STUFF_MAKE_DELETE_LIST_SUCCESS when an item is removed from the processing queue.
+	/// </summary>
+	private static void SendStuffMakeDeleteListSuccess(PlayerClient pc, StuffMakeSession session, int slot, long count)
+	{
+		// Build result items array from session (after removal)
+		var resultItems = new STUFF_MAKE_ITEMS
+		{
+			stuffMakeItems = new STUFF_MAKE_ITEM[5]
+		};
+
+		// Initialize all slots
+		for (int i = 0; i < 5; i++)
+		{
+			if (i < session.Items.Count)
+			{
+				var inventory = pc.GetInventory();
+				var item = inventory.AtSlot(session.Items[i].Slot);
+				resultItems.stuffMakeItems[i] = new STUFF_MAKE_ITEM
+				{
+					typeID = (int)(item?.GetId() ?? 0),
+					count = session.Items[i].Count
+				};
+			}
+			else
+			{
+				resultItems.stuffMakeItems[i] = new STUFF_MAKE_ITEM();
+			}
+		}
+
+		var deletedSlot = new STUFF_MAKE_SLOT
+		{
+			slot = slot,
+			count = count
+		};
+
+		var packet = new SC_STUFF_MAKE_DELETE_LIST_SUCCESS
+		{
+			typeID = session.TypeID,
+			successPercent = 75,
+			makeTime = 3000,
+			requestLP = 10,
+			resultItems = resultItems,
+			deletedItem = deletedSlot
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToPacket(), default).Wait();
+	}
+
+	/// <summary>
+	/// Sends SC_STUFF_MAKE_FINISH when material processing completes or is cancelled.
+	/// </summary>
+	/// <param name="pc">Player client</param>
+	/// <param name="finishResult">0=fail, 1=success, 2=critical, 3=cancelled</param>
+	/// <param name="instID">Created item instance ID (0 if failed/cancelled)</param>
+	/// <param name="useLP">LP consumed</param>
+	/// <param name="currentLP">Current LP after processing</param>
+	private static void SendStuffMakeFinish(PlayerClient pc, byte finishResult, long instID, ushort useLP, ushort currentLP)
+	{
+		var packet = new SC_STUFF_MAKE_FINISH
+		{
+			finishResult = finishResult,
+			InstID = instID,
+			useLP = useLP,
+			currentLP = currentLP
+		};
+
+		using PacketWriter pw = new();
+		pw.Write(packet);
+		pc.Send(pw.ToPacket(), default).Wait();
 	}
 
 	/// <summary>
