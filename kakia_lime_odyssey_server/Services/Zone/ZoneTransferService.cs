@@ -368,8 +368,10 @@ public class ZoneTransferService
 		// Check quest requirement
 		if (zone.RequiredQuestId > 0)
 		{
-			// TODO: Check if player has completed required quest
-			// For now, allow entry
+			if (!LimeServer.QuestService.HasCompletedQuest(pc, (uint)zone.RequiredQuestId))
+			{
+				return (false, $"You must complete a required quest before entering this zone.");
+			}
 		}
 
 		return (true, string.Empty);
