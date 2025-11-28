@@ -26,6 +26,12 @@ using kakia_lime_odyssey_server.Services.Trade;
 using kakia_lime_odyssey_server.Services.Crafting;
 using kakia_lime_odyssey_server.Services.Currency;
 using kakia_lime_odyssey_server.Services.Audit;
+using kakia_lime_odyssey_server.Services.Durability;
+using kakia_lime_odyssey_server.Services.Enhancement;
+using kakia_lime_odyssey_server.Services.Mount;
+using kakia_lime_odyssey_server.Services.Socket;
+using kakia_lime_odyssey_server.Services.Zone;
+using kakia_lime_odyssey_server.Services.MissionZone;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -86,6 +92,24 @@ public class LimeServer : SocketServer
 
 	/// <summary>Service for tracking currency transactions and audit logging</summary>
 	public static CurrencyAuditService CurrencyAuditService { get; } = new();
+
+	/// <summary>Service for managing item durability</summary>
+	public static DurabilityService DurabilityService { get; } = new();
+
+	/// <summary>Service for managing item enhancement/upgrading</summary>
+	public static EnhancementService EnhancementService { get; } = new();
+
+	/// <summary>Service for managing player mounts</summary>
+	public static MountService MountService { get; } = new();
+
+	/// <summary>Service for managing gem socketing into equipment</summary>
+	public static SocketGemService SocketGemService { get; } = new();
+
+	/// <summary>Service for managing zone transfers and portals</summary>
+	public static ZoneTransferService ZoneTransferService { get; } = new();
+
+	/// <summary>Service for managing instanced mission zones (dungeons)</summary>
+	public static MissionZoneService MissionZoneService { get; } = new();
 
 	public Config Config { get; set; }
 

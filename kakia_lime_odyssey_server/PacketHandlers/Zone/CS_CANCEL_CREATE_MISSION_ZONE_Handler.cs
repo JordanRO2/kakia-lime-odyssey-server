@@ -3,7 +3,7 @@
 /// </summary>
 /// <remarks>
 /// Triggered by: Player canceling dungeon/mission zone creation
-/// Response packets: None
+/// Response packets: SC_CANCELED_CREATE_MISSION_ZONE
 /// </remarks>
 using kakia_lime_odyssey_logging;
 using kakia_lime_odyssey_network;
@@ -24,7 +24,7 @@ class CS_CANCEL_CREATE_MISSION_ZONE_Handler : PacketHandler
 		string playerName = pc.GetCurrentCharacter()?.appearance.name ?? "Unknown";
 		Logger.Log($"[ZONE] {playerName} canceling mission zone creation", LogLevel.Debug);
 
-		// Mission zone creation is canceled - no specific cleanup needed at this time
-		// The client handles the UI state change, server just acknowledges
+		// Cancel the mission zone request via service
+		LimeServer.MissionZoneService.CancelMissionRequest(pc);
 	}
 }
