@@ -32,6 +32,7 @@ using kakia_lime_odyssey_server.Services.Mount;
 using kakia_lime_odyssey_server.Services.Socket;
 using kakia_lime_odyssey_server.Services.Zone;
 using kakia_lime_odyssey_server.Services.MissionZone;
+using kakia_lime_odyssey_server.Services.Patch;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -111,6 +112,9 @@ public class LimeServer : SocketServer
 	/// <summary>Service for managing instanced mission zones (dungeons)</summary>
 	public static MissionZoneService MissionZoneService { get; } = new();
 
+	/// <summary>HTTP service for launcher patch/news endpoints (port 8080)</summary>
+	public static PatchHttpService PatchHttpService { get; } = new();
+
 	public Config Config { get; set; }
 
 	public BackgroundTask BackgroundTask { get; set; }
@@ -154,6 +158,9 @@ public class LimeServer : SocketServer
 
 		// Subscribe to ban service kick events
 		BanService.OnPlayerBanned += HandlePlayerBan;
+
+		// Start HTTP service for launcher (patch/news)
+		PatchHttpService.Start();
 	}
 
 	/// <summary>
@@ -408,11 +415,19 @@ public class LimeServer : SocketServer
 		}
 	}
 
+	/// <summary>
+	/// Sends a packet to all players in the same zone as the sender.
+	/// Only sends to players who have fully entered the game world (IsLoaded).
+	/// </summary>
+	/// <param name="sender">The player sending the packet (will be excluded)</param>
+	/// <param name="packet">The packet data to send</param>
+	/// <param name="token">Cancellation token</param>
 	public async Task SendGlobal(PlayerClient sender, byte[] packet, CancellationToken token)
 	{
 		foreach(var pc in GetReadonlyPlayers())
 		{
-			if (pc == sender || pc.GetZone() != sender.GetZone()) continue;
+			// Skip sender, players in different zones, and players not yet in game world
+			if (pc == sender || pc.GetZone() != sender.GetZone() || !pc.IsLoaded()) continue;
 			pc.Send(packet, token).Wait();
 		}
 	}

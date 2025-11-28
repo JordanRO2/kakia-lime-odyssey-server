@@ -23,6 +23,20 @@ class CS_START_GAME_Handler : PacketHandler
 		var selectedCharacter = PacketConverter.Extract<CS_START_GAME>(p.Payload);
 		var db = DatabaseFactory.Instance;
 		var characters = db.LoadPC(client.GetAccountId());
+
+		// Validate character slot is within bounds
+		if (characters == null || characters.Count == 0)
+		{
+			Logger.Log($"[START_GAME] No characters found for account {client.GetAccountId()}", LogLevel.Warning);
+			return;
+		}
+
+		if (selectedCharacter.charNum >= characters.Count)
+		{
+			Logger.Log($"[START_GAME] Invalid character slot {selectedCharacter.charNum} for account {client.GetAccountId()} (max: {characters.Count - 1})", LogLevel.Warning);
+			return;
+		}
+
 		var current = characters[selectedCharacter.charNum];
 		client.SetCurrentCharacter(current);
 

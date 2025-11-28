@@ -10,6 +10,19 @@ namespace kakia_lime_odyssey_server.AntiCheat;
 /// </summary>
 public static class CheatDetection
 {
+	/// <summary>
+	/// Set to false to disable auto-banning (logging still works)
+	/// </summary>
+	public static bool AutoBanEnabled { get; set; } = false;
+
+	/// <summary>
+	/// Set to true to log all detections to a file for tuning
+	/// </summary>
+	public static bool FileLoggingEnabled { get; set; } = true;
+
+	private static readonly string _logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cheat_detections.log");
+	private static readonly object _fileLock = new();
+
 	public enum CheatType
 	{
 		SpeedHack,
@@ -78,6 +91,12 @@ public static class CheatDetection
 			log.Violations[cheatType]++;
 
 			Logger.Log($"[CHEAT] Player {playerName} ({playerId}) - {cheatType}: {details} (Count: {log.Violations[cheatType]})");
+
+			// Log to file for tuning
+			if (FileLoggingEnabled)
+			{
+				WriteToLogFile(log, cheatType, details);
+			}
 
 			// Auto-ban threshold
 			if (ShouldAutoBan(log, cheatType))
@@ -177,6 +196,10 @@ public static class CheatDetection
 	/// </summary>
 	private static bool ShouldAutoBan(CheatLog log, CheatType cheatType)
 	{
+		// Check if auto-ban is enabled
+		if (!AutoBanEnabled)
+			return false;
+
 		// Configurable thresholds
 		var thresholds = new Dictionary<CheatType, int>
 		{
@@ -215,6 +238,25 @@ public static class CheatDetection
 		lock (_playerLogs)
 		{
 			_playerLogs.Remove(playerId);
+		}
+	}
+
+	/// <summary>
+	/// Write cheat detection to log file for tuning
+	/// </summary>
+	private static void WriteToLogFile(CheatLog log, CheatType cheatType, string details)
+	{
+		try
+		{
+			lock (_fileLock)
+			{
+				var logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}|{log.PlayerId}|{log.PlayerName}|{log.AccountId}|{log.IpAddress}|{cheatType}|{log.Violations[cheatType]}|{details}";
+				File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.Log($"[CHEAT] Failed to write to log file: {ex.Message}", LogLevel.Warning);
 		}
 	}
 }

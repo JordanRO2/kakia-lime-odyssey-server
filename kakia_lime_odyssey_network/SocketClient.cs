@@ -36,11 +36,29 @@ namespace kakia_lime_odyssey_network
 					return;
 				}
 				await HandleData(len);
-			} catch (Exception ex)
+			}
+			catch (SocketException ex) when (IsNormalDisconnect(ex.SocketErrorCode))
+			{
+				// Normal client disconnect - log as info, not error
+				IsAlive = false;
+				Logger.Log($"{GetIP()} disconnected (client closed connection).");
+			}
+			catch (Exception ex)
 			{
 				Logger.Log(ex);
 				IsAlive = false;
 			}
+		}
+
+		/// <summary>
+		/// Checks if the socket error indicates a normal client disconnect
+		/// </summary>
+		private static bool IsNormalDisconnect(SocketError error)
+		{
+			return error == SocketError.ConnectionReset ||
+			       error == SocketError.ConnectionAborted ||
+			       error == SocketError.Shutdown ||
+			       error == SocketError.OperationAborted;
 		}
 
 		private async Task HandleData(int len)

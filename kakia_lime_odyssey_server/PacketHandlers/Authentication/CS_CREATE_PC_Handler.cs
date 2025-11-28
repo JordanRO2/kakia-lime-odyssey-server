@@ -7,6 +7,8 @@ using kakia_lime_odyssey_packets.Packets.CS;
 using kakia_lime_odyssey_packets.Packets.Models;
 using kakia_lime_odyssey_packets.Packets.SC;
 using kakia_lime_odyssey_server.Database;
+using kakia_lime_odyssey_server.Models;
+using kakia_lime_odyssey_server.Network;
 
 namespace kakia_lime_odyssey_server.PacketHandlers.Authentication;
 
@@ -62,39 +64,55 @@ class CS_CREATE_PC_Handler : PacketHandler
 			appearance = new()
 			{
 				name = nameBytes,
+				_padding1 = new byte[2],
 				raceTypeID = character.raceTypeID,
-				genderType = character.genderType,
 				lifeJobTypeID = character.lifeJobTypeID,
 				combatJobTypeID = 1,
+				genderType = character.genderType,
 				headType = character.headType,
 				hairType = character.hairType,
 				eyeType = character.eyeType,
 				earType = character.earType,
+				playingJobClass = 0,
 				underwearType = character.underwearType,
+				_padding2 = new byte[2],
+				equiped = new int[20],
 				familyNameType = character.familyNameType,
-				skinColorType = character.skinColorType,
-				hairColorType = character.hairColorType,
-				eyeColorType = character.eyeColorType,
-				eyeBrowColorType = character.eyeBrowColorType,
+				_padding3 = new byte[3],
 				action = 0,
 				actionStartTick = 0,
+				scale = 1,
+				transparent = 1,
+				showHelm = true,
 				color = new()
 				{
 					r = 1,
 					g = 1,
 					b = 1
 				},
-				playingJobClass = 0,
-				scale = 1,
-				showHelm = true,
-				transparent = 1,
-				equiped = new int[20]
+				skinColorType = character.skinColorType,
+				hairColorType = character.hairColorType,
+				eyeColorType = character.eyeColorType,
+				eyeBrowColorType = character.eyeBrowColorType
 			}
 		};
 
 		var db = DatabaseFactory.Instance;
 		db.StoreAppearance(client.GetAccountId(), character.name, newCharacter.appearance);
 		db.StoreSavedStatusPC(client.GetAccountId(), character.name, newCharacter.status);
+
+		// Set starting zone and position (Muris Village - Zone 1)
+		var startingZoneId = 1u;
+		var spawnPoint = LimeServer.ZoneTransferService.GetSpawnPoint(startingZoneId);
+		var startingPosition = new WorldPosition
+		{
+			ZoneID = startingZoneId,
+			Position = spawnPoint,
+			Direction = new FPOS { x = 0.9f, y = 0, z = 0 }
+		};
+		db.SaveWorldPosition(client.GetAccountId(), character.name, startingPosition);
+
+		Logger.Log($"[CREATE_PC] Created character '{character.name}' at Zone {startingZoneId} ({spawnPoint.x:F0}, {spawnPoint.y:F0}, {spawnPoint.z:F0})", LogLevel.Information);
 
 		SC_CREATED_PC sc_created_pc = new()
 		{

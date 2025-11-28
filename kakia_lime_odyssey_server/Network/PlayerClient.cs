@@ -172,8 +172,8 @@ public class PlayerClient : IPlayerClient, IEntity
 		}
 		else
 		{
-			Logger.Log($"NOT IMPLEMENTED [{packet.PacketId}]", LogLevel.Warning);
-			//Logger.LogPck(packet.Payload);
+			Logger.Log($"[UNHANDLED PACKET] {packet.PacketId} (0x{(int)packet.PacketId:X4}) - {packet.Payload.Length} bytes", LogLevel.Information);
+			Logger.LogPck(packet.Payload);
 		}
 	}
 
@@ -211,9 +211,7 @@ public class PlayerClient : IPlayerClient, IEntity
 
 	public uint GetObjInstID()
 	{
-		if (_objInstID == 0)
-			Logger.Log("Requesting obj id before its set!", LogLevel.Error);
-
+		// Note: _objInstID == 0 is normal for probe connections (launcher checking server status)
 		return _objInstID;
 	}
 

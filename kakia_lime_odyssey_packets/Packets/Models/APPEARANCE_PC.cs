@@ -36,35 +36,96 @@ namespace kakia_lime_odyssey_packets.Packets.Models;
 /// - 0x97: unsigned __int8 eyeBrowColorType (1 byte)
 /// Total: 152 bytes (0x98)
 /// </remarks>
+/// <summary>
+/// Character appearance data - IDA verified structure with explicit padding.
+/// Total size: 152 bytes (0x98)
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct APPEARANCE_PC_KR
 {
+	/// <summary>Character name (26 bytes) at offset 0x00</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 26)]
 	public byte[] name;
+
+	/// <summary>Padding after name (2 bytes) at offset 0x1A</summary>
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+	public byte[] _padding1;
+
+	/// <summary>Race type ID (4 bytes) at offset 0x1C</summary>
 	public uint raceTypeID;
+
+	/// <summary>Life job type ID (1 byte) at offset 0x20</summary>
 	public byte lifeJobTypeID;
+
+	/// <summary>Combat job type ID (1 byte) at offset 0x21</summary>
 	public byte combatJobTypeID;
+
+	/// <summary>Gender type (1 byte bool) at offset 0x22</summary>
 	[MarshalAs(UnmanagedType.U1)]
 	public bool genderType;
+
+	/// <summary>Head type (1 byte) at offset 0x23</summary>
 	public byte headType;
+
+	/// <summary>Hair type (1 byte) at offset 0x24</summary>
 	public byte hairType;
+
+	/// <summary>Eye type (1 byte) at offset 0x25</summary>
 	public byte eyeType;
+
+	/// <summary>Ear type (1 byte) at offset 0x26</summary>
 	public byte earType;
+
+	/// <summary>Playing job class (1 byte) at offset 0x27</summary>
 	public byte playingJobClass;
+
+	/// <summary>Underwear type (2 bytes) at offset 0x28</summary>
 	public short underwearType;
+
+	/// <summary>Padding after underwearType (2 bytes) at offset 0x2A</summary>
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+	public byte[] _padding2;
+
+	/// <summary>Equipped items array (80 bytes = 20 ints) at offset 0x2C</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
 	public int[] equiped;
+
+	/// <summary>Family name type (1 byte) at offset 0x7C</summary>
 	public byte familyNameType;
+
+	/// <summary>Padding after familyNameType (3 bytes) at offset 0x7D</summary>
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+	public byte[] _padding3;
+
+	/// <summary>Action ID (4 bytes) at offset 0x80</summary>
 	public uint action;
+
+	/// <summary>Action start tick (4 bytes) at offset 0x84</summary>
 	public uint actionStartTick;
+
+	/// <summary>Character scale (4 bytes float) at offset 0x88</summary>
 	public float scale;
+
+	/// <summary>Transparency (4 bytes float) at offset 0x8C</summary>
 	public float transparent;
+
+	/// <summary>Show helm flag (1 byte bool) at offset 0x90</summary>
 	[MarshalAs(UnmanagedType.U1)]
 	public bool showHelm;
+
+	/// <summary>Character color (3 bytes RGB) at offset 0x91</summary>
 	public COLOR color;
+
+	/// <summary>Skin color type (1 byte) at offset 0x94</summary>
 	public byte skinColorType;
+
+	/// <summary>Hair color type (1 byte) at offset 0x95</summary>
 	public byte hairColorType;
+
+	/// <summary>Eye color type (1 byte) at offset 0x96</summary>
 	public byte eyeColorType;
+
+	/// <summary>Eyebrow color type (1 byte) at offset 0x97</summary>
 	public byte eyeBrowColorType;
 }
 
@@ -196,6 +257,7 @@ public class ModAppearance
 		return new APPEARANCE_PC_KR()
 		{
 			name = nameBytes,
+			_padding1 = new byte[2],
 			raceTypeID = raceTypeID,
 			lifeJobTypeID = lifeJobTypeID,
 			combatJobTypeID = combatJobTypeID,
@@ -206,8 +268,10 @@ public class ModAppearance
 			earType = earType,
 			playingJobClass = playingJobClass,
 			underwearType = underwearType,
+			_padding2 = new byte[2],
 			equiped = equiped?.AsArray() ?? new int[20],
 			familyNameType = familyNameType,
+			_padding3 = new byte[3],
 			action = action,
 			actionStartTick = actionStartTick,
 			scale = scale,

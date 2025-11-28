@@ -69,9 +69,20 @@ CancellationTokenSource ct = new();
 _ = server.Run(ct.Token);
 
 Logger.Log("==== [Server is now running, press Q to quit gracefully] ====", LogLevel.Information);
-while (Console.ReadKey().KeyChar.ToString().ToLower() != "q")
+
+// Handle both interactive console and background/service mode
+if (Console.IsInputRedirected || !Environment.UserInteractive)
 {
-	await Task.Delay(1000);
+	// Running in background/service mode - wait indefinitely
+	await Task.Delay(Timeout.Infinite, ct.Token);
+}
+else
+{
+	// Running interactively - wait for Q key
+	while (Console.ReadKey(true).KeyChar.ToString().ToLower() != "q")
+	{
+		await Task.Delay(100);
+	}
 }
 server.Stop();
 ct.Cancel();

@@ -18,6 +18,17 @@ public class MongoDBService : IDatabase
     private static MongoDBService? _instance;
     public static MongoDBService Instance => _instance ??= new MongoDBService();
 
+    /// <summary>
+    /// Gets a collection by name for custom document types.
+    /// </summary>
+    /// <typeparam name="T">Document type.</typeparam>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <returns>MongoDB collection.</returns>
+    public IMongoCollection<T> GetCollection<T>(string collectionName)
+    {
+        return _database.GetCollection<T>(collectionName);
+    }
+
     public MongoDBService(string connectionString = "mongodb://172.22.0.1:27017", string databaseName = "lime_odyssey")
     {
         var client = new MongoClient(connectionString);
@@ -713,6 +724,7 @@ public class PlayerDocument
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
+    [BsonIgnoreIfNull]
     public string? Id { get; set; }
 
     [BsonElement("accountId")]

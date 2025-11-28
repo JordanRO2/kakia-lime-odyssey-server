@@ -224,9 +224,43 @@ public static class QuestInfo
 				Logger.Log($"[QUEST] Loaded {questRoot.Quests.Count} quests from {Path.GetFileName(filePath)}", LogLevel.Debug);
 			}
 		}
+		catch (InvalidOperationException ex) when (ex.InnerException != null)
+		{
+			// XML deserialization wraps actual XML errors in InvalidOperationException
+			Logger.Log($"[QUEST] XML parse error in {Path.GetFileName(filePath)}: {ex.InnerException.Message}", LogLevel.Error);
+
+			// Try to extract line content for debugging
+			try
+			{
+				var lines = File.ReadAllLines(filePath, Encoding.GetEncoding("EUC-KR"));
+				if (ex.Message.Contains("(") && ex.Message.Contains(")"))
+				{
+					// Parse "(line, col)" from message
+					int start = ex.Message.IndexOf('(');
+					int comma = ex.Message.IndexOf(',', start);
+					int end = ex.Message.IndexOf(')', comma);
+					if (start > 0 && comma > start && end > comma)
+					{
+						if (int.TryParse(ex.Message.Substring(start + 1, comma - start - 1).Trim(), out int lineNum) && lineNum > 0 && lineNum <= lines.Length)
+						{
+							string problemLine = lines[lineNum - 1];
+							Logger.Log($"[QUEST] Problem at line {lineNum}: {problemLine.Substring(0, Math.Min(200, problemLine.Length))}", LogLevel.Error);
+						}
+					}
+				}
+			}
+			catch
+			{
+				// Ignore errors reading the file for debug output
+			}
+		}
 		catch (Exception ex)
 		{
 			Logger.Log($"[QUEST] Error loading quest file {filePath}: {ex.Message}", LogLevel.Error);
+			if (ex.InnerException != null)
+			{
+				Logger.Log($"[QUEST] Inner exception: {ex.InnerException.Message}", LogLevel.Error);
+			}
 		}
 
 		return quests;

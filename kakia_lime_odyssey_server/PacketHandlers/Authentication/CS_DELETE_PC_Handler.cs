@@ -59,7 +59,7 @@ class CS_DELETE_PC_Handler : PacketHandler
 
 			using PacketWriter pw = new();
 			pw.Write(response);
-			pc.Send(pw.ToSizedPacket(), default).Wait();
+			pc.Send(pw.ToPacket(), default).Wait();
 		}
 		else
 		{

@@ -172,27 +172,34 @@ public class ZoneTransferService
 	/// <summary>
 	/// Initializes default zone definitions.
 	/// </summary>
+	/// <remarks>
+	/// Coordinates sourced from MapTargetInfo.xml:
+	/// - worldIndex=1 = Muris Village area (worldMapTypeId=0)
+	/// - Guild positions: x=-545 to -575, y=-3858 to -3867, z=~495
+	/// </remarks>
 	private void InitializeDefaultZones()
 	{
-		// Starting zone
+		// Starting zone - Muris Village (from MapTargetInfo.xml worldIndex=1)
+		// Combat Guild NPC position: posX="-545" posY="-3867" posZ="495.80"
 		RegisterZone(new ZoneDefinition
 		{
 			ZoneTypeId = 1,
 			Name = "Muris Village",
-			DefaultSpawn = new FPOS { x = 7490.0f, y = 175.0f, z = 8960.0f },
-			ResurrectionSpawn = new FPOS { x = 7490.0f, y = 175.0f, z = 8960.0f },
+			DefaultSpawn = new FPOS { x = -545.0f, y = -3867.0f, z = 495.80f },
+			ResurrectionSpawn = new FPOS { x = -575.0f, y = -3858.0f, z = 495.80f },
 			MinLevel = 1,
 			IsSafeZone = true,
 			AllowMounts = true
 		});
 
-		// Field zone
+		// Field zone - Near village outskirts
+		// From MapTargetInfo: various monster spawn areas around -1500 to -3000 range
 		RegisterZone(new ZoneDefinition
 		{
 			ZoneTypeId = 2,
 			Name = "Muris Fields",
-			DefaultSpawn = new FPOS { x = 7000.0f, y = 150.0f, z = 8000.0f },
-			ResurrectionSpawn = new FPOS { x = 7490.0f, y = 175.0f, z = 8960.0f },
+			DefaultSpawn = new FPOS { x = -1560.0f, y = -3294.0f, z = 273.54f },
+			ResurrectionSpawn = new FPOS { x = -545.0f, y = -3867.0f, z = 495.80f },
 			MinLevel = 1,
 			AllowMounts = true
 		});
@@ -233,9 +240,9 @@ public class ZoneTransferService
 		{
 			Name = "To Muris Fields",
 			SourceZoneId = 1,
-			Position = new FPOS { x = 7600.0f, y = 175.0f, z = 9100.0f },
+			Position = new FPOS { x = -700.0f, y = -3586.0f, z = 520.0f },
 			TargetZoneId = 2,
-			TargetPosition = new FPOS { x = 7000.0f, y = 150.0f, z = 8000.0f },
+			TargetPosition = new FPOS { x = -1560.0f, y = -3294.0f, z = 273.54f },
 			IsBidirectional = true
 		});
 
@@ -244,9 +251,9 @@ public class ZoneTransferService
 		{
 			Name = "To Muris Village",
 			SourceZoneId = 2,
-			Position = new FPOS { x = 7000.0f, y = 150.0f, z = 8100.0f },
+			Position = new FPOS { x = -1560.0f, y = -3294.0f, z = 280.0f },
 			TargetZoneId = 1,
-			TargetPosition = new FPOS { x = 7490.0f, y = 175.0f, z = 8960.0f },
+			TargetPosition = new FPOS { x = -545.0f, y = -3867.0f, z = 495.80f },
 			IsBidirectional = true
 		});
 
@@ -316,7 +323,8 @@ public class ZoneTransferService
 			return zone.DefaultSpawn;
 		}
 		// Default fallback spawn
-		return new FPOS { x = 7490.0f, y = 175.0f, z = 8960.0f };
+		// Fallback to Muris Village spawn (from MapTargetInfo.xml)
+		return new FPOS { x = -545.0f, y = -3867.0f, z = 495.80f };
 	}
 
 	/// <summary>
